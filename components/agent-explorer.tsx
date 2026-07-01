@@ -1,10 +1,12 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { AgentGrid } from "@/components/agent-grid"
+import { SkillInstallGuide } from "@/components/skill-install-guide"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
 import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
+import { AnimatedNumber } from "@/components/ui/animated-number"
 import { cn } from "@/lib/utils"
 
 type SortKey = "jobs" | "rating" | "bond"
@@ -19,6 +21,27 @@ interface Props {
 export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
   const [skillFilter, setSkillFilter] = useState<string | null>(null)
   const [sort, setSort] = useState<SortKey>("jobs")
+
+  // Live-poll chain block so the "Chain Block" stat ticks in real time.
+  const [liveBlock, setLiveBlock] = useState<bigint | null>(chainInfo?.block ?? null)
+  useEffect(() => {
+    let active = true
+    const poll = async () => {
+      try {
+        const res = await fetch("/api/stats", { cache: "no-store" })
+        if (!res.ok) return
+        const data = await res.json()
+        if (active && data?.block) setLiveBlock(BigInt(data.block))
+      } catch {
+        /* keep last known value on transient RPC errors */
+      }
+    }
+    const id = setInterval(poll, 12000)
+    return () => {
+      active = false
+      clearInterval(id)
+    }
+  }, [])
 
   const totalBond = agents.reduce((sum, a) => sum + a.bondAmount, BigInt(0))
   const totalJobs = agents.reduce((sum, a) => sum + a.jobCount, 0)
@@ -44,11 +67,15 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
     return [...jobs].sort((a, b) => order[a.status] - order[b.status]).slice(0, 8)
   }, [jobs])
 
+  const blockNum = liveBlock != null ? Number(liveBlock) : chainInfo ? Number(chainInfo.block) : 0
+  const hasBlock = liveBlock != null || chainInfo != null
+  const bondRitual = Number(totalBond) / 1e18
+
   const stats = [
-    { label: "Active Agents", value: String(agents.length), icon: Bot, tone: "primary" as const },
-    { label: "Jobs Executed", value: totalJobs.toLocaleString(), icon: Wifi, tone: "green" as const },
-    { label: "Total Bond", value: `${(Number(totalBond) / 1e18).toFixed(1)} RITUAL`, icon: Activity, tone: "yellow" as const },
-    { label: "Chain Block", value: chainInfo ? Number(chainInfo.block).toLocaleString() : "—", icon: Boxes, tone: "blue" as const },
+    { label: "Active Agents", value: agents.length, decimals: 0, suffix: "", icon: Bot, tone: "primary" as const },
+    { label: "Jobs Executed", value: totalJobs, decimals: 0, suffix: "", icon: Wifi, tone: "green" as const },
+    { label: "Total Bond", value: bondRitual, decimals: 1, suffix: " RITUAL", icon: Activity, tone: "yellow" as const },
+    { label: "Chain Block", value: blockNum, decimals: 0, suffix: "", icon: Boxes, tone: "blue" as const, live: hasBlock },
   ]
 
   return (
@@ -95,8 +122,22 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                     <Icon className="h-5 w-5" />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-xl font-bold tabular-nums">{s.value}</p>
-                    <p className="text-xs text-muted-foreground">{s.label}</p>
+                    <p className="truncate text-xl font-bold tabular-nums">
+                      {s.live === false && s.label === "Chain Block" ? (
+                        "—"
+                      ) : (
+                        <AnimatedNumber value={s.value} decimals={s.decimals} suffix={s.suffix} />
+                      )}
+                    </p>
+                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      {s.label}
+                      {s.live && (
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
+                        </span>
+                      )}
+                    </p>
                   </div>
                 </CardContent>
               </Card>
@@ -197,6 +238,11 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
               </CardContent>
             </Card>
           </aside>
+        </div>
+
+        {/* Tutorial: install skill */}
+        <div className="mt-6">
+          <SkillInstallGuide />
         </div>
       </section>
     </div>
