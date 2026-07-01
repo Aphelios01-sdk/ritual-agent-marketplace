@@ -10,7 +10,7 @@ import {
   type AgentInfo,
 } from "@/lib/constants"
 import { fetchAgents } from "@/lib/onchain"
-import { formatRitual, formatRating, truncateAddress, getSkillBadgeColor, countSkillsByType } from "@/lib/utils"
+import { formatRitual, formatRating, truncateAddress, getSkillBadgeColor } from "@/lib/utils"
 
 export const dynamic = "force-dynamic"
 
@@ -55,7 +55,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
   const completed = MOCK_JOB_REQUESTS.filter((j) => j.status === "COMPLETED")
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto max-w-[1400px] px-4 py-8 md:py-12">
       <Button variant="ghost" size="sm" className="mb-4 gap-2" asChild>
         <Link href="/"><ArrowLeft className="h-4 w-4" /> Back</Link>
       </Button>
@@ -63,7 +63,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Agent Profile */}
         <div className="lg:col-span-2">
-          <Card>
+          <Card className="surface-card border-border/60">
             <CardContent className="p-6">
               <div className="mb-6 flex items-start justify-between">
                 <div>
@@ -139,7 +139,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
         {/* Activity sidebar */}
         <div className="space-y-4">
           {/* Incoming Jobs */}
-          <Card>
+          <Card className="surface-card border-border/60">
             <CardContent className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <Clock className="h-4 w-4 text-yellow-500" />
@@ -166,7 +166,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
           </Card>
 
           {/* Active Jobs */}
-          <Card>
+          <Card className="surface-card border-border/60">
             <CardContent className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <Cpu className="h-4 w-4 text-blue-500" />
@@ -193,7 +193,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
           </Card>
 
           {/* Completed */}
-          <Card>
+          <Card className="surface-card border-border/60">
             <CardContent className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />

@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { ChevronDown, BookOpen, Check, Copy, Terminal } from "lucide-react"
+import { CodeBlock } from "@/components/ui/code-block"
+import { ChevronDown, BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface Step {
@@ -13,39 +14,6 @@ interface Step {
 const PRECOMPILE_HTTP = "0x0000000000000000000000000000000000000801"
 const PRECOMPILE_LLM = "0x0000000000000000000000000000000000000802"
 const REGISTRY = "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5"
-
-function CodeBlock({ code, lang = "ts" }: { code: string; lang?: string }) {
-  const [copied, setCopied] = useState(false)
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(code)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1500)
-    } catch {
-      /* clipboard unavailable */
-    }
-  }
-  return (
-    <div className="group relative mt-2 overflow-hidden rounded-lg border border-border bg-muted/40">
-      <div className="flex items-center justify-between border-b border-border px-3 py-1.5">
-        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          <Terminal className="h-3 w-3" />
-          {lang}
-        </span>
-        <button
-          onClick={copy}
-          className="flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground"
-        >
-          {copied ? <Check className="h-3 w-3 text-green-500" /> : <Copy className="h-3 w-3" />}
-          {copied ? "Copied" : "Copy"}
-        </button>
-      </div>
-      <pre className="overflow-x-auto p-3 text-xs leading-relaxed">
-        <code className="font-mono text-foreground">{code}</code>
-      </pre>
-    </div>
-  )
-}
 
 export function SkillInstallGuide() {
   const [open, setOpen] = useState(false)

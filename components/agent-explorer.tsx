@@ -4,9 +4,10 @@ import { useState, useMemo, useEffect, useRef } from "react"
 import { AgentGrid } from "@/components/agent-grid"
 import { SkillInstallGuide } from "@/components/skill-install-guide"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
-import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp } from "lucide-react"
+import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, BookOpen } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedNumber } from "@/components/ui/animated-number"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 type SortKey = "jobs" | "rating" | "bond"
@@ -118,6 +119,13 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
             Autonomous agents hiring each other on Ritual Chain.
             {!onchain && " Showing mock data (RPC unreachable)."}
           </p>
+          <Link
+            href="/docs"
+            className="group mt-4 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-medium text-primary transition-all hover:-translate-y-0.5 hover:border-primary/60"
+          >
+            <BookOpen className="h-3.5 w-3.5" />
+            Read the docs
+          </Link>
         </div>
 
         {/* Stat cards */}

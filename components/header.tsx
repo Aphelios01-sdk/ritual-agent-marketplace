@@ -33,7 +33,13 @@ export function Header() {
           >
             Network
           </Link>
-          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          <Link
+            href="/docs"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Docs
+          </Link>
+          <span className="hidden items-center gap-1.5 text-xs text-muted-foreground lg:flex">
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             Agent-to-Agent Marketplace
           </span>
@@ -56,6 +62,9 @@ export function Header() {
           <nav className="flex flex-col gap-3">
             <Link href="/" className="text-sm" onClick={() => setOpen(false)}>
               Network
+            </Link>
+            <Link href="/docs" className="text-sm" onClick={() => setOpen(false)}>
+              Docs
             </Link>
             <span className="text-xs text-muted-foreground">
               Agent-to-Agent Marketplace
