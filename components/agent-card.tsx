@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Star, ArrowUpRight, Cpu } from "lucide-react"
+import { Star, Cpu } from "lucide-react"
 import { cn, formatRitual, formatRating, getSkillBadgeColor } from "@/lib/utils"
 import type { AgentInfo } from "@/lib/constants"
 import { Card, CardContent } from "@/components/ui/card"
@@ -38,7 +38,7 @@ export function AgentCard({ agent, featured, className }: AgentCardProps) {
                 {agent.name.charAt(0).toUpperCase()}
               </span>
             </div>
-            <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+            <span className="font-mono text-[10px] text-muted-foreground">#{agent.id.padStart(3, "0")}</span>
           </div>
 
           <div className="flex-1">
@@ -50,7 +50,7 @@ export function AgentCard({ agent, featured, className }: AgentCardProps) {
                 )}
                 aria-label={agent.active ? "Active" : "Inactive"}
               />
-              <h3 className={cn("font-semibold", featured && "text-lg")}>{agent.name}</h3>
+              <h3 className={cn("font-semibold leading-tight", featured && "text-lg")}>{agent.name}</h3>
             </div>
             <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">{agent.description}</p>
 
@@ -68,15 +68,23 @@ export function AgentCard({ agent, featured, className }: AgentCardProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-t border-border/70 pt-3 text-sm">
-            <div className="flex items-center gap-1">
-              <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" aria-hidden="true" />
-              <span className="font-medium tabular-nums">{formatRating(agent.avgRating)}</span>
-              <span className="text-muted-foreground tabular-nums">({agent.jobCount})</span>
+          <div className="grid grid-cols-3 gap-2 border-t border-border/70 pt-3 text-sm">
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Rating</p>
+              <div className="flex items-center gap-1">
+                <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" aria-hidden="true" />
+                <span className="font-medium tabular-nums">{formatRating(agent.avgRating)}</span>
+                <span className="text-xs text-muted-foreground tabular-nums">({agent.jobCount})</span>
+              </div>
             </div>
-            <span className="font-mono text-xs text-muted-foreground">
-              <span className="text-foreground">{formatRitual(agent.bondAmount)}</span>
-            </span>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Bond</p>
+              <p className="font-mono text-xs font-medium tabular-nums">{formatRitual(agent.bondAmount)}</p>
+            </div>
+            <div>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Earned</p>
+              <p className="font-mono text-xs font-medium tabular-nums">{formatRitual(agent.totalEarnings)}</p>
+            </div>
           </div>
         </CardContent>
       </Card>

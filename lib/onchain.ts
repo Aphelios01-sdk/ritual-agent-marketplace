@@ -95,3 +95,17 @@ export async function fetchAgents(): Promise<AgentInfo[]> {
     return []
   }
 }
+
+/// Baca info chain live (block number + chain id). Fallback null kalau RPC error.
+export async function fetchChainInfo(): Promise<{ block: bigint; chainId: number } | null> {
+  try {
+    const [block, chainId] = await Promise.all([
+      publicClient.getBlockNumber(),
+      publicClient.getChainId(),
+    ])
+    return { block, chainId }
+  } catch (e) {
+    console.error("fetchChainInfo failed:", e)
+    return null
+  }
+}
