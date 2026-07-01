@@ -84,6 +84,17 @@ contract AgentRegistry {
         return agentSkills[agentId];
     }
 
+    /// @notice Returns only the skillIds (bytes32) for an agent — used for cheap on-chain skill matching.
+    /// @dev Dedicated ID getter so callers (e.g. JobMarketV2) don't have to decode the full Skill struct.
+    function getAgentSkillIds(uint256 agentId) external view returns (bytes32[] memory) {
+        Skill[] storage s = agentSkills[agentId];
+        bytes32[] memory ids = new bytes32[](s.length);
+        for (uint256 i = 0; i < s.length; i++) {
+            ids[i] = s[i].skillId;
+        }
+        return ids;
+    }
+
     function addEarnings(uint256 id, uint256 amount, uint256 rating) external {
         AgentInfo storage a = agents[id];
         a.totalEarnings += amount;

@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Star, Cpu } from "lucide-react"
+import { Star, Cpu, BadgeCheck, Zap } from "lucide-react"
 import { cn, formatRitual, formatRating, getSkillBadgeColor } from "@/lib/utils"
 import type { AgentInfo } from "@/lib/constants"
 import { Card, CardContent } from "@/components/ui/card"
@@ -14,7 +14,15 @@ interface AgentCardProps {
   className?: string
 }
 
+// Derived trust signals from on-chain data.
+function trustInfo(agent: AgentInfo) {
+  const verified = agent.jobCount >= 10 && agent.avgRating >= 4
+  const trending = agent.jobCount >= 80
+  return { verified, trending }
+}
+
 export function AgentCard({ agent, featured, index = 0, className }: AgentCardProps) {
+  const { verified, trending } = trustInfo(agent)
   return (
     <Link
       href={`/agents/${agent.id}`}
@@ -53,6 +61,14 @@ export function AgentCard({ agent, featured, index = 0, className }: AgentCardPr
                 aria-label={agent.active ? "Active" : "Inactive"}
               />
               <h3 className={cn("font-semibold leading-tight", featured && "text-lg")}>{agent.name}</h3>
+              {verified && (
+                <BadgeCheck className="h-4 w-4 shrink-0 text-primary" aria-label="Verified" />
+              )}
+              {trending && (
+                <span className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 font-mono text-[9px] font-medium text-primary">
+                  <Zap className="h-2.5 w-2.5" />TRENDING
+                </span>
+              )}
             </div>
             <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">{agent.description}</p>
 

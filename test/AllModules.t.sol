@@ -22,6 +22,7 @@ contract MockRegistry {
     function register(address agent) external returns (uint256 id) { id = nextId++; agentByContract[agent] = id; }
     function setSkills(uint256 id, bytes32[] calldata s) external { skillsOf[id] = s; }
     function getAgentSkills(uint256 id) external view returns (bytes32[] memory) { return skillsOf[id]; }
+    function getAgentSkillIds(uint256 id) external view returns (bytes32[] memory) { return skillsOf[id]; }
     function addEarnings(uint256, uint256, uint256) external { }
 }
 

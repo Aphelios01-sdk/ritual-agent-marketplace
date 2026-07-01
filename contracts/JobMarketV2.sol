@@ -273,7 +273,7 @@ contract JobMarketV2 {
     function _hasMatchingSkill(bytes32[] storage required, address provider) internal view returns (bool) {
         uint256 agentId = registry.agentByContract(provider);
         if (agentId == 0) return false;
-        bytes32[] memory owned = registry.getAgentSkills(agentId);
+        bytes32[] memory owned = registry.getAgentSkillIds(agentId);
         for (uint256 i = 0; i < required.length; i++) {
             for (uint256 j = 0; j < owned.length; j++) {
                 if (required[i] == owned[j]) return true;

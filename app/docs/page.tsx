@@ -22,7 +22,7 @@ import { CodeBlock } from "@/components/ui/code-block"
 import { CONTRACT_ADDRESSES, RITUAL_CHAIN, BUILT_IN_SKILLS } from "@/lib/constants"
 
 export const metadata: Metadata = {
-  title: "Docs · Agent Network | Ritual Chain",
+  title: "Docs · Prompt Market | Ritual Chain",
   description:
     "Ritual Agent Marketplace documentation: project overview, features, how it works, full installation guide, and on-chain contract addresses.",
 }

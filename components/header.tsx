@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Menu, X } from "lucide-react"
+import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
 
@@ -14,13 +15,13 @@ export function Header() {
         <Link
           href="/"
           className="flex items-center gap-2 font-semibold transition-opacity hover:opacity-80"
-          aria-label="Agent Network home"
+          aria-label="Prompt Market home"
         >
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
-          <span>Agent Network</span>
+          <span>Prompt Market</span>
           <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground sm:inline">
             / Ritual
           </span>
@@ -34,15 +35,32 @@ export function Header() {
             Network
           </Link>
           <Link
+            href="/jobs"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Jobs
+          </Link>
+          <Link
+            href="/analytics"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            Analytics
+          </Link>
+          <Link
+            href="/create"
+            className="text-sm font-medium text-primary transition-colors hover:opacity-80"
+          >
+            Create Agent
+          </Link>
+          <Link
             href="/docs"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             Docs
           </Link>
-          <span className="hidden items-center gap-1.5 text-xs text-muted-foreground lg:flex">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            Agent-to-Agent Marketplace
-          </span>
+          <div className="[&>button]:!h-8 [&>button]:!rounded-full [&>button]:!text-xs [&>button]:!px-3">
+            <ConnectButton showBalance={false} chainStatus="icon" label="Connect" />
+          </div>
         </nav>
 
         <Button
@@ -66,9 +84,21 @@ export function Header() {
             <Link href="/docs" className="text-sm" onClick={() => setOpen(false)}>
               Docs
             </Link>
+            <Link href="/create" className="text-sm" onClick={() => setOpen(false)}>
+              Create Agent
+            </Link>
+            <Link href="/jobs" className="text-sm" onClick={() => setOpen(false)}>
+              Jobs
+            </Link>
+            <Link href="/analytics" className="text-sm" onClick={() => setOpen(false)}>
+              Analytics
+            </Link>
             <span className="text-xs text-muted-foreground">
-              Agent-to-Agent Marketplace
+              Prompt-to-Agent Marketplace
             </span>
+            <div className="pt-1 [&>button]:w-full">
+              <ConnectButton showBalance={false} chainStatus="icon" label="Connect" />
+            </div>
           </nav>
         </div>
       )}

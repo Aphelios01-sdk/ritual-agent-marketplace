@@ -4,13 +4,13 @@ import { useState, useMemo, useEffect, useRef } from "react"
 import { AgentGrid } from "@/components/agent-grid"
 import { SkillInstallGuide } from "@/components/skill-install-guide"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
-import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, BookOpen } from "lucide-react"
+import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, BookOpen, Search } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedNumber } from "@/components/ui/animated-number"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
-type SortKey = "jobs" | "rating" | "bond"
+type SortKey = "jobs" | "rating" | "bond" | "earnings"
 
 interface Props {
   agents: AgentInfo[]
@@ -22,6 +22,7 @@ interface Props {
 export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
   const [skillFilter, setSkillFilter] = useState<string | null>(null)
   const [sort, setSort] = useState<SortKey>("jobs")
+  const [query, setQuery] = useState("")
 
   // Live-poll the latest block every 4s so "Chain Block" reflects the chain head.
   const [liveBlock, setLiveBlock] = useState<bigint | null>(chainInfo?.block ?? null)
@@ -64,13 +65,23 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
   const skills = Array.from(skillMap, ([skillId, name]) => ({ skillId, name }))
 
   const filtered = useMemo(() => {
-    const base = skillFilter ? agents.filter((a) => a.skills.some((s) => s.skillId === skillFilter)) : agents
-    return [...base].sort((a, b) => {
+    const q = query.trim().toLowerCase()
+    const bySkill = skillFilter ? agents.filter((a) => a.skills.some((s) => s.skillId === skillFilter)) : agents
+    const byQuery = q
+      ? bySkill.filter(
+          (a) =>
+            a.name.toLowerCase().includes(q) ||
+            a.description.toLowerCase().includes(q) ||
+            a.skills.some((s) => s.name.toLowerCase().includes(q)),
+        )
+      : bySkill
+    return [...byQuery].sort((a, b) => {
       if (sort === "jobs") return b.jobCount - a.jobCount
       if (sort === "rating") return b.avgRating - a.avgRating
+      if (sort === "earnings") return Number(b.totalEarnings - a.totalEarnings)
       return Number(b.bondAmount - a.bondAmount)
     })
-  }, [agents, skillFilter, sort])
+  }, [agents, skillFilter, sort, query])
 
   // Activity feed: job terbaru, prioritaskan OPEN/IN_PROGRESS dulu
   const activity = useMemo(() => {
@@ -113,10 +124,10 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
             )}
           </div>
           <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">
-            Agent Network
+            Prompt Market
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Autonomous agents hiring each other on Ritual Chain.
+            Autonomous agents hiring each other to run prompt-driven jobs on Ritual Chain.
             {!onchain && " Showing mock data (RPC unreachable)."}
           </p>
           <Link
@@ -192,9 +203,15 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
           <div className="min-w-0">
             <div className="mb-4 animate-fade-up" style={{ animationDelay: "420ms" }}>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Filter by skill
-                </span>
+                <div className="flex min-w-[200px] flex-1 items-center gap-1.5 rounded-lg border border-border bg-transparent px-2.5 py-1.5 focus-within:border-primary/40">
+                  <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search agents, skills…"
+                    className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+                  />
+                </div>
                 <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
                   <ArrowUpDown className="h-3.5 w-3.5" />
                   Sort
@@ -206,6 +223,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                     <option value="jobs">Most jobs</option>
                     <option value="rating">Top rated</option>
                     <option value="bond">Highest bond</option>
+                    <option value="earnings">Top earners</option>
                   </select>
                 </label>
               </div>

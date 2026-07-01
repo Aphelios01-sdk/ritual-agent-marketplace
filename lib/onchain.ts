@@ -1,6 +1,7 @@
 import { createPublicClient, http, type Address } from "viem"
-import { RITUAL_CHAIN, type AgentInfo, type SkillDefinition } from "./constants"
+import { RITUAL_CHAIN, type AgentInfo, type SkillDefinition, type JobStatus } from "./constants"
 import { AGENT_REGISTRY_ABI } from "./contract-abi"
+import { JOB_MARKET_V2_ABI } from "./contract-abi-v2"
 
 // Public client to read on-chain state (without a wagmi provider)
 export const publicClient = createPublicClient({
@@ -107,5 +108,79 @@ export async function fetchChainInfo(): Promise<{ block: bigint; chainId: number
   } catch (e) {
     console.error("fetchChainInfo failed:", e)
     return null
+  }
+}
+
+// On-chain JobStatus enum order (must match JobMarketV2.JobStatus).
+const JOB_STATUS_ORDER: JobStatus[] = ["OPEN", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "DISPUTED", "REFUNDED", "CANCELLED"]
+
+export interface OnchainJob {
+  id: string
+  requester: `0x${string}`
+  provider: `0x${string}`
+  reward: bigint
+  bondRequired: bigint
+  status: JobStatus
+  statusRaw: number
+  deadline: bigint
+  taskData: string
+  resultData: string
+}
+
+const JOB_MARKET_V2 = CONTRACT_ADDRESSES.jobMarketV2 as Address
+
+function decodeBytesToText(hex: `0x${string}`): string {
+  if (!hex || hex === "0x") return ""
+  try {
+    const str = Buffer.from(hex.slice(2), "hex").toString("utf8")
+    // Heuristic: if it parses as JSON-ish or is mostly printable, return it
+    return str
+  } catch {
+    return hex
+  }
+}
+
+/// Read all jobs from JobMarketV2. Falls back to [] on RPC error.
+export async function fetchJobs(): Promise<OnchainJob[]> {
+  try {
+    const count = (await publicClient.readContract({
+      address: JOB_MARKET_V2,
+      abi: JOB_MARKET_V2_ABI,
+      functionName: "nextJobId",
+    })) as bigint
+
+    if (count === BigInt(0)) return []
+
+    const ids = Array.from({ length: Number(count) }, (_, i) => BigInt(i + 1))
+    const jobs: OnchainJob[] = []
+
+    for (const id of ids) {
+      const raw = (await publicClient.readContract({
+        address: JOB_MARKET_V2,
+        abi: JOB_MARKET_V2_ABI,
+        functionName: "jobs",
+        args: [id],
+      })) as readonly [
+        bigint, Address, `0x${string}`, bigint, bigint, number, Address, `0x${string}`, bigint, bigint, bigint
+      ]
+
+      const statusRaw = raw[5]
+      jobs.push({
+        id: id.toString(),
+        requester: raw[1],
+        provider: raw[6],
+        reward: raw[3],
+        bondRequired: raw[4],
+        status: JOB_STATUS_ORDER[statusRaw] ?? "OPEN",
+        statusRaw,
+        deadline: raw[8],
+        taskData: decodeBytesToText(raw[2]),
+        resultData: decodeBytesToText(raw[7]),
+      })
+    }
+    return jobs
+  } catch (e) {
+    console.error("fetchJobs failed:", e)
+    return []
   }
 }
