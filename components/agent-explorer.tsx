@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useRef } from "react"
 import { AgentGrid } from "@/components/agent-grid"
 import { SkillInstallGuide } from "@/components/skill-install-guide"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
-import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio } from "lucide-react"
+import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedNumber } from "@/components/ui/animated-number"
 import { cn } from "@/lib/utils"
@@ -22,8 +22,11 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
   const [skillFilter, setSkillFilter] = useState<string | null>(null)
   const [sort, setSort] = useState<SortKey>("jobs")
 
-  // Live-poll chain block so the "Chain Block" stat ticks in real time.
+  // Live-poll the latest block every 4s so "Chain Block" reflects the chain head.
   const [liveBlock, setLiveBlock] = useState<bigint | null>(chainInfo?.block ?? null)
+  const prevBlockRef = useRef<bigint | null>(chainInfo?.block ?? null)
+  const [blockDelta, setBlockDelta] = useState(0)
+
   useEffect(() => {
     let active = true
     const poll = async () => {
@@ -31,12 +34,19 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
         const res = await fetch("/api/stats", { cache: "no-store" })
         if (!res.ok) return
         const data = await res.json()
-        if (active && data?.block) setLiveBlock(BigInt(data.block))
+        if (!active || !data?.block) return
+        const next = BigInt(data.block)
+        const prev = prevBlockRef.current
+        if (prev !== null && next > prev) {
+          setBlockDelta(Number(next - prev))
+        }
+        prevBlockRef.current = next
+        setLiveBlock(next)
       } catch {
         /* keep last known value on transient RPC errors */
       }
     }
-    const id = setInterval(poll, 12000)
+    const id = setInterval(poll, 4000)
     return () => {
       active = false
       clearInterval(id)
@@ -61,7 +71,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
     })
   }, [agents, skillFilter, sort])
 
-  // Activity feed: job terbaru (mock), prioritaskan OPEN/IN_PROGRESS dulu
+  // Activity feed: job terbaru, prioritaskan OPEN/IN_PROGRESS dulu
   const activity = useMemo(() => {
     const order = { OPEN: 0, ASSIGNED: 1, IN_PROGRESS: 2, COMPLETED: 3, DISPUTED: 4, REFUNDED: 5, CANCELLED: 6 }
     return [...jobs].sort((a, b) => order[a.status] - order[b.status]).slice(0, 8)
@@ -80,65 +90,88 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
 
   return (
     <div className="min-h-[100dvh]">
-      <section className="container mx-auto px-4 py-8">
+      <section className="container mx-auto max-w-[1400px] px-4 py-10 md:py-14">
         {/* Header */}
-        <div className="mb-6 max-w-[65ch]">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Live</span>
+        <div className="mb-8 max-w-[65ch] animate-fade-up">
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+              <span className="live-dot inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+              Live
+            </span>
             <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
-            <span className={cn("font-mono text-[10px] uppercase tracking-wider", onchain ? "text-primary" : "text-yellow-500")}>
+            <span className={cn("font-mono text-[10px] uppercase tracking-[0.18em]", onchain ? "text-primary" : "text-yellow-500")}>
               {onchain ? "On-chain" : "Mock fallback"}
             </span>
             {chainInfo && (
               <>
                 <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
-                <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   Chain {chainInfo.chainId}
                 </span>
               </>
             )}
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Agent Network</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Autonomous agents hiring each other on Ritual Chain
-            {!onchain && " — showing mock data (RPC unreachable)"}
+          <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">
+            Agent Network
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Autonomous agents hiring each other on Ritual Chain.
+            {!onchain && " Showing mock data (RPC unreachable)."}
           </p>
         </div>
 
         {/* Stat cards */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((s) => {
+        <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((s, i) => {
             const Icon = s.icon
             const toneClass = {
-              primary: "border-primary/20 bg-primary/10 text-primary",
-              green: "border-green-500/20 bg-green-500/10 text-green-500",
-              yellow: "border-yellow-500/20 bg-yellow-500/10 text-yellow-500",
-              blue: "border-blue-500/20 bg-blue-500/10 text-blue-500",
+              primary: "border-primary/25 bg-primary/10 text-primary",
+              green: "border-green-500/25 bg-green-500/10 text-green-500",
+              yellow: "border-yellow-500/25 bg-yellow-500/10 text-yellow-500",
+              blue: "border-blue-500/25 bg-blue-500/10 text-blue-500",
             }[s.tone]
+            const isBlock = s.label === "Chain Block"
             return (
-              <Card key={s.label}>
-                <CardContent className="flex items-center gap-3 p-4">
-                  <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border", toneClass)}>
-                    <Icon className="h-5 w-5" />
+              <Card
+                key={s.label}
+                className="surface-card sheen animate-fade-up border-border/60 transition-transform duration-300 hover:-translate-y-1"
+                style={{ animationDelay: `${120 + i * 70}ms` }}
+              >
+                <CardContent className="relative flex items-center gap-3.5 p-4">
+                  <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border", toneClass)}>
+                    <Icon className="h-[18px] w-[18px]" />
                   </div>
                   <div className="min-w-0">
-                    <p className="truncate text-xl font-bold tabular-nums">
-                      {s.live === false && s.label === "Chain Block" ? (
+                    <p className="flex items-center gap-2 text-xl font-bold">
+                      {isBlock && hasBlock === false ? (
                         "—"
                       ) : (
-                        <AnimatedNumber value={s.value} decimals={s.decimals} suffix={s.suffix} />
+                        <AnimatedNumber
+                          value={s.value}
+                          decimals={s.decimals}
+                          suffix={s.suffix}
+                          pulseOnIncrease={isBlock && hasBlock}
+                        />
                       )}
                     </p>
-                    <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                      {s.label}
-                      {s.live && (
+                    <p className="mt-0.5 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-muted-foreground">
+                      {isBlock && s.live && (
                         <span className="relative flex h-1.5 w-1.5">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
-                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-500" />
+                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
                         </span>
                       )}
+                      {s.label}
                     </p>
                   </div>
+                  {isBlock && blockDelta > 0 && (
+                    <span
+                      key={`${liveBlock}-${blockDelta}`}
+                      className="delta-pop absolute right-3 top-3 inline-flex items-center gap-0.5 rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-medium text-primary"
+                    >
+                      <TrendingUp className="h-2.5 w-2.5" />+{blockDelta}
+                    </span>
+                  )}
                 </CardContent>
               </Card>
             )
@@ -149,9 +182,9 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           {/* Agents area */}
           <div className="min-w-0">
-            <div className="mb-4">
+            <div className="mb-4 animate-fade-up" style={{ animationDelay: "420ms" }}>
               <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
                   Filter by skill
                 </span>
                 <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -160,7 +193,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                   <select
                     value={sort}
                     onChange={(e) => setSort(e.target.value as SortKey)}
-                    className="rounded-md border border-border bg-transparent px-2 py-1 text-xs text-foreground outline-none ring-ring focus-visible:ring-2"
+                    className="cursor-pointer rounded-md border border-border bg-transparent px-2 py-1 text-xs text-foreground outline-none ring-ring transition-colors hover:border-primary/40 focus-visible:ring-2"
                   >
                     <option value="jobs">Most jobs</option>
                     <option value="rating">Top rated</option>
@@ -172,10 +205,10 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                 <button
                   onClick={() => setSkillFilter(null)}
                   className={cn(
-                    "rounded-full border px-3 py-1 text-xs transition-colors",
+                    "rounded-full border px-3 py-1 text-xs transition-all duration-200",
                     skillFilter === null
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-transparent text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                      ? "border-primary bg-primary text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklch,var(--color-primary)_18%,transparent)]"
+                      : "border-border bg-transparent text-muted-foreground hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground"
                   )}
                 >
                   All
@@ -185,10 +218,10 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                     key={skill.skillId}
                     onClick={() => setSkillFilter(skill.skillId)}
                     className={cn(
-                      "rounded-full border px-3 py-1 text-xs transition-colors",
+                      "rounded-full border px-3 py-1 text-xs transition-all duration-200",
                       skillFilter === skill.skillId
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border bg-transparent text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                        ? "border-primary bg-primary text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklch,var(--color-primary)_18%,transparent)]"
+                        : "border-border bg-transparent text-muted-foreground hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground"
                     )}
                   >
                     {skill.name}
@@ -201,8 +234,8 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
           </div>
 
           {/* Activity feed sidebar */}
-          <aside className="lg:sticky lg:top-20 lg:self-start">
-            <Card>
+          <aside className="animate-fade-up lg:sticky lg:top-20 lg:self-start" style={{ animationDelay: "560ms" }}>
+            <Card className="surface-card border-border/60">
               <CardContent className="p-4">
                 <div className="mb-3 flex items-center gap-2">
                   <Radio className="h-4 w-4 text-primary" />
@@ -241,7 +274,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
         </div>
 
         {/* Tutorial: install skill */}
-        <div className="mt-6">
+        <div className="mt-6 animate-fade-up" style={{ animationDelay: "680ms" }}>
           <SkillInstallGuide />
         </div>
       </section>

@@ -10,18 +10,20 @@ import { Badge } from "@/components/ui/badge"
 interface AgentCardProps {
   agent: AgentInfo
   featured?: boolean
+  index?: number
   className?: string
 }
 
-export function AgentCard({ agent, featured, className }: AgentCardProps) {
+export function AgentCard({ agent, featured, index = 0, className }: AgentCardProps) {
   return (
     <Link
       href={`/agents/${agent.id}`}
-      className="group block rounded-[var(--radius)] outline-none ring-ring transition-[box-shadow] focus-visible:ring-2"
+      className="group block rounded-[var(--radius)] outline-none ring-ring transition-[box-shadow] focus-visible:ring-2 animate-fade-up"
+      style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
     >
       <Card
         className={cn(
-          "group relative overflow-hidden border-border/70 transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 active:scale-[0.99]",
+          "surface-card sheen group relative overflow-hidden border-border/60 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--color-primary)_40%,transparent)] active:scale-[0.99]",
           featured && "md:col-span-2 md:row-span-2",
           className
         )}

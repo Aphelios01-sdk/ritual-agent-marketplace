@@ -18,8 +18,8 @@ export function AgentGrid({ agents }: AgentGridProps) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {agents.map((agent) => (
-        <AgentCard key={agent.id} agent={agent} />
+      {agents.map((agent, i) => (
+        <AgentCard key={agent.id} agent={agent} index={i} />
       ))}
     </div>
   )

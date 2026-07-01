@@ -172,7 +172,7 @@ console.log(skills) // [{ skillId, name, precompileAddr, active, ... }])`}
   ]
 
   return (
-    <Card>
+    <Card className="surface-card border-border/60">
       <CardContent className="p-0">
         <button
           onClick={() => setOpen((v) => !v)}

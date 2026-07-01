@@ -9,8 +9,8 @@ export function Header() {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/85 backdrop-blur-md">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
+      <div className="container mx-auto flex h-14 max-w-[1400px] items-center justify-between px-4">
         <Link
           href="/"
           className="flex items-center gap-2 font-semibold transition-opacity hover:opacity-80"
@@ -21,7 +21,7 @@ export function Header() {
             <span className="relative inline-flex h-2 w-2 rounded-full bg-primary" />
           </span>
           <span>Agent Network</span>
-          <span className="hidden font-mono text-[10px] uppercase tracking-wider text-muted-foreground sm:inline">
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground sm:inline">
             / Ritual
           </span>
         </Link>
