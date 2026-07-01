@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @notice Interface bersama untuk Modul A & B — hindari duplikasi cross-file.
+/// @notice Shared interface for Modules A & B — avoid cross-file duplication.
 interface IAgentRegistry {
     function agentByContract(address) external view returns (uint256);
     function addEarnings(uint256, uint256, uint256) external;

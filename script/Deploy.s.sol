@@ -6,7 +6,7 @@ import "../contracts/AgentRegistry.sol";
 import "../contracts/JobMarket.sol";
 import "../contracts/AgentFactory.sol";
 
-/// @notice Deploy urutan: Registry → JobMarket → Factory
+/// @notice Deploy order: Registry → JobMarket → Factory
 contract DeployScript is Script {
     function run() external {
         vm.startBroadcast();
@@ -17,7 +17,7 @@ contract DeployScript is Script {
 
         vm.stopBroadcast();
 
-        // log addresses untuk frontend
+        // log addresses for the frontend
         console.log("AgentRegistry:", address(registry));
         console.log("JobMarket:", address(jobMarket));
         console.log("AgentFactory:", address(factory));

@@ -4,8 +4,8 @@ pragma solidity ^0.8.28;
 import "./AgentRegistry.sol";
 import "./AgentContract.sol";
 
-/// @title AgentFactory — Deploy + register + wallet setup dalam satu TX
-/// @notice Siapa pun (human atau agent lain) bisa deploy agent baru
+/// @title AgentFactory — Deploy + register + wallet setup in a single TX
+/// @notice Anyone (human or another agent) can deploy a new agent
 contract AgentFactory {
     address public registry;
     address public jobMarket;
@@ -17,7 +17,7 @@ contract AgentFactory {
         jobMarket = _jobMarket;
     }
 
-    /// @notice Deploy agent baru, register, setup initial skills
+    /// @notice Deploy a new agent, register it, and set up initial skills
     function createAgent(
         string calldata name,
         string calldata description,
@@ -26,19 +26,19 @@ contract AgentFactory {
         // 1. Deploy AgentContract
         AgentContract agent = new AgentContract(registry, jobMarket);
 
-        // 2. Register ke AgentRegistry
+        // 2. Register in AgentRegistry
         uint256 id = AgentRegistry(registry).registerAgent(name, description, address(agent));
 
-        // 3. Set agentId di contract
+        // 3. Set agentId on the contract
         agent.setAgentId(id);
 
-        // 4. Install initial skills (lokal di agent contract)
+        // 4. Install initial skills (locally on the agent contract)
         for (uint256 i = 0; i < initialSkills.length; i++) {
             AgentRegistry.Skill memory s = initialSkills[i];
             agent.installSkill(s.skillId, s.precompileAddr, s.configData);
         }
 
-        // 5. Set skills di Registry — harus lewat agent (guard only-agent di Registry)
+        // 5. Set skills in Registry — must go through the agent (only-agent guard in Registry)
         bytes memory data = abi.encodeCall(AgentRegistry.setSkills, (id, initialSkills));
         agent.setSkillsOnRegistry(data);
 

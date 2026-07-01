@@ -4,9 +4,9 @@ pragma solidity ^0.8.28;
 import "./interfaces.sol";
 
 /// @title AgentSubcontractor — Agent-to-agent recursive sub-contracting
-/// @notice Provider A dapat job dari JobMarketV2, tapi subcontract sebagian ke Agent B
-///         (sub-provider) dengan reward split. Bisa recursive (B subcontract lagi ke C).
-///         Anti-loop: MAX_DEPTH. Parent tetap bertanggung jawab ke requester (escrow di parent).
+/// @notice Provider A gets a job from JobMarketV2, but subcontracts part of it to Agent B
+///         (sub-provider) with a reward split. Can be recursive (B subcontracts again to C).
+///         Anti-loop: MAX_DEPTH. Parent stays responsible to the requester (escrow is in parent).
 interface IJobMarketV2Sub {
     function submitResult(uint256 jobId, bytes calldata) external;
 }
@@ -16,16 +16,16 @@ contract AgentSubcontractor {
     IJobMarketV2Sub public immutable jobMarket;
 
     uint256 public constant MAX_DEPTH = 3;
-    uint256 public constant PARENT_MARGIN_MIN_BPS = 500;   // parent minimal ambil 5% margin
+    uint256 public constant PARENT_MARGIN_MIN_BPS = 500;   // parent takes a minimum 5% margin
 
     struct Sub {
         uint256 id;
-        bytes32 parentJobId;       // jobId dari market (bytes32(uint256))
-        address parent;            // agent yang subcontract
+        bytes32 parentJobId;       // jobId from market (bytes32(uint256))
+        address parent;            // agent that subcontracts
         address child;             // sub-provider
         bytes32[] requiredSkillIds;
         bytes taskData;
-        uint256 reward;            // reward untuk child (<= parent reward)
+        uint256 reward;            // reward for child (<= parent reward)
         uint8 depth;
         Status status;
         bytes resultData;
@@ -53,7 +53,7 @@ contract AgentSubcontractor {
     }
 
     /// @notice Parent create sub-contract. rewardChild <= parentReward * (1 - margin).
-    /// @param depth 0 jika dari job market langsung; naik tiap level.
+    /// @param depth 0 if straight from the job market; increases per level.
     function createSub(
         bytes32 parentJobId,
         address child,
@@ -66,7 +66,7 @@ contract AgentSubcontractor {
         require(registry.agentByContract(child) != 0, "child not agent");
         require(depth <= MAX_DEPTH, "max depth");
         require(rewardChild > 0, "reward required");
-        // parent harus ambil margin minimal
+        // parent must take the minimum margin
         require(rewardChild + (parentReward * PARENT_MARGIN_MIN_BPS) / 10000 <= parentReward, "margin too thin");
         require(msg.value >= rewardChild, "escrow child reward");
 
@@ -98,8 +98,8 @@ contract AgentSubcontractor {
         emit SubAccepted(subId);
     }
 
-    /// @notice Child submit hasil. Escrow release ke child. Parent dapat sisa (margin).
-    /// @dev ponytail: parent reward (sisa) di-claim terpisah; di sini release child + result disimpan.
+    /// @notice Child submits the result. Escrow released to child. Parent gets the remainder (margin).
+    /// @dev ponytail: parent reward (remainder) is claimed separately; here the child is released + result is stored.
     function submitSubResult(uint256 subId, bytes calldata resultData) external onlyAgent {
         Sub storage s = subs[subId];
         require(s.status == Status.ACCEPTED, "not accepted");
@@ -111,7 +111,7 @@ contract AgentSubcontractor {
         emit SubCompleted(subId, resultData);
     }
 
-    /// @notice Parent batalkan sub OPEN (sebelum accept). Refund escrow.
+    /// @notice Parent cancels an OPEN sub (before accept). Refunds the escrow.
     function cancelSub(uint256 subId) external onlyAgent {
         Sub storage s = subs[subId];
         require(s.parent == msg.sender, "only parent");

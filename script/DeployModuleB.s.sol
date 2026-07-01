@@ -6,8 +6,8 @@ import "../contracts/AgentReputation.sol";
 import "../contracts/AgentDirectory.sol";
 import "../contracts/JobTemplates.sol";
 
-/// @notice Deploy Modul B: AgentReputation + AgentDirectory + JobTemplates.
-///         Reuse AgentRegistry. AgentDirectory butuh AgentReputation (wiring).
+/// @notice Deploy Module B: AgentReputation + AgentDirectory + JobTemplates.
+///         Reuse AgentRegistry. AgentDirectory needs AgentReputation (wiring).
 contract DeployModuleB is Script {
     address constant REGISTRY = 0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5;
 

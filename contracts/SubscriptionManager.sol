@@ -4,10 +4,10 @@ pragma solidity ^0.8.28;
 import "./interfaces.sol";
 
 /// @title SubscriptionManager — Recurring subscription job via Scheduler precompile
-/// @notice Client subscribe ke agent (periodik: tiap N block). Scheduler (0x56e7...) trigger
-///         execute → panggil agent. Auto-charge per period dari deposit. Cancel kapan saja.
-///         ponytail: Scheduler precompile call di-comment (butuh format khusus). Untuk demo,
-///         execute manual / oleh keeper off-chain. Hook execute siap.
+/// @notice Client subscribes to an agent (periodic: every N blocks). Scheduler (0x56e7...) triggers
+///         execute → calls the agent. Auto-charges per period from the deposit. Cancel anytime.
+///         ponytail: Scheduler precompile call is commented out (needs a specific format). For the demo,
+///         execute manually / by an off-chain keeper. The execute hook is ready.
 interface IAgentSubExec {
     function executeForSubscriber(bytes32 subId, bytes calldata payload) external;
 }
@@ -15,7 +15,7 @@ interface IAgentSubExec {
 contract SubscriptionManager {
     IAgentRegistry public immutable registry;
 
-    uint256 public constant MAX_PERIODS = 365;   // cap sub 1 tahun (period=1day-ish)
+    uint256 public constant MAX_PERIODS = 365;   // cap subscription at 1 year (period=1day-ish)
 
     struct Sub {
         bytes32 id;
@@ -24,8 +24,8 @@ contract SubscriptionManager {
         bytes32[] requiredSkillIds;
         bytes taskTemplate;     // payload per execution
         uint256 pricePerPeriod; // charge tiap period
-        uint256 periodBlocks;   // interval eksekusi
-        uint256 nextExecBlock;  // block eksekusi berikutnya
+        uint256 periodBlocks;   // execution interval
+        uint256 nextExecBlock;  // next execution block
         uint256 periodsLeft;
         uint256 deposit;        // sisa deposit (auto-decrement)
         bool active;
@@ -88,8 +88,8 @@ contract SubscriptionManager {
         emit ToppedUp(id, msg.value);
     }
 
-    /// @notice Execute satu period (dipanggil keeper/Scheduler/keeper agent). Charge deposit, pay agent.
-    /// @dev ponytail: hook ke agent execution (HTTP/LLM) off-chain. Di sini settle payment.
+    /// @notice Execute one period (called by keeper/Scheduler/keeper agent). Charges the deposit, pays the agent.
+    /// @dev ponytail: hook to agent execution (HTTP/LLM) off-chain. Payment is settled here.
     function execute(bytes32 id) external {
         Sub storage s = subs[id];
         require(s.active, "inactive");

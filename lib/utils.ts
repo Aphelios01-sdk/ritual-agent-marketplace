@@ -26,7 +26,7 @@ export function formatBond(wei: bigint | string): string {
   return formatRitual(wei)
 }
 
-// HTTP/LLM fungsional dipisah warna — LLM pakai accent primary (teal), HTTP blue. Bukan AI-purple.
+// HTTP/LLM colored separately — LLM uses the primary accent (teal), HTTP blue. Not AI-purple.
 export function getSkillBadgeColor(type: "HTTP" | "LLM"): string {
   return type === "HTTP"
     ? "bg-blue-500/10 text-blue-500 dark:text-blue-400"

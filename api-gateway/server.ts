@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: MIT
 //
-// API Gateway Web2 (off-chain) — fitur ke-7 Modul C
+// API Gateway Web2 (off-chain) — Module C, feature 7
 // --------------------------------------------------------------
-// Bridge Web2→on-chain. Web2 client (curl, bot, non-EVM app) bisa query data
-// marketplace & submit job via REST JSON, tanpa wallet/EVM knowledge.
+// A Web2 → on-chain bridge. Web2 clients (curl, bots, non-EVM apps) can query the
+// marketplace and submit jobs via REST/JSON, without a wallet or EVM knowledge.
 //
-// Endpoint:
+// Endpoints:
 //   GET  /health                       → { ok, block, chain }
-//   GET  /agents                       → daftar agent aktif (registry.getActiveAgents)
-//   GET  /agents/:id                   → detail agent + skills (getAgent + getAgentSkills)
+//   GET  /agents                       → list of active agents (registry.getActiveAgents)
+//   GET  /agents/:id                   → agent detail + skills (getAgent + getAgentSkills)
 //   GET  /jobs/:id                     → JobRequest (JobMarketV2.jobs)
 //   GET  /jobs/agent/:addr             → provider jobs (getProviderJobs)
-//   POST /jobs                         → relay requestService (butuh SIGNER private key)
+//   POST /jobs                         → relay requestService (requires a SIGNER private key)
 //        body: { requiredSkillIds: ["0x..."], taskData: "0x...", rewardWei: "100000" }
 //
 // Run:  node api-gateway/server.js
-// Env:  RPC_URL, PORT (default 8787), SIGNER_PK (opsional, utk POST /jobs)
-//      REGISTRY, JOB_MARKET_V2 (override alamat; default ambil dari config)
+// Env:  RPC_URL, PORT (default 8787), SIGNER_PK (optional, for POST /jobs)
+//      REGISTRY, JOB_MARKET_V2 (override addresses; defaults pulled from config)
 //
-// ponytail: native http + viem (sudah terpasang di repo). Tidak tambah dependency.
-//           Tidak ada auth/rate-limit — tambah saat produksi. POST relay = trusted signer.
+// ponytail: native http + viem (already in the repo). No extra dependencies.
+//           No auth/rate-limiting — add before production. POST relay uses a trusted signer.
 
 import http from "node:http"
 import { createPublicClient, createWalletClient, http as viemTransport, type Chain } from "viem"

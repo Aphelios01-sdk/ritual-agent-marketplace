@@ -4,9 +4,9 @@ pragma solidity ^0.8.28;
 import "./interfaces.sol";
 
 /// @title DisputeCouncil — Verifier staking + arbiter panel + appeal + bond
-/// @notice Verifier stake untuk jadi arbiter. Job dispute masuk → panel N arbiter vote.
-///         Appeal tier 2 kalau tidak puas (bond ganda). Verifier menang dapat fee, kalah diskors.
-///         JobMarketV2.dispute() bisa trigger createDispute (atau manual).
+/// @notice Verifiers stake to become arbiters. A job dispute enters → a panel of N arbiters votes.
+///         Tier-2 appeal if unsatisfied (double bond). Winning verifiers earn a fee, losers are suspended.
+///         JobMarketV2.dispute() can trigger createDispute (or manual).
 interface IAgentStakingExt {
     function slash(address, uint256, string calldata) external;
 }
@@ -18,9 +18,9 @@ contract DisputeCouncil {
     uint256 public constant MIN_VERIFIER_STAKE = 0.05 ether;
     uint256 public constant PANEL_SIZE = 3;
     uint256 public constant VOTE_WINDOW = 100;         // blocks
-    uint256 public constant VERIFIER_FEE_BPS = 100;    // 1% dari reward ke verifier menang
+    uint256 public constant VERIFIER_FEE_BPS = 100;    // 1% of reward to the winning verifier
     uint256 public constant APPEAL_BOND_MULT = 2;
-    uint256 public constant SLASH_LOSER_BPS = 2500;    // 25% stake provider kalah di-slash
+    uint256 public constant SLASH_LOSER_BPS = 2500;    // losing provider has 25% of stake slashed
 
     enum Verdict { NONE, FAVOR_CLIENT, FAVOR_PROVIDER }
     enum Status { NONE, VOTING, RESOLVED_CLIENT, RESOLVED_PROVIDER, APPEALED }
@@ -28,22 +28,22 @@ contract DisputeCouncil {
     struct Verifier {
         uint256 stake;
         uint256 resolvedCount;
-        uint256 correctCount;     // vote sesuai mayoritas
-        bool slashed;             // diskors
+        uint256 correctCount;     // voted with the majority
+        bool slashed;             // suspended
     }
 
     struct Dispute {
-        bytes32 jobId;            // id job (jobId kecil → bytes32(uint256(jobId)))
+        bytes32 jobId;            // job id (small jobId → bytes32(uint256(jobId)))
         address client;
         address provider;
-        uint256 reward;           // escrow amount sengketa
+        uint256 reward;           // disputed escrow amount
         Status status;
         Verdict verdict;
         uint256 voteDeadline;
         address[] panel;
         mapping(address => Verdict) votes;
-        mapping(address => uint256) votedRound;   // voter → round terakhir (reset vote tiap appeal)
-        uint256 round;            // naik tiap appeal → vote lama diabaikan
+        mapping(address => uint256) votedRound;   // voter → last round (resets vote each appeal)
+        uint256 round;            // increments each appeal → old votes are ignored
         uint256 favorClient;
         uint256 favorProvider;
         uint256 appealLevel;
@@ -84,16 +84,16 @@ contract DisputeCouncil {
         require(ok, "withdraw failed");
     }
 
-    /// @notice Pilih panel acak-ish (deterministic dari disputeId + pool). ponytail: produksi pakai VRF.
+    /// @notice Pick a random-ish panel (deterministic from disputeId + pool). ponytail: production should use VRF.
     function _pickPanel(uint256 disputeId) internal view returns (address[] memory) {
-        // ponytail: demo pakai fixed pseudo; perlu pool real dari event stake. Untuk sekarang
-        // return empty → voting terbuka ke semua verifier aktif (simpler). panel field kosong.
+        // ponytail: demo uses fixed pseudo; needs a real pool from stake events. For now
+        // return empty → voting is open to all active verifiers (simpler). panel field stays empty.
         return new address[](0);
     }
 
     // ── Dispute flow ──
 
-    /// @notice Raise dispute (client atau provider). reward = nilai sengketa (escrow).
+    /// @notice Raise a dispute (client or provider). reward = disputed amount (escrow).
     function raiseDispute(bytes32 jobId, address provider, uint256 reward) external returns (uint256) {
         uint256 id = ++nextDisputeId;
         Dispute storage d = disputes[id];
@@ -103,13 +103,13 @@ contract DisputeCouncil {
         d.reward = reward;
         d.status = Status.VOTING;
         d.voteDeadline = block.number + VOTE_WINDOW;
-        d.round = 1;   // round mulai 1 (votedRound default 0 → verifier baru boleh vote)
+        d.round = 1;   // round starts at 1 (votedRound defaults to 0 → new verifiers may vote)
         d.panel = _pickPanel(id);
         emit DisputeRaised(id, jobId, msg.sender, provider);
         return id;
     }
 
-    /// @notice Verifier vote (terbuka ke semua verifier staked aktif). Tiap appeal = round baru.
+    /// @notice Verifier votes (open to all active staked verifiers). Each appeal = a new round.
     function vote(uint256 disputeId, Verdict v) external {
         Dispute storage d = disputes[disputeId];
         require(d.status == Status.VOTING, "not voting");
@@ -126,7 +126,7 @@ contract DisputeCouncil {
         emit Voted(disputeId, msg.sender, v);
     }
 
-    /// @notice Resolve setelah vote window. Mayoritas menang. Slash pihak kalah.
+    /// @notice Resolve after the vote window. Majority wins. Slash the losing party.
     function resolve(uint256 disputeId) external {
         Dispute storage d = disputes[disputeId];
         require(d.status == Status.VOTING, "not voting");
@@ -137,7 +137,7 @@ contract DisputeCouncil {
 
         if (v == Verdict.FAVOR_CLIENT) {
             d.status = Status.RESOLVED_CLIENT;
-            // provider kalah: slash stake via staking
+            // losing provider: slash stake via staking
             try staking.slash(d.provider, SLASH_LOSER_BPS, "dispute lost") {} catch {}
         } else {
             d.status = Status.RESOLVED_PROVIDER;
@@ -145,7 +145,7 @@ contract DisputeCouncil {
         emit DisputeResolved(disputeId, v, d.status);
     }
 
-    /// @notice Appeal — double bond, level naik. Re-open voting: round baru reset vote semua verifier.
+    /// @notice Appeal — double bond, level increases. Re-opens voting: new round resets votes for all verifiers.
     function appeal(uint256 disputeId) external payable {
         Dispute storage d = disputes[disputeId];
         require(d.status == Status.RESOLVED_CLIENT || d.status == Status.RESOLVED_PROVIDER, "not resolved");
@@ -154,7 +154,7 @@ contract DisputeCouncil {
         require(msg.value >= bond, "appeal bond required");
 
         d.appealLevel++;
-        d.round++;                    // round baru → votedRound verifier lama tidak match → bisa vote lagi
+        d.round++;                    // new round → old verifiers' votedRound no longer matches → can vote again
         d.status = Status.VOTING;
         d.voteDeadline = block.number + VOTE_WINDOW;
         d.favorClient = 0;

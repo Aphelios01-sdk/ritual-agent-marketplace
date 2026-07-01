@@ -6,10 +6,10 @@ import "../contracts/AgentStaking.sol";
 import "../contracts/AgentHeartbeat.sol";
 import "../contracts/JobMarketV2.sol";
 
-/// @notice Deploy Modul A: AgentStaking + AgentHeartbeat + JobMarketV2.
-///         Reuse AgentRegistry yang sudah ada di chain.
+/// @notice Deploy Module A: AgentStaking + AgentHeartbeat + JobMarketV2.
+///         Reuse the AgentRegistry already on-chain.
 contract DeployModuleA is Script {
-    // Kontrak existing di chain 1979
+    // Existing contracts on chain 1979
     address constant REGISTRY = 0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5;
 
     function run() external {

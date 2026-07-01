@@ -5,9 +5,9 @@ import "./interfaces.sol";
 
 /// @title WebhookRegistry — On-chain webhook/callback registry
 /// @notice Agent/oracle register webhook target (contract address + function selector).
-///         Saat event tertentu (job completed, dispute resolved), JobMarket/oracle trigger
-///         callback ke target. Target harus implementasi IWebhookReceiver.
-///         ponytail: gas-limit callback dibatasi (low-level call, tidak revert parent).
+///         On certain events (job completed, dispute resolved), JobMarket/oracle triggers
+///         a callback to the target. The target must implement IWebhookReceiver.
+///         ponytail: gas-limited callback (low-level call, does not revert the parent).
 interface IWebhookReceiver {
     function onWebhook(bytes32 eventType, bytes calldata payload) external;
 }
@@ -16,14 +16,14 @@ contract WebhookRegistry {
     IAgentRegistry public immutable registry;
     address public owner;
     uint256 public constant MAX_WEBHOOKS_PER_AGENT = 50;
-    uint256 public constant MAX_TRIGGER_PER_EVENT = 20;   // cap loop trigger anti gas-grief
+    uint256 public constant MAX_TRIGGER_PER_EVENT = 20;   // cap trigger loop to prevent gas-griefing
 
-    mapping(address => bool) public authorized;   // keeper whitelist utk trigger
+    mapping(address => bool) public authorized;   // keeper whitelist for triggering
 
     struct Webhook {
         address target;          // contract penerima callback
         bytes4 selector;         // selector (default onWebhook)
-        bytes32[] eventTypes;    // jenis event yg dipicu (keccak)
+        bytes32[] eventTypes;    // event types that trigger it (keccak)
         bool active;
     }
 
@@ -45,14 +45,14 @@ contract WebhookRegistry {
         _;
     }
 
-    /// @notice Owner kelola whitelist keeper (JobMarket/oracle) yang boleh trigger.
+    /// @notice Owner manages the keeper whitelist (JobMarket/oracle) allowed to trigger.
     function setAuthorized(address caller, bool ok) external {
         require(msg.sender == owner, "only owner");
         authorized[caller] = ok;
         emit AuthorizedChanged(caller, ok);
     }
 
-    /// @notice Agent register webhook. selector default ke onWebhook.
+    /// @notice Agent registers a webhook. selector defaults to onWebhook.
     function registerWebhook(address target, bytes4 selector, bytes32[] calldata eventTypes) external onlyAgent returns (uint256) {
         require(target != address(0), "bad target");
         require(eventTypes.length > 0, "no events");
@@ -77,9 +77,9 @@ contract WebhookRegistry {
         emit WebhookRemoved(msg.sender, index);
     }
 
-    /// @notice Trigger webhook untuk agent + eventType. Hanya keeper ter-whitelist.
-    /// @dev low-level call dengan gas terbatas, swallow revert (tidak block parent flow).
-    ///      Loop di-cap MAX_TRIGGER_PER_EVENT anti gas-grief.
+    /// @notice Trigger webhook for an agent + eventType. Only whitelisted keepers.
+    /// @dev low-level call with limited gas, swallows reverts (does not block parent flow).
+    ///      Loop is capped at MAX_TRIGGER_PER_EVENT to prevent gas-griefing.
     function trigger(address agent, bytes32 eventType, bytes calldata payload) external {
         require(authorized[msg.sender] || msg.sender == owner, "not authorized keeper");
         uint256[] storage indices = _byEvent[agent][eventType];

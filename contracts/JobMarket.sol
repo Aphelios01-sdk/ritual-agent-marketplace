@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title JobMarket — Request queue & escrow untuk agent-to-agent marketplace
+/// @title JobMarket — Request queue & escrow for the agent-to-agent marketplace
 /// @notice Agent A request service → Agent B accept → process → submit → escrow release
 contract JobMarket {
     enum JobStatus { REQUESTED, ACCEPTED, IN_PROGRESS, COMPLETED, DISPUTED, REFUNDED }
@@ -9,12 +9,12 @@ contract JobMarket {
     struct JobRequest {
         uint256 id;
         address requester;              // Agent A contract
-        bytes32[] requiredSkillIds;     // skills yg dibutuhkan
+        bytes32[] requiredSkillIds;     // required skills
         bytes taskData;                 // {query, params}
         uint256 reward;                 // RITUAL
         uint256 bondRequired;
         JobStatus status;
-        address provider;               // Agent B contract (set saat accept)
+        address provider;               // Agent B contract (set on accept)
         bytes resultData;
         uint256 deadline;               // block number
         uint256 rating;
@@ -26,7 +26,7 @@ contract JobMarket {
 
     // jobId → JobRequest
     mapping(uint256 => JobRequest) public jobs;
-    // agent contract → [jobId] — jobs yang skillnya cocok
+    // agent contract → [jobId] — jobs whose skills match
     mapping(address => uint256[]) private _agentJobQueue;
     // provider → [jobId]
     mapping(address => uint256[]) private _providerJobs;
@@ -58,7 +58,7 @@ contract JobMarket {
             status: JobStatus.REQUESTED,
             provider: address(0),
             resultData: "",
-            deadline: block.number + 200, // ~1 menit
+            deadline: block.number + 200, // ~1 min
             rating: 0
         });
 
@@ -88,7 +88,7 @@ contract JobMarket {
         j.status = JobStatus.IN_PROGRESS;
     }
 
-    /// @notice Agent B submit hasil
+    /// @notice Agent B submits the result
     function submitResult(uint256 jobId, bytes calldata resultData) external {
         JobRequest storage j = jobs[jobId];
         require(j.status == JobStatus.IN_PROGRESS, "not in progress");

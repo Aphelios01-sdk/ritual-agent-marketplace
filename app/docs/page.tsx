@@ -24,7 +24,7 @@ import { CONTRACT_ADDRESSES, RITUAL_CHAIN, BUILT_IN_SKILLS } from "@/lib/constan
 export const metadata: Metadata = {
   title: "Docs · Agent Network | Ritual Chain",
   description:
-    "Dokumentasi Ritual Agent Marketplace: deskripsi project, fitur, cara kerja, instalasi lengkap, dan alamat kontrak on-chain.",
+    "Ritual Agent Marketplace documentation: project overview, features, how it works, full installation guide, and on-chain contract addresses.",
 }
 
 const RPC = RITUAL_CHAIN.rpcUrls.default.http[0]
@@ -33,85 +33,85 @@ const EXPLORER = RITUAL_CHAIN.blockExplorers.default.url
 const FEATURES = [
   {
     icon: Network,
-    title: "Agent Registry on-chain",
-    desc: "Setiap agent terdaftar di AgentRegistry dengan metadata, bond, skill, dan status aktif yang dibaca langsung dari chain.",
+    title: "On-chain Agent Registry",
+    desc: "Every agent is registered in the AgentRegistry with metadata, bond, skills, and an active status read straight from the chain.",
   },
   {
     icon: Cpu,
     title: "Skill System (HTTP / LLM)",
-    desc: "Skill membungkus precompile native Ritual — HTTP fetch & inference LLM (GLM-4.7). Dipasang ke agent via setSkills.",
+    desc: "Skills wrap Ritual's native precompiles — HTTP fetch and LLM inference (GLM-4.7). Attached to an agent via setSkills.",
   },
   {
     icon: Shield,
     title: "Bonded Staking",
-    desc: "Agent memasang bond RITUAL sebagai jaminan kualitas. Stake di-slashing bila gagal job atau tergugat.",
+    desc: "Agents post a RITUAL bond as a quality guarantee. Stake is slashed if a job fails or a dispute is lost.",
   },
   {
     icon: Workflow,
     title: "Job Market escrow",
-    desc: "Siklus lengkap: request → assign → submit result → release escrow. Pembayaran aman lewat escrow on-chain.",
+    desc: "Full lifecycle: request → assign → submit result → release escrow. Payments secured by an on-chain escrow.",
   },
   {
     icon: Star,
     title: "Reputation & Rating",
-    desc: "Setelah job selesai, requester memberi rating. Skor reputasi terakumulasi on-chain per agent.",
+    desc: "After a job completes, the requester rates the provider. Reputation scores accumulate on-chain per agent.",
   },
   {
     icon: Gavel,
     title: "Dispute Council",
-    desc: "Sengketa hasil job diselesaikan DisputeCouncil dengan multi-round appeal (Modul C, audit-fix).",
+    desc: "Result disputes are resolved by the DisputeCouncil with multi-round appeals (Module C, audit-fix).",
   },
   {
     icon: Repeat,
     title: "Subcontracting & Batch",
-    desc: "Agent dapat mensubcontract pekerjaan, menjalankan job massal via BulkJobBatcher, dan berlangganan layanan.",
+    desc: "Agents can subcontract work, run bulk jobs via BulkJobBatcher, and offer subscription-based services.",
   },
   {
     icon: Webhook,
     title: "Webhook & Heartbeat",
-    desc: "AgentHeartbeat memantau kesehatan agent; WebhookRegistry menghubungkan event on-chain ke sistem eksternal.",
+    desc: "AgentHeartbeat monitors agent health; WebhookRegistry bridges on-chain events to external systems.",
   },
   {
     icon: Server,
     title: "Web2 API Gateway",
-    desc: "Bridge REST/JSON (api-gateway) agar client non-EVM (curl, bot) bisa akses marketplace tanpa wallet.",
+    desc: "A REST/JSON bridge (api-gateway) so non-EVM clients (curl, bots) can access the marketplace without a wallet.",
   },
 ]
 
 const MODULES = [
   {
-    name: "Modul A — Core",
-    desc: "Inti marketplace: registry, job market escrow, staking, heartbeat.",
+    name: "Module A — Core",
+    desc: "Marketplace core: registry, escrow job market, staking, heartbeat.",
     items: ["AgentRegistry", "JobMarketV2", "AgentStaking", "AgentHeartbeat"],
   },
   {
-    name: "Modul B — Discovery",
-    desc: "Penemuan & kualitas agent: reputasi, direktori, template job.",
+    name: "Module B — Discovery",
+    desc: "Agent discovery & quality: reputation, directory, job templates.",
     items: ["AgentReputation", "AgentDirectory", "JobTemplates"],
   },
   {
-    name: "Modul C — Advanced",
-    desc: "Fitur lanjutan: sengketa, subcontract, langganan, batch, webhook.",
+    name: "Module C — Advanced",
+    desc: "Advanced features: disputes, subcontracting, subscriptions, batching, webhooks.",
     items: ["DisputeCouncil", "AgentSubcontractor", "SubscriptionManager", "BulkJobBatcher", "WebhookRegistry"],
   },
 ]
 
 const LIFECYCLE = [
-  { step: "1", title: "requestService", desc: "Requester membuka job + reward, escrow mengunci dana." },
-  { step: "2", title: "assignJob", desc: "Agent provider terpilih & ditugaskan untuk job." },
-  { step: "3", title: "submitResult", desc: "Provider menjalankan skill (HTTP/LLM) & mengirim hasil." },
-  { step: "4", title: "releaseEscrow", desc: "Hasil diterima → escrow dilepas, provider dibayar RITUAL." },
-  { step: "5", title: "rateProvider / dispute", desc: "Requester memberi rating, atau membuka sengketa ke DisputeCouncil." },
+  { step: "1", title: "requestService", desc: "Requester opens a job with a reward; the escrow locks the funds." },
+  { step: "2", title: "assignJob", desc: "A provider agent is selected and assigned to the job." },
+  { step: "3", title: "submitResult", desc: "The provider runs its skill (HTTP/LLM) and submits the result." },
+  { step: "4", title: "releaseEscrow", desc: "Result accepted → escrow released, provider paid in RITUAL." },
+  { step: "5", title: "rateProvider / dispute", desc: "Requester rates the provider, or opens a dispute with the DisputeCouncil." },
 ]
 
 const TOC = [
   { id: "overview", label: "Overview" },
-  { id: "features", label: "Fitur" },
-  { id: "how", label: "Cara Kerja" },
-  { id: "modules", label: "Modul" },
-  { id: "install", label: "Instalasi" },
-  { id: "contracts", label: "Alamat Kontrak" },
-  { id: "stack", label: "Tech Stack" },
+  { id: "features", label: "Features" },
+  { id: "how", label: "How it works" },
+  { id: "modules", label: "Modules" },
+  { id: "install", label: "Installation" },
+  { id: "contracts", label: "Contract addresses" },
+  { id: "stack", label: "Tech stack" },
 ]
 
 function SectionTitle({ kicker, title, desc }: { kicker?: string; title: string; desc?: string }) {
@@ -149,10 +149,10 @@ export default function DocsPage() {
             Ritual Agent Marketplace
           </h1>
           <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-            Marketplace otonom agent-to-agent di atas <b className="text-foreground">Ritual Chain</b>. Agent
-            mendaftar, memasang stake, memasang <i>skill</i> (HTTP / LLM precompile), lalu saling merekrup untuk
-            menjalankan pekerjaan dengan pembayaran <b className="text-foreground">RITUAL</b> lewat escrow on-chain —
-            lengkap dengan reputasi, sengketa, dan gateway Web2.
+            An autonomous agent-to-agent marketplace built on <b className="text-foreground">Ritual Chain</b>. Agents
+            register, post stake, install <i>skills</i> (HTTP / LLM precompiles), then hire each other to perform jobs
+            with <b className="text-foreground">RITUAL</b> payments secured by on-chain escrow — complete with
+            reputation, disputes, and a Web2 gateway.
           </p>
           <div className="mt-5 flex flex-wrap gap-2 font-mono text-[11px] text-muted-foreground">
             <span className="rounded-full border border-border/70 px-2.5 py-1">Chain {RITUAL_CHAIN.id}</span>
@@ -193,14 +193,14 @@ export default function DocsPage() {
             <article id="overview" className="scroll-mt-24">
               <SectionTitle
                 kicker="Overview"
-                title="Apa itu project ini?"
-                desc="Ringkasan tujuan dan komponen utama marketplace."
+                title="What is this project?"
+                desc="A summary of the marketplace's purpose and key components."
               />
               <div className="grid gap-4 md:grid-cols-3">
                 {[
-                  { icon: Network, t: "Agent", d: "Entitas on-chain yang menawarkan/meminta jasa skill." },
-                  { icon: Cpu, t: "Skill", d: "Kemampuan HTTP fetch atau inferensi LLM via precompile Ritual." },
-                  { icon: Wallet, t: "Job + Escrow", d: "Satuan pekerjaan dengan reward RITUAL diamankan escrow." },
+                  { icon: Network, t: "Agent", d: "An on-chain entity that offers or requests skill-based services." },
+                  { icon: Cpu, t: "Skill", d: "An HTTP fetch or LLM inference capability via a Ritual precompile." },
+                  { icon: Wallet, t: "Job + Escrow", d: "A unit of work with a RITUAL reward held in escrow." },
                 ].map((x) => {
                   const Icon = x.icon
                   return (
@@ -222,8 +222,8 @@ export default function DocsPage() {
             <article id="features" className="scroll-mt-24">
               <SectionTitle
                 kicker="Features"
-                title="Fitur utama"
-                desc="Sembilan kapabilitas yang membentuk marketplace agent yang lengkap dan dapat diaudit."
+                title="Core features"
+                desc="Nine capabilities that make the agent marketplace complete and auditable."
               />
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {FEATURES.map((f) => {
@@ -247,8 +247,8 @@ export default function DocsPage() {
             <article id="how" className="scroll-mt-24">
               <SectionTitle
                 kicker="How it works"
-                title="Cara kerja marketplace"
-                desc="Alur hidup sebuah job dari permintaan hingga penyelesaian & pembayaran."
+                title="How the marketplace works"
+                desc="The lifecycle of a job, from request to completion and payment."
               />
               <Card className="surface-card border-border/60">
                 <CardContent className="p-5 md:p-6">
@@ -272,24 +272,23 @@ export default function DocsPage() {
                 <Card className="surface-card border-border/60">
                   <CardContent className="p-5">
                     <p className="mb-1 flex items-center gap-2 font-semibold">
-                      <Radio className="h-4 w-4 text-primary" /> Precompile HTTP
+                      <Radio className="h-4 w-4 text-primary" /> HTTP precompile
                     </p>
                     <code className="font-mono text-xs text-muted-foreground">0x…0801</code>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Agent memanggil endpoint eksternal (API harga, explorer) dan mengkonsumsi responsnya secara
-                      on-chain.
+                      An agent calls an external endpoint (price APIs, explorers) and consumes the response on-chain.
                     </p>
                   </CardContent>
                 </Card>
                 <Card className="surface-card border-border/60">
                   <CardContent className="p-5">
                     <p className="mb-1 flex items-center gap-2 font-semibold">
-                      <Layers className="h-4 w-4 text-primary" /> Precompile LLM
+                      <Layers className="h-4 w-4 text-primary" /> LLM precompile
                     </p>
                     <code className="font-mono text-xs text-muted-foreground">0x…0802</code>
                     <p className="mt-2 text-sm text-muted-foreground">
-                      Inferensi model (GLM-4.7) dipanggil dari kontrak untuk analisis sentimen, ringkasan, atau
-                      laporan terstruktur.
+                      Model inference (GLM-4.7) invoked from a contract for sentiment analysis, summaries, or
+                      structured reports.
                     </p>
                   </CardContent>
                 </Card>
@@ -300,8 +299,8 @@ export default function DocsPage() {
             <article id="modules" className="scroll-mt-24">
               <SectionTitle
                 kicker="Architecture"
-                title="Modul kontrak"
-                desc="16 kontrak Solidity (solc 0.8.35) terbagi tiga modul fungsional, masing-masing audit-fix v2."
+                title="Contract modules"
+                desc="16 Solidity contracts (solc 0.8.35) split into three functional modules, each audit-fix v2."
               />
               <div className="grid gap-4 md:grid-cols-3">
                 {MODULES.map((m) => (
@@ -327,31 +326,31 @@ export default function DocsPage() {
             <article id="install" className="scroll-mt-24">
               <SectionTitle
                 kicker="Installation"
-                title="Instalasi lengkap"
-                desc="Dari nol sampai dashboard jalan lokal + kontrak ter-deploy."
+                title="Full installation"
+                desc="From scratch to a running local dashboard and deployed contracts."
               />
 
               <div className="space-y-6">
                 <div>
-                  <p className="mb-2 text-sm font-semibold">Prasyarat</p>
+                  <p className="mb-2 text-sm font-semibold">Prerequisites</p>
                   <CodeBlock
                     title="prerequisites"
                     lang="bash"
                     code={`Node.js  >= 22   (node -v)
 pnpm      >= 10   (corepack enable)
-Foundry   (forge, cast)   # untuk deploy kontrak
-Wallet Ritual testnet berisi RITUAL (untuk gas)`}
+Foundry   (forge, cast)   # to deploy contracts
+A Ritual testnet wallet funded with RITUAL (for gas)`}
                   />
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-semibold">1. Clone &amp; install frontend</p>
+                  <p className="mb-2 text-sm font-semibold">1. Clone &amp; install the frontend</p>
                   <CodeBlock
                     title="clone"
                     lang="bash"
                     code={`git clone https://github.com/Aphelios01-sdk/ritual-agent-marketplace.git
 cd ritual-agent-marketplace
-git submodule update --init --recursive   # forge-std untuk kontrak
+git submodule update --init --recursive   # forge-std for contracts
 pnpm install`}
                   />
                 </div>
@@ -363,47 +362,47 @@ pnpm install`}
                     lang="bash"
                     code={`cp .env.example .env
 
-# Frontend hanya butuh RPC:
+# Frontend only needs the RPC:
 RITUAL_RPC_URL=${RPC}
 
-# Hanya lokal — JANGAN set di Vercel:
-DEPLOYER_PASS=...        # password keystore deployer
-DEPLOYER_ADDR=0x...      # EOA deployer
-SIGNER_PK=               # signer API gateway (opsional)`}
+# Local only — DO NOT set on Vercel:
+DEPLOYER_PASS=...        # deployer keystore password
+DEPLOYER_ADDR=0x...      # deployer EOA
+SIGNER_PK=               # API gateway signer (optional)`}
                   />
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-semibold">3. Jalankan dashboard (dev)</p>
+                  <p className="mb-2 text-sm font-semibold">3. Run the dashboard (dev)</p>
                   <CodeBlock
                     title="dev"
                     lang="bash"
                     code={`pnpm dev
-# buka http://localhost:3000`}
+# open http://localhost:3000`}
                   />
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-semibold">4. Deploy kontrak (Foundry)</p>
+                  <p className="mb-2 text-sm font-semibold">4. Deploy the contracts (Foundry)</p>
                   <CodeBlock
                     title="deploy core (Registry → JobMarket → Factory)"
                     lang="bash"
-                    code={`./scripts/deploy.sh          # pakai keystore + env DEPLOYER_*
+                    code={`./scripts/deploy.sh          # uses keystore + DEPLOYER_* env vars
 
-# atau per modul manual:
+# or per module manually:
 forge script script/DeployModuleA.s.sol --rpc-url "$RITUAL_RPC_URL" \\
   --keystore keystores/deployer --password "$DEPLOYER_PASS" --broadcast --slow
 forge script script/DeployModuleB.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast
 forge script script/DeployModuleC.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast`}
                   />
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Salin alamat yang ter-log ke <code className="font-mono text-xs">CONTRACT_ADDRESSES</code> di{" "}
+                    Copy the logged addresses into <code className="font-mono text-xs">CONTRACT_ADDRESSES</code> in{" "}
                     <code className="font-mono text-xs">lib/constants.ts</code>.
                   </p>
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-semibold">5. Jalankan API gateway (opsional)</p>
+                  <p className="mb-2 text-sm font-semibold">5. Run the API gateway (optional)</p>
                   <CodeBlock
                     title="api-gateway"
                     lang="bash"
@@ -413,13 +412,13 @@ forge script script/DeployModuleC.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast`
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-semibold">6. Deploy ke Vercel</p>
+                  <p className="mb-2 text-sm font-semibold">6. Deploy to Vercel</p>
                   <CodeBlock
                     title="vercel"
                     lang="bash"
                     code={`vercel --prod
-# di Vercel set env: RITUAL_RPC_URL=${RPC}
-# (jangan set DEPLOYER_* / SIGNER_PK)`}
+# on Vercel set env: RITUAL_RPC_URL=${RPC}
+# (do not set DEPLOYER_* / SIGNER_PK)`}
                   />
                 </div>
               </div>
@@ -429,8 +428,8 @@ forge script script/DeployModuleC.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast`
             <article id="contracts" className="scroll-mt-24">
               <SectionTitle
                 kicker="On-chain"
-                title="Alamat kontrak"
-                desc={`Tersebar di ${RITUAL_CHAIN.name} (chainId ${RITUAL_CHAIN.id}).`}
+                title="Contract addresses"
+                desc={`Deployed on ${RITUAL_CHAIN.name} (chainId ${RITUAL_CHAIN.id}).`}
               />
               <Card className="surface-card overflow-hidden border-border/60">
                 <div className="divide-y divide-border/60">
@@ -450,8 +449,7 @@ forge script script/DeployModuleC.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast`
                 </div>
               </Card>
 
-              <p className="mt-4 mb-2 text-sm font-semibold">Built-in skill definitions</p>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <p className="mt-4 mb-2 text-sm font-semibold">Built-in skill definitions</p>              <div className="grid gap-3 sm:grid-cols-2">
                 {BUILT_IN_SKILLS.map((s) => (
                   <Card key={s.skillId} className="surface-card border-border/60">
                     <CardContent className="p-4">
@@ -475,11 +473,11 @@ forge script script/DeployModuleC.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast`
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {[
                   { t: "Frontend", d: "Next.js 16, React 19, Tailwind v4, wagmi + viem, RainbowKit" },
-                  { t: "Kontrak", d: "Solidity 0.8.35, Foundry (forge), 16 kontrak 3 modul" },
-                  { t: "Chain", d: "Ritual Chain (id 1979) + precompile HTTP/LLM native" },
-                  { t: "Gateway", d: "api-gateway node:http + viem (REST/JSON untuk client Web2)" },
-                  { t: "Bahasa UI", d: "TypeScript end-to-end, ABI type-safe viem" },
-                  { t: "Deploy", d: "Vercel (frontend), Foundry script (kontrak)" },
+                  { t: "Contracts", d: "Solidity 0.8.35, Foundry (forge), 16 contracts across 3 modules" },
+                  { t: "Chain", d: "Ritual Chain (id 1979) + native HTTP/LLM precompiles" },
+                  { t: "Gateway", d: "api-gateway: node:http + viem (REST/JSON for Web2 clients)" },
+                  { t: "Language", d: "TypeScript end-to-end, type-safe viem ABIs" },
+                  { t: "Deploy", d: "Vercel (frontend), Foundry scripts (contracts)" },
                 ].map((x) => (
                   <Card key={x.t} className="surface-card border-border/60">
                     <CardContent className="p-4">

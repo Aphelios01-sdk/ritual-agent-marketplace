@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title AgentContract — Template sovereign agent untuk agent-to-agent marketplace
-/// @notice Agent fully autonomous dengan RitualWallet + skill execution engine
-/// @dev Bisa jadi requester (hire agent lain) dan provider (dihire agent lain)
+/// @title AgentContract — Sovereign agent template for the agent-to-agent marketplace
+/// @notice Fully autonomous agent with RitualWallet + skill execution engine
+/// @dev Can act as requester (hire other agents) and provider (be hired by other agents)
 contract AgentContract {
     enum AgentStep { IDLE, FETCHING, ANALYZING, DONE }
 
@@ -118,8 +118,8 @@ contract AgentContract {
         skillConfigs.push(SkillConfig(skillId, precompileAddr, configData));
     }
 
-    /// @notice Forward skill registration to Registry (msg.sender ke Registry = this agent)
-    /// @dev Dipanggil factory saat setup. Registry punya guard only-agent.
+    /// @notice Forward skill registration to Registry (msg.sender to Registry = this agent)
+    /// @dev Called by factory during setup. Registry has an only-agent guard.
     function setSkillsOnRegistry(bytes calldata registryCallData) external {
         (bool ok,) = registry.call(registryCallData);
         require(ok, "registry call failed");

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.28;
 
-/// @title AgentRegistry — Daftar agent + skill registry untuk agent-to-agent marketplace
-/// @notice Agent terdaftar via factory. Skills didefinisikan per-agent.
+/// @title AgentRegistry — Agent directory + skill registry for the agent-to-agent marketplace
+/// @notice Agents are registered via the factory. Skills are defined per-agent.
 contract AgentRegistry {
     struct Skill {
         bytes32 skillId;        // keccak(name, precompileAddr)

@@ -13,18 +13,18 @@ export const RITUAL_CHAIN = {
 export const CONTRACT_ADDRESSES = {
   agentRegistry: "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5" as const,
   jobMarket: "0x5d87fE0d14d5c72B915Cf4C1dddb6e6ac86d84Cd" as const,        // v1 (legacy)
-  jobMarketV2: "0xA7AA5FDC4DcE7036B31b3C57f938832616b27f1A" as const,       // Modul A v2 (audit-fix): access control + escrow refund + .call + treasury
+  jobMarketV2: "0xA7AA5FDC4DcE7036B31b3C57f938832616b27f1A" as const,       // Module A v2 (audit-fix): access control + escrow refund + .call + treasury
   agentFactory: "0x4567a3EdAa03B52eb2f6d23c3a68FdfB4A67419b" as const,
-  agentStaking: "0x8C2Ab37A6e9721fb2dE113acf0AC787eD937DdcB" as const,      // Modul A v2 (audit-fix): onlyAuthorized + claimTreasury
-  agentHeartbeat: "0x43581F6bE77b1050AA75db112280b46B75666Bc1" as const,    // Modul A v2 (audit-fix): bounded grace
-  agentReputation: "0x5221A9a7DF7E2BC888bD1C1eEa5F1549A68eE253" as const,   // Modul B v2 (audit-fix): onlyAuthorized
-  agentDirectory: "0x81f8944e57179f386daaa662fe7e86df2e597e5d" as const,    // Modul B
-  jobTemplates: "0xebe50c17951cf42fcc73824f755419436c34cc2f" as const,      // Modul B
-  disputeCouncil: "0x540A04d366C156DADF22130eF48A28Ed54D291B5" as const,   // Modul C v2 (audit-fix): appeal round reset
-  agentSubcontractor: "0x0636a24da36d73526eeec2c73cd79703bcb137ca" as const, // Modul C
-  subscriptionManager: "0x256cb7547f97b39aaad3941b3e842cdb60b88e79" as const, // Modul C
-  bulkJobBatcher: "0x01d39cf9d5bcc6953a85f2377dfd1372d812788a" as const,    // Modul C
-  webhookRegistry: "0x88D99b82e04903bd71f36e57B708e6D357f2DfEb" as const,   // Modul C v2 (audit-fix): authorized keeper + caps
+  agentStaking: "0x8C2Ab37A6e9721fb2dE113acf0AC787eD937DdcB" as const,      // Module A v2 (audit-fix): onlyAuthorized + claimTreasury
+  agentHeartbeat: "0x43581F6bE77b1050AA75db112280b46B75666Bc1" as const,    // Module A v2 (audit-fix): bounded grace
+  agentReputation: "0x5221A9a7DF7E2BC888bD1C1eEa5F1549A68eE253" as const,   // Module B v2 (audit-fix): onlyAuthorized
+  agentDirectory: "0x81f8944e57179f386daaa662fe7e86df2e597e5d" as const,    // Module B
+  jobTemplates: "0xebe50c17951cf42fcc73824f755419436c34cc2f" as const,      // Module B
+  disputeCouncil: "0x540A04d366C156DADF22130eF48A28Ed54D291B5" as const,   // Module C v2 (audit-fix): appeal round reset
+  agentSubcontractor: "0x0636a24da36d73526eeec2c73cd79703bcb137ca" as const, // Module C
+  subscriptionManager: "0x256cb7547f97b39aaad3941b3e842cdb60b88e79" as const, // Module C
+  bulkJobBatcher: "0x01d39cf9d5bcc6953a85f2377dfd1372d812788a" as const,    // Module C
+  webhookRegistry: "0x88D99b82e04903bd71f36e57B708e6D357f2DfEb" as const,   // Module C v2 (audit-fix): authorized keeper + caps
 }
 
 export const PRECOMPILE_ADDRESSES = {
@@ -149,7 +149,7 @@ export const MOCK_AGENTS: AgentInfo[] = [
   {
     id: "1",
     name: "Crypto Sentiment Bot",
-    description: "Analisis sentimen pasar crypto menggunakan HTTP fetch + LLM analysis. Memberikan summary sentiment harian.",
+    description: "Analyzes crypto market sentiment using HTTP fetch + LLM analysis. Provides a daily sentiment summary.",
     contractAddress: "0x0000000000000000000000000000000000000001",
     skills: [BUILT_IN_SKILLS[0], BUILT_IN_SKILLS[1]],
     bondAmount: BigInt("100000000000000000000"), // 100 RITUAL
@@ -161,7 +161,7 @@ export const MOCK_AGENTS: AgentInfo[] = [
   {
     id: "2",
     name: "Token Price Oracle",
-    description: "Ambil harga real-time token dari CoinGecko & DexScreener via HTTP precompile. Output structured data.",
+    description: "Fetches real-time token prices from CoinGecko & DexScreener via the HTTP precompile. Returns structured data.",
     contractAddress: "0x0000000000000000000000000000000000000002",
     skills: [BUILT_IN_SKILLS[0]],
     bondAmount: BigInt("50000000000000000000"), // 50 RITUAL
@@ -173,7 +173,7 @@ export const MOCK_AGENTS: AgentInfo[] = [
   {
     id: "3",
     name: "DeFi Report Generator",
-    description: "Generate laporan DeFi terperinci dari on-chain data — TVL, APY, volume protokol, insight LLM-driven.",
+    description: "Generates detailed DeFi reports from on-chain data — TVL, APY, protocol volume, with LLM-driven insights.",
     contractAddress: "0x0000000000000000000000000000000000000003",
     skills: [BUILT_IN_SKILLS[2], BUILT_IN_SKILLS[3]],
     bondAmount: BigInt("200000000000000000000"), // 200 RITUAL
@@ -185,7 +185,7 @@ export const MOCK_AGENTS: AgentInfo[] = [
   {
     id: "4",
     name: "On-Chain Data Scout",
-    description: "Fetch data dari Ritual Chain explorer dan sajikan dalam format JSON siap pakai untuk agent lain.",
+    description: "Fetches data from the Ritual Chain explorer and returns it as ready-to-use JSON for other agents.",
     contractAddress: "0x0000000000000000000000000000000000000004",
     skills: [BUILT_IN_SKILLS[3]],
     bondAmount: BigInt("30000000000000000000"), // 30 RITUAL

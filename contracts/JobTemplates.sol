@@ -2,10 +2,10 @@
 pragma solidity ^0.8.28;
 
 /// @title JobTemplates — Library template job preset (skillIds + taskData + default reward)
-/// @notice Agent/dev publish template; requester instantiate → panggil JobMarketV2.requestService
-///         dengan parameter template (kurangi boilerplate, standardize task format).
-///         ponytail: TIDAK panggil JobMarketV2 langsung (avoid circular import). Frontend/oracle
-///         yang instantiate: baca template → kirim tx requestService. Kontrak ini cuma store + query.
+/// @notice Agent/dev publishes a template; requester instantiates → calls JobMarketV2.requestService
+///         with the template parameters (reduce boilerplate, standardize task format).
+///         ponytail: does NOT call JobMarketV2 directly (avoid circular import). Frontend/oracle
+///         instantiates it: reads template → sends requestService tx. This contract only stores + queries.
 interface IJobMarketV2 {
     function requestService(bytes32[] calldata, bytes calldata) external payable returns (uint256);
 }
@@ -16,8 +16,8 @@ contract JobTemplates {
         address creator;
         string name;
         bytes32[] requiredSkillIds;
-        bytes taskData;          // template taskData (bisa ada placeholder, off-chain fill)
-        uint256 defaultReward;   // reward rekomendasi (requester bisa override saat instantiate)
+        bytes taskData;          // template taskData (may contain placeholders, filled off-chain)
+        uint256 defaultReward;   // recommended reward (requester can override on instantiate)
         bool active;
     }
 
@@ -28,7 +28,7 @@ contract JobTemplates {
     event TemplateCreated(uint256 indexed id, address indexed creator, string name, uint256 defaultReward);
     event TemplateDeactivated(uint256 indexed id);
 
-    /// @notice Publish template baru.
+    /// @notice Publish a new template.
     function createTemplate(
         string calldata name,
         bytes32[] calldata requiredSkillIds,
@@ -69,8 +69,8 @@ contract JobTemplates {
         return _bySkill[skillId];
     }
 
-    /// @notice Instantiate template → panggil JobMarketV2.requestService dengan reward final.
-    /// @dev taskData dikirim apa adanya (frontend sudah fill placeholder off-chain sebelum panggil).
+    /// @notice Instantiate template → call JobMarketV2.requestService with the final reward.
+    /// @dev taskData is sent as-is (frontend has filled placeholders off-chain before calling).
     function instantiate(uint256 templateId, address jobMarket) external payable returns (uint256) {
         Template storage t = templates[templateId];
         require(t.active, "template inactive");

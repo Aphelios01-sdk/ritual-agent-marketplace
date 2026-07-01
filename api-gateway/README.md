@@ -1,59 +1,59 @@
-# API Gateway Web2 (off-chain) — Modul C fitur 7
+# Web2 API Gateway (off-chain) — Module C, feature 7
 
-Bridge REST/JSON untuk client Web2 (curl, bot, aplikasi non-EVM) mengakses marketplace
-on-chain tanpa perlu wallet atau pengetahuan EVM. Native `node:http` + viem, tanpa
-dependency tambahan.
+A REST/JSON bridge so Web2 clients (curl, bots, non-EVM apps) can access the on-chain
+marketplace without a wallet or any EVM knowledge. Built on native `node:http` + viem,
+with no extra dependencies.
 
-## Menjalankan
+## Running
 
 ```bash
 node --experimental-strip-types api-gateway/server.ts
 # default :8787, RPC=https://rpc.ritualfoundation.org
 ```
 
-Variabel env:
-| Env | Default | Keterangan |
+Environment variables:
+| Env | Default | Description |
 |---|---|---|
 | `RPC_URL` | `https://rpc.ritualfoundation.org` | Ritual Chain RPC |
-| `PORT` | `8787` | Port HTTP |
-| `SIGNER_PK` | (kosong) | Private key signer untuk POST /jobs relay. Kosong = relay OFF |
-| `REGISTRY` | alamat Modul A | Override AgentRegistry |
-| `JOB_MARKET_V2` | alamat Modul A | Override JobMarketV2 |
+| `PORT` | `8787` | HTTP port |
+| `SIGNER_PK` | (empty) | Private key of the signer for POST /jobs relay. Empty = relay OFF |
+| `REGISTRY` | Module A address | Override AgentRegistry |
+| `JOB_MARKET_V2` | Module A address | Override JobMarketV2 |
 
-## Endpoint
+## Endpoints
 
-| Method | Path | Sumber on-chain |
+| Method | Path | On-chain source |
 |---|---|---|
 | GET | `/health` | `getBlockNumber` |
 | GET | `/agents` | `registry.getActiveAgents()` |
 | GET | `/agents/:id` | `getAgent(id)` + `getAgentSkills(id)` |
 | GET | `/jobs/:id` | `JobMarketV2.jobs(id)` |
 | GET | `/jobs/agent/:addr` | `getProviderJobs(addr)` |
-| POST | `/jobs` | relay `requestService(skillIds, taskData)` — butuh `SIGNER_PK` |
+| POST | `/jobs` | relay `requestService(skillIds, taskData)` — requires `SIGNER_PK` |
 
-### Contoh
+### Examples
 
 ```bash
 # Health
 curl http://localhost:8787/health
 # {"ok":true,"block":"39973105","chain":1979}
 
-# Daftar agent
+# List agents
 curl http://localhost:8787/agents
 
-# Detail agent + skills
+# Agent detail + skills
 curl http://localhost:8787/agents/1
 
-# Relay job (butuh SIGNER_PK)
+# Relay a job (requires SIGNER_PK)
 curl -X POST http://localhost:8787/jobs \
   -H 'content-type: application/json' \
   -d '{"requiredSkillIds":["0x0000...0001"],"taskData":"0x...","rewardWei":"100000000000000000"}'
 ```
 
-## Catatan
+## Notes
 
-- `ponytail`: tidak ada auth/rate-limit. Tambah saat produksi (API key middleware, per-IP
-  throttle). POST relay memakai satu trusted signer — untuk multi-tenant, ganti jadi
-  proxy yang sign atas permintaan client berotentikasi.
-- BigInt diserialisasi sebagai string (aman untuk JSON).
-- CORS `*` — ketatkan bila gateway ini terbuka ke publik.
+- `ponytail`: no auth/rate-limiting. Add it before production (API key middleware,
+  per-IP throttling). The POST relay uses a single trusted signer — for multi-tenant
+  setups, replace it with a proxy that signs on behalf of authenticated clients.
+- BigInt values are serialized as strings (JSON-safe).
+- CORS is `*` — tighten it if this gateway is exposed publicly.

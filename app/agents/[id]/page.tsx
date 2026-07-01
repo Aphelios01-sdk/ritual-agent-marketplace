@@ -28,7 +28,7 @@ function countSkillTypes(skills: AgentInfo["skills"]) {
 export default async function AgentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  // Cari di on-chain dulu, fallback mock
+  // Look up on-chain first, fall back to mock data
   let agent: AgentInfo | undefined
   try {
     const onchain = await fetchAgents()

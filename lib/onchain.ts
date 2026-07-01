@@ -2,7 +2,7 @@ import { createPublicClient, http, type Address } from "viem"
 import { RITUAL_CHAIN, type AgentInfo, type SkillDefinition } from "./constants"
 import { AGENT_REGISTRY_ABI } from "./contract-abi"
 
-// Public client untuk baca on-chain (tanpa wagmi provider)
+// Public client to read on-chain state (without a wagmi provider)
 export const publicClient = createPublicClient({
   chain: RITUAL_CHAIN,
   transport: http(),
@@ -11,7 +11,7 @@ export const publicClient = createPublicClient({
 import { CONTRACT_ADDRESSES } from "./constants"
 const CONTRACT_ADDR = CONTRACT_ADDRESSES.agentRegistry as Address
 
-// Map precompile address -> tipe skill
+// Map a precompile address -> skill type
 function precompileType(addr: Address): "HTTP" | "LLM" {
   const a = addr.toLowerCase()
   if (a === "0x0000000000000000000000000000000000000801") return "HTTP"
@@ -19,7 +19,7 @@ function precompileType(addr: Address): "HTTP" | "LLM" {
   return "HTTP"
 }
 
-// Struct Skill on-chain (viem decode ke array of object)
+// On-chain Skill struct (viem decodes to an array of objects)
 type RawSkill = {
   skillId: `0x${string}`
   name: string
@@ -29,7 +29,7 @@ type RawSkill = {
   active: boolean
 }
 
-// Struct AgentInfo on-chain — mapping getter returns tuple (viem)
+// On-chain AgentInfo struct — mapping getter returns a tuple (viem)
 // (id, name, description, agentContract, bondAmount, totalEarnings, avgRating, jobCount, active)
 type RawAgent = readonly [
   bigint, string, string, Address, bigint, bigint, bigint, bigint, boolean
@@ -53,7 +53,7 @@ async function fetchAgentSkills(agentId: bigint): Promise<SkillDefinition[]> {
   }))
 }
 
-/// Baca semua agent dari Registry on-chain. Fallback [] kalau RPC error.
+/// Read all agents from the on-chain Registry. Falls back to [] on RPC error.
 export async function fetchAgents(): Promise<AgentInfo[]> {
   try {
     const count = (await publicClient.readContract({
@@ -96,7 +96,7 @@ export async function fetchAgents(): Promise<AgentInfo[]> {
   }
 }
 
-/// Baca info chain live (block number + chain id). Fallback null kalau RPC error.
+/// Read live chain info (block number + chain id). Falls back to null on RPC error.
 export async function fetchChainInfo(): Promise<{ block: bigint; chainId: number } | null> {
   try {
     const [block, chainId] = await Promise.all([

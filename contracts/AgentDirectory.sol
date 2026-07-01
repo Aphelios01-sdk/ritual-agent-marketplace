@@ -4,8 +4,8 @@ pragma solidity ^0.8.28;
 import "./interfaces.sol";
 
 /// @title AgentDirectory — Category tags + portfolio (output hash) + leaderboard
-/// @notice Agent set category & tags sendiri (off-chain index oleh frontend). Portfolio = list output hash
-///         per job (bukti kerja on-chain). Leaderboard query by category, urut skor reputasi decay.
+/// @notice Agents set their own category & tags (indexed off-chain by frontend). Portfolio = list of output hashes
+///         per job (on-chain proof of work). Leaderboard query by category, sorted by decayed reputation score.
 contract AgentDirectory {
     IAgentRegistry public immutable registry;
     IAgentReputation public immutable reputation;
@@ -13,14 +13,14 @@ contract AgentDirectory {
     struct Profile {
         bytes32 category;       // keccak256("defi"|"sentiment"|...) — 1 kategori utama
         bytes32[] tags;         // multi-tag
-        string metadataURI;     // IPFS/HTTP metadata off-chain (avatar, bio, dll)
+        string metadataURI;     // IPFS/HTTP metadata off-chain (avatar, bio, etc.)
         bool set;
     }
 
     struct PortfolioEntry {
         bytes32 jobId;
-        bytes32 outputHash;     // hash hasil kerja (off-chain content)
-        bytes32 skillId;        // skill yg dipakai
+        bytes32 outputHash;     // hash of work output (off-chain content)
+        bytes32 skillId;        // skill used
         uint256 block;
     }
 
@@ -57,7 +57,7 @@ contract AgentDirectory {
         emit ProfileUpdated(msg.sender, category, tags, metadataURI);
     }
 
-    /// @notice Tambah portfolio entry (bisa dipanggil agent sendiri atau JobMarket via hook).
+    /// @notice Add a portfolio entry (callable by the agent itself or JobMarket via hook).
     function addPortfolioEntry(bytes32 jobId, bytes32 outputHash, bytes32 skillId) external onlyAgent {
         portfolio[msg.sender].push(PortfolioEntry({
             jobId: jobId,
@@ -80,8 +80,8 @@ contract AgentDirectory {
         return _byCategory[category];
     }
 
-    /// @notice Leaderboard kategori: top N agent urut skor reputasi decay (bubble, N kecil).
-    /// @dev ponytail: O(m*log m) naive; aman untuk demo (agent per kategori kecil). Produksi pakai off-chain indexer.
+    /// @notice Category leaderboard: top N agents sorted by decayed reputation score (bubble, small N).
+    /// @dev ponytail: O(m*log m) naive; safe for the demo (few agents per category). Production should use an off-chain indexer.
     function getLeaderboard(bytes32 category, uint256 limit) external view returns (address[] memory addrs, uint256[] memory scores) {
         address[] memory members = _byCategory[category];
         uint256 n = members.length;
@@ -90,7 +90,7 @@ contract AgentDirectory {
             (sc[i],,) = reputation.getReputation(members[i]);
             if (sc[i] == 0) sc[i] = 5000;
         }
-        // simple selection sort ambil top `limit`
+        // simple selection sort to take the top `limit`
         uint256 outN = n < limit ? n : limit;
         addrs = new address[](outN);
         scores = new uint256[](outN);

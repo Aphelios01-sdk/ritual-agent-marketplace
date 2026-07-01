@@ -4,14 +4,14 @@ pragma solidity ^0.8.28;
 import "./interfaces.sol";
 
 /// @title AgentReputation — Decay-based reputation + confidence score + review text
-/// @notice Skor reputasi EMA dengan decay waktu (lama gak direview → skor turun ke mean).
-///         Confidence score = seberapa yakin provider thd hasil (0-100, off-chain derived, on-chain record).
-///         Review text disimpan hash-nya (content hash) untuk audit.
-///         Dipanggil oleh JobMarketV2.submitResult (confidence) + rateProvider (rating+review).
+/// @notice EMA reputation score with time decay (long unreviewed → score decays toward the mean).
+///         Confidence score = how confident the provider is in the result (0-100, off-chain derived, on-chain record).
+///         Review text is stored as a hash (content hash) for auditing.
+///         Called by JobMarketV2.submitResult (confidence) + rateProvider (rating+review).
 contract AgentReputation {
-    uint256 public constant BASE_SCORE = 5000;       // skor awal 50.00 (scale 0-10000)
-    uint256 public constant DECAY_PER_BLOCK = 1;     // decay linear ke BASE
-    uint256 public constant EMA_WEIGHT = 7000;       // bobot rating baru 70% (basis 10000)
+    uint256 public constant BASE_SCORE = 5000;       // initial score 50.00 (scale 0-10000)
+    uint256 public constant DECAY_PER_BLOCK = 1;     // linear decay toward BASE
+    uint256 public constant EMA_WEIGHT = 7000;       // new rating weight 70% (basis 10000)
     uint256 public constant MAX_CONFIDENCE = 100;
 
     IAgentRegistry public immutable registry;
@@ -19,13 +19,13 @@ contract AgentReputation {
     mapping(address => bool) public authorized;   // whitelist caller (JobMarketV2)
 
     struct Rep {
-        uint256 score;          // 0-10000 (display = /100, 2 desimal)
+        uint256 score;          // 0-10000 (display = /100, 2 decimals)
         uint256 reviewCount;
-        uint256 lastUpdate;     // block number rating terakhir
+        uint256 lastUpdate;     // last rating block number
     }
 
     struct Review {
-        bytes32 jobId;          // identitas job (review per-job)
+        bytes32 jobId;          // job identity (review per-job)
         address client;
         uint256 rating;         // 1-5
         uint8 confidence;       // 0-100
@@ -54,7 +54,7 @@ contract AgentReputation {
         _;
     }
 
-    /// @notice Owner kelola whitelist caller (JobMarketV2) yang boleh record.
+    /// @notice Owner manages the caller whitelist (JobMarketV2) allowed to record.
     function setAuthorized(address caller, bool ok) external {
         require(msg.sender == owner, "only owner");
         authorized[caller] = ok;
@@ -65,8 +65,8 @@ contract AgentReputation {
         owner = next;
     }
 
-    /// @notice Provider submit confidence score untuk hasil job (sebelum/di saat submitResult).
-    /// @dev Dipanggil JobMarketV2 (msg.sender = market). Hanya caller ter-whitelist.
+    /// @notice Provider submits a confidence score for a job result (before/at submitResult).
+    /// @dev Called by JobMarketV2 (msg.sender = market). Only whitelisted callers.
     function recordConfidence(address agent, bytes32 jobId, uint8 confidence) external onlyAuthorized {
         if (confidence > MAX_CONFIDENCE) confidence = uint8(MAX_CONFIDENCE);
         Rep storage r = reps[agent];
@@ -74,7 +74,7 @@ contract AgentReputation {
         emit ConfidenceRecorded(agent, jobId, confidence);
     }
 
-    /// @notice Client kasih rating + review (hash). Update skor EMA + apply decay.
+    /// @notice Client gives a rating + review (hash). Updates the EMA score + applies decay.
     function recordReview(
         address agent,
         bytes32 jobId,
@@ -86,7 +86,7 @@ contract AgentReputation {
         Rep storage r = reps[agent];
         if (r.lastUpdate == 0) { r.score = BASE_SCORE; r.lastUpdate = block.number; }
 
-        // Apply decay: skor bergerak ke BASE_SCORE seiring block berlalu tanpa review.
+        // Apply decay: score moves toward BASE_SCORE as blocks pass without a review.
         uint256 elapsed = block.number - r.lastUpdate;
         if (r.score > BASE_SCORE) {
             uint256 decay = elapsed * DECAY_PER_BLOCK;
@@ -96,7 +96,7 @@ contract AgentReputation {
             r.score = r.score + decay < BASE_SCORE ? r.score + decay : BASE_SCORE;
         }
 
-        // EMA update: skor baru = (old * 30%) + (ratingScaled * 70%)
+        // EMA update: new score = (old * 30%) + (ratingScaled * 70%)
         uint256 ratingScaled = (rating * 10000) / 5;   // 1-5 → 2000-10000
         r.score = (r.score * (10000 - EMA_WEIGHT) + ratingScaled * EMA_WEIGHT) / 10000;
         r.reviewCount++;
@@ -123,7 +123,7 @@ contract AgentReputation {
         return reviews[agent];
     }
 
-    /// @notice Skor yang sudah di-decay ke waktu sekarang (untuk leaderboard real-time).
+    /// @notice Score decayed to the current time (for real-time leaderboards).
     function getDecayedScore(address agent) external view returns (uint256) {
         Rep storage r = reps[agent];
         if (r.lastUpdate == 0) return BASE_SCORE;

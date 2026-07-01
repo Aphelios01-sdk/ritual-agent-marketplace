@@ -3,15 +3,15 @@ pragma solidity ^0.8.28;
 
 import "./interfaces.sol";
 
-/// @title AgentStaking — Stake RITUAL untuk aktif jualan jasa + anti-scam slash
-/// @notice Agent wajib stake >= minStake. Slash kalau dispute kalah / rating jelek berulang.
-///         Unstake ada cooldown (job yang sedang berjalan harus selesai dulu).
+/// @title AgentStaking — Stake RITUAL to actively sell services + anti-scam slash
+/// @notice Agents must stake >= minStake. Slashed if dispute lost / repeated low ratings.
+///         Unstake has a cooldown (in-flight jobs must finish first).
 contract AgentStaking {
     uint256 public constant MIN_STAKE = 0.01 ether;      // 0.01 RITUAL minimum
-    uint256 public constant UNSTAKE_COOLDOWN = 100;       // ~block sebelum withdraw (job in-flight)
-    uint256 public constant SLASH_MAX_BPS = 5000;         // max slash 50% per insiden
-    uint256 public constant LOW_RATING_THRESHOLD = 2;     // rating <= 2 dianggap jelek
-    uint256 public constant LOW_RATING_STRIKES = 3;       // 3x rating jelek = slash otomatis
+    uint256 public constant UNSTAKE_COOLDOWN = 100;       // ~blocks before withdraw (job in-flight)
+    uint256 public constant SLASH_MAX_BPS = 5000;         // max slash 50% per incident
+    uint256 public constant LOW_RATING_THRESHOLD = 2;     // rating <= 2 is considered low
+    uint256 public constant LOW_RATING_STRIKES = 3;       // 3x low rating = automatic slash
 
     IAgentRegistry public immutable registry;
     address public owner;
@@ -19,14 +19,14 @@ contract AgentStaking {
 
     struct Stake {
         uint256 amount;          // total staked
-        uint256 lockedUntil;     // block hingga mana tidak bisa withdraw (cooldown)
-        uint256 lowRatingCount;  // jumlah rating jelek akumulatif
-        bool active;             // sudah pernah stake (aktif jualan)
+        uint256 lockedUntil;     // block until which withdrawal is blocked (cooldown)
+        uint256 lowRatingCount;  // cumulative low rating count
+        bool active;             // has staked before (actively selling)
     }
 
     mapping(address => Stake) public stakes;     // agentContract -> Stake
     uint256 public totalSlashed;
-    uint256 internal _totalStaked;   // total stake aktif (bukan slashed) — proteksi claimTreasury
+    uint256 internal _totalStaked;   // total active stake (not slashed) — protects claimTreasury
 
     event Staked(address indexed agent, uint256 amount);
     event UnstakeRequested(address indexed agent, uint256 unlockBlock);
@@ -51,7 +51,7 @@ contract AgentStaking {
         _;
     }
 
-    /// @notice Owner kelola whitelist caller (JobMarketV2, DisputeCouncil) yang boleh recordRating/slash.
+    /// @notice Owner manages the caller whitelist (JobMarketV2, DisputeCouncil) allowed to recordRating/slash.
     function setAuthorized(address caller, bool ok) external {
         require(msg.sender == owner, "only owner");
         authorized[caller] = ok;
@@ -63,7 +63,7 @@ contract AgentStaking {
         owner = next;
     }
 
-    /// @notice Agent stake untuk aktif jualan. Harus >= MIN_STAKE.
+    /// @notice Agent stakes to become active. Must be >= MIN_STAKE.
     function stake() external payable onlyAgent {
         Stake storage s = stakes[msg.sender];
         s.amount += msg.value;
@@ -72,8 +72,8 @@ contract AgentStaking {
         emit Staked(msg.sender, msg.value);
     }
 
-    /// @notice Request unstake — mulai cooldown. Job in-flight tidak di-lock,
-    ///         tapi JobMarket bisa cek isUnstaking sebelum accept bid.
+    /// @notice Request unstake — starts the cooldown. In-flight jobs are not locked,
+    ///         but JobMarket can check isUnstaking before accepting a bid.
     function requestUnstake() external onlyAgent {
         Stake storage s = stakes[msg.sender];
         require(s.amount > 0, "nothing staked");
@@ -82,7 +82,7 @@ contract AgentStaking {
         emit UnstakeRequested(msg.sender, s.lockedUntil);
     }
 
-    /// @notice Withdraw stake setelah cooldown lewat.
+    /// @notice Withdraw stake after the cooldown has passed.
     function withdraw() external onlyAgent {
         Stake storage s = stakes[msg.sender];
         require(s.lockedUntil > 0 && block.number >= s.lockedUntil, "cooldown not passed");
@@ -97,14 +97,14 @@ contract AgentStaking {
         emit Withdrawn(msg.sender, amt);
     }
 
-    /// @notice Cek apakah agent aktif (staked >= min & tidak mid-unstake yang sudah lewat window aktif).
+    /// @notice Check whether the agent is active (staked >= min & not mid-unstake past the active window).
     function isAgentActive(address agent) external view returns (bool) {
         Stake storage s = stakes[agent];
         return s.active && s.amount >= MIN_STAKE;
     }
 
-    /// @notice Record rating dari JobMarket setelah job selesai. Trigger slash otomatis kalau strike.
-    /// @dev Dipanggil oleh JobMarket (bukan agent). Di sini kita trust JobMarket.
+    /// @notice Record rating from JobMarket after a job completes. Triggers automatic slash on strike.
+    /// @dev Called by JobMarket (not the agent). JobMarket is trusted here.
     function recordRating(address agent, uint256 rating) external onlyAuthorized {
         if (rating <= LOW_RATING_THRESHOLD) {
             Stake storage s = stakes[agent];
@@ -117,8 +117,8 @@ contract AgentStaking {
         }
     }
 
-    /// @notice Slash stake — dipanggil oleh dispute resolver (Modul C) atau otomatis.
-    /// @param amountBps porsi stake yang di-slash (basis points, max SLASH_MAX_BPS)
+    /// @notice Slash stake — called by the dispute resolver (Module C) or automatically.
+    /// @param amountBps portion of stake to slash (basis points, max SLASH_MAX_BPS)
     function slash(address agent, uint256 amountBps, string calldata reason) external onlyAuthorized {
         require(amountBps <= SLASH_MAX_BPS, "slash too high");
         uint256 slashAmt = (stakes[agent].amount * amountBps) / 10000;
@@ -131,11 +131,11 @@ contract AgentStaking {
         s.amount -= amount;
         _totalStaked -= amount;
         totalSlashed += amount;
-        // slashed amount stays in contract — di-claim treasury via claimTreasury
+        // slashed amount stays in contract — claimed by treasury via claimTreasury
         emit Slashed(agent, amount, reason);
     }
 
-    /// @notice Owner klaim dana hasil slash untuk treasury. Tidak boleh sentuh stake agent.
+    /// @notice Owner claims slashed funds for the treasury. Must not touch agent stakes.
     function claimTreasury(address payable to) external {
         require(msg.sender == owner, "only owner");
         uint256 bal = address(this).balance;

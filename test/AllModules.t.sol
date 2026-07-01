@@ -14,7 +14,7 @@ import "../contracts/SubscriptionManager.sol";
 import "../contracts/BulkJobBatcher.sol";
 import "../contracts/WebhookRegistry.sol";
 
-/// @notice Mock registry: merekam agentByContract + skills untuk verifikasi guard onlyAgent.
+/// @notice Mock registry: records agentByContract + skills to verify the onlyAgent guard.
 contract MockRegistry {
     mapping(address => uint256) public agentByContract;
     mapping(uint256 => bytes32[]) public skillsOf;
@@ -25,7 +25,7 @@ contract MockRegistry {
     function addEarnings(uint256, uint256, uint256) external { }
 }
 
-/// @title Harness test logika 18 fitur Modul A/B/C — lokal, tanpa gas on-chain.
+/// @title Harness test for the logic of 18 features across Module A/B/C — local, no on-chain gas.
 contract AllModulesTest is Test {
     MockRegistry reg;
     AgentStaking staking;
@@ -47,7 +47,7 @@ contract AllModulesTest is Test {
     bytes32 constant SK1 = bytes32(uint256(1));
     bytes32 constant SK2 = bytes32(uint256(2));
 
-    /// @dev Terima ether (test contract = treasury JobMarketV2) supaya fee transfer tidak revert.
+    /// @dev Receive ether (test contract = JobMarketV2 treasury) so fee transfers don't revert.
     receive() external payable {}
 
     function setUp() public {
@@ -78,12 +78,12 @@ contract AllModulesTest is Test {
         bytes32[] memory s2 = new bytes32[](2); s2[0] = SK1; s2[1] = SK2;
         reg.setSkills(reg.agentByContract(agentC), s2);
 
-        // stake agent agar isAgentActive=true (prasyarat submitBid)
+        // stake the agent so isAgentActive=true (prerequisite for submitBid)
         vm.startPrank(agentA); staking.stake{value: 0.05 ether}(); vm.stopPrank();
         vm.startPrank(agentC); staking.stake{value: 0.05 ether}(); vm.stopPrank();
     }
 
-    // ───────── MODUL A ─────────
+    // ───────── MODULE A ─────────
 
     function test_A1_stakeAndSlash() public {
         (uint256 amt,,,) = staking.getStake(agentA);
@@ -151,7 +151,7 @@ contract AllModulesTest is Test {
     }
 
     function test_A5_rateLimit() public {
-        // agentC accept 3 job → ke-4 revert (MAX_CONCURRENT=3)
+        // agentC accepts 3 jobs → the 4th reverts (MAX_CONCURRENT=3)
         for (uint256 i = 0; i < 3; i++) {
             bytes32[] memory req = new bytes32[](1); req[0] = SK1;
             vm.prank(requester);
@@ -169,10 +169,10 @@ contract AllModulesTest is Test {
         market.submitBid(jid4, 0.09 ether, 30);
     }
 
-    // ───────── MODUL B ─────────
+    // ───────── MODULE B ─────────
 
     function test_B1_reputation() public {
-        // test contract = owner Reputation → lolos onlyAuthorized
+        // test contract = Reputation owner → passes onlyAuthorized
         rep.recordReview(agentA, bytes32(uint256(1)), 5, 90, keccak256("review"));
         (uint256 score, uint256 cnt,) = rep.getReputation(agentA);
         assertEq(cnt, 1);
@@ -194,14 +194,14 @@ contract AllModulesTest is Test {
         assertEq(tmpl.getTemplatesBySkill(SK1).length, 1);
     }
 
-    // ───────── MODUL C ─────────
+    // ───────── MODULE C ─────────
 
     function test_C1_dispute() public {
         vm.prank(agentB);
         council.stakeAsVerifier{value: 0.06 ether}();
         uint256 did = council.raiseDispute(bytes32(uint256(1)), agentA, 0.1 ether);
         assertEq(did, 1);
-        // panel vote + resolve (verdict FAVOR_PROVIDER=2). vote sebagai agentB (verifier staked)
+        // panel vote + resolve (verdict FAVOR_PROVIDER=2). vote as agentB (staked verifier)
         vm.prank(agentB);
         council.vote(did, DisputeCouncil.Verdict.FAVOR_PROVIDER);
         vm.roll(block.number + 150);
@@ -209,7 +209,7 @@ contract AllModulesTest is Test {
     }
 
     function test_C2_subcontractor() public {
-        // agentA create sub ke agentB, parentReward 0.1, child 0.05, depth 1
+        // agentA creates a sub to agentB, parentReward 0.1, child 0.05, depth 1
         bytes32[] memory req = new bytes32[](1); req[0] = SK1;
         vm.prank(agentA);
         sub.createSub{value: 0.05 ether}(bytes32(uint256(1)), agentB, req, "subtask", 0.05 ether, 0.1 ether, 1);
@@ -240,12 +240,12 @@ contract AllModulesTest is Test {
         vm.prank(agentA);
         uint256 idx = hook.registerWebhook(makeAddr("target"), bytes4(0), ev);
         assertEq(idx, 0);
-        hook.trigger(agentA, keccak256("JOB_COMPLETED"), "payload");   // owner = test, lolos
+        hook.trigger(agentA, keccak256("JOB_COMPLETED"), "payload");   // owner = test, passes
     }
 
-    /// @dev Verifikasi access control baru: caller tidak ter-whitelist ditolak.
+    /// @dev Verify new access control: non-whitelisted callers are rejected.
     function test_sec_accessControl() public {
-        // agentB (bukan authorized/owner) tidak boleh slash/rating/review/trigger
+        // agentB (not authorized/owner) cannot slash/rating/review/trigger
         vm.prank(agentB);
         vm.expectRevert();
         staking.slash(agentA, 1000, "malicious");
