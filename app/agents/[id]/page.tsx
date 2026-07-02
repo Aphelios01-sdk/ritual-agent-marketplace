@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowLeft, Star, Shield, Cpu, Wifi, CheckCircle, Clock } from "lucide-react"
+import { ArrowLeft, Star, Shield, Cpu, Wifi, CheckCircle, Clock, ExternalLink, History } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,8 +9,10 @@ import {
   JOB_STATUS_LABELS,
   type AgentInfo,
 } from "@/lib/constants"
-import { fetchAgents } from "@/lib/onchain"
-import { formatRitual, formatRating, truncateAddress, getSkillBadgeColor } from "@/lib/utils"
+import { fetchAgents, fetchJobs } from "@/lib/onchain"
+import { formatRitual, formatRating, truncateAddress, getSkillBadgeColor, cn } from "@/lib/utils"
+
+const EXPLORER = "https://explorer.ritualfoundation.org"
 
 export const dynamic = "force-dynamic"
 
@@ -53,6 +55,13 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
   const incoming = MOCK_JOB_REQUESTS.filter((j) => j.status === "OPEN")
   const active = MOCK_JOB_REQUESTS.filter((j) => j.status === "IN_PROGRESS" || j.status === "ASSIGNED")
   const completed = MOCK_JOB_REQUESTS.filter((j) => j.status === "COMPLETED")
+
+  // Audit trail: on-chain jobs where this agent is provider or requester.
+  const onchainJobs = await fetchJobs()
+  const addr = agent.contractAddress.toLowerCase()
+  const agentHistory = onchainJobs
+    .filter((j) => j.provider.toLowerCase() === addr || j.requester.toLowerCase() === addr)
+    .slice(0, 12)
 
   return (
     <div className="container mx-auto max-w-[1400px] px-4 py-8 md:py-12">
@@ -122,7 +131,9 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
                 <div className="flex items-center gap-2">
                   <Shield className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Contract:</span>
-                  <span className="font-mono text-xs">{truncateAddress(agent.contractAddress)}</span>
+                  <a href={`${EXPLORER}/address/${agent.contractAddress}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 font-mono text-xs text-primary hover:underline">
+                    {truncateAddress(agent.contractAddress)} <ExternalLink className="h-3 w-3" />
+                  </a>
                 </div>
                 <div className="flex items-center gap-2">
                   <Wifi className="h-4 w-4 text-muted-foreground" />
@@ -224,6 +235,67 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
             </CardContent>
           </Card>
         </div>
+      </div>
+
+      {/* Audit trail */}
+      <div className="mt-8">
+        <Card className="surface-card border-border/60">
+          <CardContent className="p-5">
+            <div className="mb-4 flex items-center gap-2">
+              <History className="h-4 w-4 text-primary" />
+              <h3 className="font-semibold">On-chain history</h3>
+              <span className="ml-auto text-xs text-muted-foreground">
+                {agentHistory.length} job{agentHistory.length === 1 ? "" : "s"} · verified on Ritual Chain
+              </span>
+            </div>
+            {agentHistory.length === 0 ? (
+              <p className="py-4 text-center text-xs text-muted-foreground">
+                No on-chain job history yet for this agent. New activity appears here once the agent bids on or requests jobs.
+              </p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="border-b border-border/60 text-[11px] uppercase tracking-wider text-muted-foreground">
+                      <th className="py-2 pr-4 font-medium">Job</th>
+                      <th className="py-2 pr-4 font-medium">Role</th>
+                      <th className="py-2 pr-4 font-medium">Status</th>
+                      <th className="py-2 pr-4 font-medium">Reward</th>
+                      <th className="py-2 font-medium">Proof</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {agentHistory.map((j) => {
+                      const role = j.provider.toLowerCase() === addr ? "Provider" : "Requester"
+                      return (
+                        <tr key={j.id} className="border-b border-border/40 last:border-0">
+                          <td className="py-2.5 pr-4">
+                            <Link href={`/jobs/${j.id}`} className="font-mono text-xs text-primary hover:underline">#{j.id}</Link>
+                          </td>
+                          <td className="py-2.5 pr-4 text-xs text-muted-foreground">{role}</td>
+                          <td className="py-2.5 pr-4">
+                            <span className={cn(
+                              "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                              j.status === "COMPLETED" ? "bg-green-500/10 text-green-500" : "bg-yellow-500/10 text-yellow-500"
+                            )}>
+                              {JOB_STATUS_LABELS[j.status]}
+                            </span>
+                          </td>
+                          <td className="py-2.5 pr-4 font-mono text-xs">{formatRitual(j.reward)}</td>
+                          <td className="py-2.5">
+                            <a href={`${EXPLORER}/address/${agent.contractAddress}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-xs text-primary hover:underline">
+                              explorer <ExternalLink className="h-2.5 w-2.5" />
+                            </a>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   )

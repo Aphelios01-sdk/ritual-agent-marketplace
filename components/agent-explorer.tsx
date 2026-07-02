@@ -4,10 +4,11 @@ import { useState, useMemo, useEffect, useRef } from "react"
 import { AgentGrid } from "@/components/agent-grid"
 import { SkillInstallGuide } from "@/components/skill-install-guide"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
-import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, BookOpen, Search } from "lucide-react"
+import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, BookOpen, Search, Zap, BadgeCheck, ArrowRight } from "lucide-react"
+import Link from "next/link"
+import { formatRating } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedNumber } from "@/components/ui/animated-number"
-import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 type SortKey = "jobs" | "rating" | "bond" | "earnings"
@@ -21,6 +22,7 @@ interface Props {
 
 export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
   const [skillFilter, setSkillFilter] = useState<string | null>(null)
+  const [category, setCategory] = useState<"all" | "HTTP" | "LLM">("all")
   const [sort, setSort] = useState<SortKey>("jobs")
   const [query, setQuery] = useState("")
 
@@ -66,7 +68,8 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    const bySkill = skillFilter ? agents.filter((a) => a.skills.some((s) => s.skillId === skillFilter)) : agents
+    const byCategory = category === "all" ? agents : agents.filter((a) => a.skills.some((s) => s.precompileType === category))
+    const bySkill = skillFilter ? byCategory.filter((a) => a.skills.some((s) => s.skillId === skillFilter)) : byCategory
     const byQuery = q
       ? bySkill.filter(
           (a) =>
@@ -81,7 +84,17 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
       if (sort === "earnings") return Number(b.totalEarnings - a.totalEarnings)
       return Number(b.bondAmount - a.bondAmount)
     })
-  }, [agents, skillFilter, sort, query])
+  }, [agents, skillFilter, category, sort, query])
+
+  // Featured strip: top verified agents by rating.
+  const featured = useMemo(
+    () =>
+      [...agents]
+        .filter((a) => a.active && a.jobCount >= 10 && a.avgRating >= 4)
+        .sort((a, b) => b.avgRating - a.avgRating)
+        .slice(0, 3),
+    [agents],
+  )
 
   // Activity feed: job terbaru, prioritaskan OPEN/IN_PROGRESS dulu
   const activity = useMemo(() => {
@@ -197,6 +210,30 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
           })}
         </div>
 
+        {/* Featured strip */}
+        {featured.length > 0 && (
+          <div className="mb-8 animate-fade-up" style={{ animationDelay: "440ms" }}>
+            <div className="mb-3 flex items-center gap-2">
+              <Zap className="h-3.5 w-3.5 text-primary" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Featured · verified</span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {featured.map((a) => (
+                <Link key={a.id} href={`/agents/${a.id}`} className="surface-card sheen group flex items-center gap-3 rounded-[var(--radius)] border border-border/60 p-4 transition-transform duration-300 hover:-translate-y-1">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 font-mono text-sm font-bold text-primary">
+                    {a.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-1 truncate text-sm font-semibold">{a.name}<BadgeCheck className="h-3.5 w-3.5 shrink-0 text-primary" /></p>
+                    <p className="truncate text-xs text-muted-foreground">{formatRating(a.avgRating)} ★ · {a.jobCount} jobs</p>
+                  </div>
+                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Layout 2-kolom: grid agents + activity feed */}
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           {/* Agents area */}
@@ -237,7 +274,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                       : "border-border bg-transparent text-muted-foreground hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground"
                   )}
                 >
-                  All
+                  All skills
                 </button>
                 {skills.map((skill) => (
                   <button
@@ -251,6 +288,23 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                     )}
                   >
                     {skill.name}
+                  </button>
+                ))}
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Type</span>
+                {(["all", "HTTP", "LLM"] as const).map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setCategory(c)}
+                    className={cn(
+                      "rounded-full border px-2.5 py-0.5 text-[11px] transition-colors",
+                      category === c
+                        ? "border-primary/60 bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    )}
+                  >
+                    {c === "all" ? "All" : c}
                   </button>
                 ))}
               </div>

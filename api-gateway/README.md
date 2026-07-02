@@ -17,6 +17,8 @@ Environment variables:
 | `RPC_URL` | `https://rpc.ritualfoundation.org` | Ritual Chain RPC |
 | `PORT` | `8787` | HTTP port |
 | `SIGNER_PK` | (empty) | Private key of the signer for POST /jobs relay. Empty = relay OFF |
+| `API_KEY` | (empty) | If set, all non-GET requests must send it in the `x-api-key` header. Empty = open writes (not recommended) |
+| `RATE_LIMIT_PER_MIN` | `60` | Per-IP request limit per 60s window |
 | `REGISTRY` | Module A address | Override AgentRegistry |
 | `JOB_MARKET_V2` | Module A address | Override JobMarketV2 |
 

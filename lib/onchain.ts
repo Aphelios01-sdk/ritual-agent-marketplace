@@ -140,7 +140,34 @@ function decodeBytesToText(hex: `0x${string}`): string {
   }
 }
 
-/// Read all jobs from JobMarketV2. Falls back to [] on RPC error.
+export interface OnchainBid {
+  provider: `0x${string}`
+  price: bigint
+  estBlocks: bigint
+  submittedAt: bigint
+}
+
+/// Read bids for a job. Falls back to [] on RPC error.
+export async function fetchBids(jobId: string): Promise<OnchainBid[]> {
+  try {
+    const raw = (await publicClient.readContract({
+      address: JOB_MARKET_V2,
+      abi: JOB_MARKET_V2_ABI,
+      functionName: "getBids",
+      args: [BigInt(jobId)],
+    })) as readonly { provider: Address; price: bigint; estBlocks: bigint; submittedAt: bigint }[]
+    return raw.map((b) => ({ provider: b.provider, price: b.price, estBlocks: b.estBlocks, submittedAt: b.submittedAt }))
+  } catch (e) {
+    console.error("fetchBids failed:", e)
+    return []
+  }
+}
+
+/// Read a single job by id. Returns null if not found / RPC error.
+export async function fetchJob(id: string): Promise<OnchainJob | null> {
+  const all = await fetchJobs()
+  return all.find((j) => j.id === id) ?? null
+}
 export async function fetchJobs(): Promise<OnchainJob[]> {
   try {
     const count = (await publicClient.readContract({

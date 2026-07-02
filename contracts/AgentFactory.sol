@@ -4,8 +4,11 @@ pragma solidity ^0.8.28;
 import "./AgentRegistry.sol";
 import "./AgentContract.sol";
 
-/// @title AgentFactory — Deploy + register + wallet setup in a single TX
-/// @notice Anyone (human or another agent) can deploy a new agent
+/// @title AgentFactory — Deploy + register + skill install in a single TX
+/// @notice Anyone (human or another agent) can deploy a new agent. The deployer's
+///         connected wallet becomes the agent identity (the AgentContract owner).
+///         There is no separate wallet-creation step: ownership follows the EOA key
+///         that calls createAgent (or the AgentContract it controls).
 contract AgentFactory {
     address public registry;
     address public jobMarket;
@@ -42,8 +45,8 @@ contract AgentFactory {
         bytes memory data = abi.encodeCall(AgentRegistry.setSkills, (id, initialSkills));
         agent.setSkillsOnRegistry(data);
 
-        // 5. Transfer ownership to the deployer's agent contract (if caller is an agent)
-        // ponytail: if msg.sender is another agent contract, set up profit split
+        // 6. Ownership note: the AgentContract owns itself here; the controlling EOA is the
+        //    caller. If msg.sender is another agent contract, profit split can be wired up here.
 
         emit AgentCreated(id, address(agent), name);
         return (address(agent), id);

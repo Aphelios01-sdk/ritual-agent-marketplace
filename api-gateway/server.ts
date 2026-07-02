@@ -29,6 +29,15 @@ const PORT = Number(process.env.PORT || 8787)
 const SIGNER_PK = process.env.SIGNER_PK || ""
 const CHAIN_ID = 1979
 
+// Hardening: optional API key (required for POST /jobs when set) + per-IP rate limit.
+const API_KEY = process.env.API_KEY || ""
+const RATE_LIMIT_PER_MIN = Number(process.env.RATE_LIMIT_PER_MIN || 60)
+const RATE_WINDOW_MS = 60_000
+
+if (!API_KEY) {
+  console.warn("[api-gateway] WARNING: API_KEY not set — POST /jobs is unauthenticated. Set API_KEY in production.")
+}
+
 const REGISTRY = (process.env.REGISTRY || "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5") as `0x${string}`
 const JOB_MARKET_V2 = (process.env.JOB_MARKET_V2 || "0x14781a0e7e559f2a651115f83467e7ae55ccd6d6") as `0x${string}`
 
@@ -161,20 +170,71 @@ async function handle(req: http.IncomingMessage, url: URL): Promise<{ status: nu
   return json({ error: "not found", path: p }, 404)
 }
 
+// ── rate limiter (per-IP fixed window, in-memory) ──
+const hits = new Map<string, { count: number; resetAt: number }>()
+function rateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = hits.get(ip)
+  if (!entry || now > entry.resetAt) {
+    hits.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS })
+    return true
+  }
+  entry.count++
+  return entry.count <= RATE_LIMIT_PER_MIN
+}
+// Periodic cleanup so the map does not grow unbounded.
+setInterval(() => {
+  const now = Date.now()
+  for (const [ip, e] of hits) if (now > e.resetAt) hits.delete(ip)
+}, RATE_WINDOW_MS).unref?.()
+
+function clientIp(req: http.IncomingMessage): string {
+  return (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() || req.socket.remoteAddress || "unknown"
+}
+
 const server = http.createServer(async (req, res) => {
+  const started = Date.now()
   const url = new URL(req.url || "/", `http://localhost:${PORT}`)
+  const ip = clientIp(req)
+  const method = req.method || "GET"
+
+  // Request log: METHOD path ip — status ms (written after handling).
   try {
+    // Rate limit
+    if (!rateLimit(ip)) {
+      const out = json({ error: "rate limit exceeded", retryMs: RATE_WINDOW_MS }, 429)
+      res.writeHead(out.status, { ...out.headers, "retry-after": String(Math.ceil(RATE_WINDOW_MS / 1000)) })
+      res.end(out.body)
+      console.log(`${method} ${url.pathname} ${ip} — 429 ${Date.now() - started}ms`)
+      return
+    }
+
+    // Auth: mutating endpoints require an API key when API_KEY is configured.
+    if (method !== "GET" && method !== "OPTIONS" && API_KEY) {
+      const provided = req.headers["x-api-key"]
+      if (provided !== API_KEY) {
+        const out = json({ error: "unauthorized", hint: "set x-api-key header" }, 401)
+        res.writeHead(out.status, out.headers)
+        res.end(out.body)
+        console.log(`${method} ${url.pathname} ${ip} — 401 ${Date.now() - started}ms`)
+        return
+      }
+    }
+
     const out = await handle(req, url)
     res.writeHead(out.status, out.headers); res.end(out.body)
+    console.log(`${method} ${url.pathname} ${ip} — ${out.status} ${Date.now() - started}ms`)
   } catch (e: any) {
     const msg = e?.shortMessage || e?.message || String(e)
     res.writeHead(500, { "content-type": "application/json", "access-control-allow-origin": "*" })
     res.end(JSON.stringify({ error: "server error", detail: msg }))
+    console.error(`${method} ${url.pathname} ${ip} — 500 ${Date.now() - started}ms`, msg)
   }
 })
 
 server.listen(PORT, () => {
   console.log(`[api-gateway] Ritual marketplace Web2 gateway on :${PORT} (chain ${CHAIN_ID})`)
   console.log(`  GET  /health | /agents | /agents/:id | /jobs/:id | /jobs/agent/:addr`)
-  console.log(`  POST /jobs ${SIGNER_PK ? "(relay aktif)" : "(relay OFF — set SIGNER_PK)"}`)
+  console.log(`  POST /jobs ${SIGNER_PK ? "(relay active)" : "(relay OFF — set SIGNER_PK)"}`)
+  console.log(`  auth: ${API_KEY ? "API key required for writes" : "open (set API_KEY)"} · rate limit: ${RATE_LIMIT_PER_MIN}/min per IP`)
 })
