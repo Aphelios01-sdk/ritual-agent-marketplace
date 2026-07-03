@@ -45,9 +45,12 @@ export interface SkillDefinition {
   precompileType: "HTTP" | "LLM"
   config: Record<string, string>
   active: boolean
+  source: "official" | "community"
+  author?: string
+  authorUrl?: string
 }
 
-export const BUILT_IN_SKILLS: SkillDefinition[] = [
+const OFFICIAL_SKILLS: SkillDefinition[] = [
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000001" as const,
     name: "fetch-token-price",
@@ -55,6 +58,7 @@ export const BUILT_IN_SKILLS: SkillDefinition[] = [
     precompileType: "HTTP",
     config: { url: "https://api.coingecko.com/api/v3/simple/price", method: "GET", headers: "{}" },
     active: true,
+    source: "official",
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000002" as const,
@@ -63,6 +67,7 @@ export const BUILT_IN_SKILLS: SkillDefinition[] = [
     precompileType: "LLM",
     config: { promptTemplate: "Analyze the sentiment of this text: {input}", model: "zai-org/GLM-4.7-FP8" },
     active: true,
+    source: "official",
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000003" as const,
@@ -71,6 +76,7 @@ export const BUILT_IN_SKILLS: SkillDefinition[] = [
     precompileType: "LLM",
     config: { promptTemplate: "Generate a DeFi report based on this data: {input}", model: "zai-org/GLM-4.7-FP8" },
     active: true,
+    source: "official",
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000004" as const,
@@ -79,8 +85,80 @@ export const BUILT_IN_SKILLS: SkillDefinition[] = [
     precompileType: "HTTP",
     config: { url: "https://explorer.ritualfoundation.org/api", method: "GET", headers: "{}" },
     active: true,
+    source: "official",
   },
 ]
+
+export const COMMUNITY_SKILLS: SkillDefinition[] = [
+  {
+    skillId: "0x0000000000000000000000000000000000000000000000000000000000000011" as const,
+    name: "twitter-sentiment",
+    description: "Fetch recent tweets for a keyword and analyze sentiment via LLM",
+    precompileType: "HTTP",
+    config: { url: "https://api.twitter.com/2/tweets/search/recent", method: "GET", headers: "{}" },
+    active: true,
+    source: "community",
+    author: "OrionLabs",
+    authorUrl: "https://github.com/orionlabs",
+  },
+  {
+    skillId: "0x0000000000000000000000000000000000000000000000000000000000000012" as const,
+    name: "price-alert",
+    description: "Monitor token price against a threshold and trigger alert if crossed",
+    precompileType: "HTTP",
+    config: { url: "https://api.coingecko.com/api/v3/simple/price", method: "GET", headers: "{}" },
+    active: true,
+    source: "community",
+    author: "DataDrift",
+    authorUrl: "https://github.com/datadrift",
+  },
+  {
+    skillId: "0x0000000000000000000000000000000000000000000000000000000000000013" as const,
+    name: "nft-metadata",
+    description: "Fetch NFT metadata (name, image, traits) from any contract address",
+    precompileType: "HTTP",
+    config: { url: "https://api.opensea.io/api/v2/chain/ethereum/contract/{address}/nfts", method: "GET", headers: "{}" },
+    active: true,
+    source: "community",
+    author: "NFTHunter",
+    authorUrl: "https://github.com/nfthunter",
+  },
+  {
+    skillId: "0x0000000000000000000000000000000000000000000000000000000000000014" as const,
+    name: "code-review",
+    description: "Automated code review — submit source code and receive LLM-powered feedback",
+    precompileType: "LLM",
+    config: { promptTemplate: "Review the following code for bugs, security issues, and style: {input}", model: "zai-org/GLM-4.7-FP8" },
+    active: true,
+    source: "community",
+    author: "ReviewBot",
+    authorUrl: "https://github.com/reviewbot",
+  },
+  {
+    skillId: "0x0000000000000000000000000000000000000000000000000000000000000015" as const,
+    name: "translate-text",
+    description: "Translate text between 50+ languages using LLM",
+    precompileType: "LLM",
+    config: { promptTemplate: "Translate the following text to {targetLang}: {input}", model: "zai-org/GLM-4.7-FP8" },
+    active: true,
+    source: "community",
+    author: "LinguaAgent",
+    authorUrl: "https://github.com/linguaagent",
+  },
+  {
+    skillId: "0x0000000000000000000000000000000000000000000000000000000000000016" as const,
+    name: "summarize-article",
+    description: "Summarize articles, docs, or long text into concise bullet points",
+    precompileType: "LLM",
+    config: { promptTemplate: "Summarize this article in 3-5 bullet points: {input}", model: "zai-org/GLM-4.7-FP8" },
+    active: true,
+    source: "community",
+    author: "SummarAI",
+    authorUrl: "https://github.com/summara",
+  },
+]
+
+export const BUILT_IN_SKILLS: SkillDefinition[] = [...OFFICIAL_SKILLS, ...COMMUNITY_SKILLS]
 
 export const SKILL_MAP = Object.fromEntries(BUILT_IN_SKILLS.map((s) => [s.skillId, s])) as Record<string, SkillDefinition>
 
@@ -231,5 +309,60 @@ export const MOCK_JOB_REQUESTS: JobRequestInfo[] = [
     provider: "0x0000000000000000000000000000000000000003",
     resultData: JSON.stringify({ status: "completed", summary: "..." }),
     rating: 5,
+  },
+  {
+    id: "4",
+    requester: "0x000000000000000000000000000000000000000d",
+    requiredSkillIds: [BUILT_IN_SKILLS[1].skillId],
+    taskData: JSON.stringify({ query: "Analyze sentiment of recent NFT market news" }),
+    reward: BigInt("75000000000000000"),
+    status: "ASSIGNED",
+    provider: "0x0000000000000000000000000000000000000001",
+    resultData: "",
+    rating: 0,
+  },
+  {
+    id: "5",
+    requester: "0x000000000000000000000000000000000000000e",
+    requiredSkillIds: [BUILT_IN_SKILLS[3].skillId],
+    taskData: JSON.stringify({ query: "Fetch latest block data from Ritual explorer" }),
+    reward: BigInt("30000000000000000"),
+    status: "COMPLETED",
+    provider: "0x0000000000000000000000000000000000000004",
+    resultData: JSON.stringify({ blockNumber: 19790042, txCount: 156, timestamp: "2026-07-03T12:00:00Z" }),
+    rating: 5,
+  },
+  {
+    id: "6",
+    requester: "0x000000000000000000000000000000000000000f",
+    requiredSkillIds: [BUILT_IN_SKILLS[2].skillId, BUILT_IN_SKILLS[0].skillId],
+    taskData: JSON.stringify({ query: "Compare TVL across Arbitrum, Optimism, Base" }),
+    reward: BigInt("150000000000000000"),
+    status: "OPEN",
+    provider: "0x0000000000000000000000000000000000000000",
+    resultData: "",
+    rating: 0,
+  },
+  {
+    id: "7",
+    requester: "0x0000000000000000000000000000000000000010",
+    requiredSkillIds: [BUILT_IN_SKILLS[0].skillId],
+    taskData: JSON.stringify({ query: "Get SOL price in USD" }),
+    reward: BigInt("25000000000000000"),
+    status: "COMPLETED",
+    provider: "0x0000000000000000000000000000000000000002",
+    resultData: JSON.stringify({ token: "SOL", price: 142.53, source: "CoinGecko" }),
+    rating: 4,
+  },
+  {
+    id: "8",
+    requester: "0x0000000000000000000000000000000000000011",
+    requiredSkillIds: [BUILT_IN_SKILLS[2].skillId],
+    taskData: JSON.stringify({ query: "Generate weekly DeFi market summary" }),
+    reward: BigInt("180000000000000000"),
+    status: "DISPUTED",
+    provider: "0x0000000000000000000000000000000000000003",
+    resultData: JSON.stringify({ summary: "Weekly DeFi report..." }),
+    rating: 0,
   },
 ]

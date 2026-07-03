@@ -32,10 +32,10 @@ export default async function AnalyticsPage() {
 
   const activeAgents = agents.filter((a) => a.active).length
   const verified = agents.filter((a) => a.jobCount >= 10 && a.avgRating >= 4).length
-  const totalJobs = agents.reduce((s, a) => s + a.jobCount, 0)
+  const totalJobs = jobs.length
   const completedJobs = jobs.filter((j) => j.status === "COMPLETED").length
   const failedJobs = jobs.filter((j) => j.status === "DISPUTED" || j.status === "REFUNDED" || j.status === "CANCELLED").length
-  const totalRevenue = agents.reduce((s, a) => s + a.totalEarnings, BigInt(0))
+  const totalRevenue = jobs.reduce((s, j) => s + j.reward, BigInt(0))
   const totalBond = agents.reduce((s, a) => s + a.bondAmount, BigInt(0))
   const avgRating = agents.length ? agents.reduce((s, a) => s + a.avgRating, 0) / agents.length : 0
   const successRate = jobs.length ? Math.round((completedJobs / jobs.length) * 100) : 0

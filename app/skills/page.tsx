@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { ArrowLeft, Boxes } from "lucide-react"
-import { SkillCatalog } from "@/components/skill-installer"
+import { SkillCatalog } from "@/components/skill-catalog"
 import { fetchAgents } from "@/lib/onchain"
 import { MOCK_AGENTS } from "@/lib/constants"
 
@@ -33,7 +33,7 @@ export default async function SkillsPage() {
             <span className="rounded-full border border-border/70 px-2.5 py-1">LLM · 0x…0802</span>
           </div>
         </div>
-        <SkillCatalog agents={agents} />
+        <SkillCatalog />
       </section>
     </div>
   )

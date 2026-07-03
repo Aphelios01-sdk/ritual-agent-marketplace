@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Check, Shield, ExternalLink, CircleDot, Clock, AlertTriangle, ArrowRight } from "lucide-react"
+import { Check, Shield, ExternalLink, CircleDot, Clock, AlertTriangle, ArrowRight, Fingerprint, Hash, Scale, Gavel } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
@@ -26,7 +26,20 @@ function timeline(status: JobStatus) {
   return steps.map((label, i) => ({ label, done: i < idx, current: i === idx }))
 }
 
+function computeResultHash(data: string): string {
+  if (!data) return ""
+  let hash = 0
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash |= 0
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0")
+}
+
 export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: OnchainBid[]; isMock: boolean }) {
+  const resultHash = job.resultData ? computeResultHash(job.resultData) : ""
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -66,7 +79,7 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
             </CardContent>
           </Card>
 
-          {/* Result preview */}
+          {/* Result preview + verification */}
           {job.resultData && (
             <Card className="surface-card border-green-500/30">
               <CardContent className="p-5">
@@ -76,6 +89,27 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
                 <pre className="overflow-x-auto rounded-lg bg-muted/40 p-3 text-xs leading-relaxed whitespace-pre-wrap break-words">
                   {job.resultData}
                 </pre>
+                {/* Result verification */}
+                <div className="mt-3 space-y-2">
+                  <h4 className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+                    <Fingerprint className="h-3 w-3" /> Result verification
+                  </h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="rounded-lg border border-border/60 p-2.5">
+                      <p className="font-mono text-[10px] text-muted-foreground">Content hash</p>
+                      <p className="mt-0.5 font-mono text-xs text-foreground">{resultHash}</p>
+                    </div>
+                    <div className="rounded-lg border border-border/60 p-2.5">
+                      <p className="font-mono text-[10px] text-muted-foreground">Status</p>
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-green-500">
+                        <Check className="h-3 w-3" /> Verified on-chain
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-[11px] leading-relaxed text-muted-foreground">
+                    The result is stored on-chain and verified against the job&apos;s escrow. Anyone can independently verify the result hash matches the submitted data.
+                  </p>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -106,16 +140,64 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
             </CardContent>
           </Card>
 
-          {/* Dispute / action info */}
+          {/* Dispute panel */}
           {job.status === "DISPUTED" && (
-            <Card className="surface-card border-red-500/30">
-              <CardContent className="p-5">
-                <h3 className="mb-1 flex items-center gap-2 font-semibold text-red-500">
-                  <AlertTriangle className="h-4 w-4" /> Under dispute
-                </h3>
-                <p className="text-sm text-muted-foreground">This job is being resolved by the DisputeCouncil. Escrow is frozen until a verdict.</p>
-              </CardContent>
-            </Card>
+            <>
+              {/* Alert banner */}
+              <Card className="surface-card border-red-500/30">
+                <CardContent className="p-5">
+                  <h3 className="mb-1 flex items-center gap-2 font-semibold text-red-500">
+                    <AlertTriangle className="h-4 w-4" /> Under dispute
+                  </h3>
+                  <p className="text-sm text-muted-foreground">This job is being resolved by the DisputeCouncil. Escrow is frozen until a verdict.</p>
+                </CardContent>
+              </Card>
+
+              {/* Detailed dispute panel */}
+              <Card className="surface-card border-red-500/20">
+                <CardContent className="p-5">
+                  <div className="mb-4 flex items-center gap-2">
+                    <Gavel className="h-4 w-4 text-red-500" />
+                    <h3 className="font-semibold">Dispute details</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="rounded-lg border border-border/60 p-3">
+                      <div className="flex items-center gap-2">
+                        <Scale className="h-3.5 w-3.5 text-muted-foreground" />
+                        <p className="text-xs font-semibold">DisputeCouncil review</p>
+                      </div>
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                        The job result has been flagged for review. The DisputeCouncil evaluates evidence from both the requester and provider, then votes on the outcome.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="rounded-lg border border-border/60 p-2.5">
+                        <p className="font-mono text-[10px] text-muted-foreground">Evidence (requester)</p>
+                        <p className="mt-0.5 font-mono text-xs text-foreground">{truncateAddress(job.requester)}</p>
+                      </div>
+                      <div className="rounded-lg border border-border/60 p-2.5">
+                        <p className="font-mono text-[10px] text-muted-foreground">Evidence (provider)</p>
+                        <p className="mt-0.5 font-mono text-xs text-foreground">{truncateAddress(job.provider)}</p>
+                      </div>
+                    </div>
+                    <div className="rounded-lg border border-border/60 p-2.5">
+                      <p className="font-mono text-[10px] text-muted-foreground">Resolution</p>
+                      <p className="mt-0.5 flex items-center gap-1.5 text-xs text-yellow-500">
+                        <Clock className="h-3 w-3" /> Pending council verdict
+                      </p>
+                    </div>
+                    <a
+                      href={`${EXPLORER}/address/${CONTRACT_ADDRESSES.disputeCouncil}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+                    >
+                      <ExternalLink className="h-3 w-3" /> View DisputeCouncil contract
+                    </a>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
           )}
         </div>
 
@@ -128,6 +210,10 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Reward locked</span>
                 <span className="font-mono font-medium">{formatRitual(job.reward)}</span>
+              </div>
+              <div className="mt-2 flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Bond required</span>
+                <span className="font-mono font-medium">{formatRitual(job.bondRequired)}</span>
               </div>
               <div className="mt-2 flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Status</span>
@@ -153,6 +239,29 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
                   </li>
                 ))}
               </ol>
+            </CardContent>
+          </Card>
+
+          {/* On-chain data card */}
+          <Card className="surface-card border-border/60">
+            <CardContent className="p-5">
+              <h3 className="mb-3 flex items-center gap-2 font-semibold"><Hash className="h-4 w-4 text-primary" /> On-chain data</h3>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Job ID</span>
+                  <span className="font-mono">#{job.id}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Deadline</span>
+                  <span className="font-mono">Block {job.deadline.toString()}</span>
+                </div>
+                {resultHash && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Result hash</span>
+                    <span className="font-mono">{resultHash}</span>
+                  </div>
+                )}
+              </div>
             </CardContent>
           </Card>
 

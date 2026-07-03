@@ -2,38 +2,29 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowRight, ArrowLeft, Check, Cpu, Shield, Sparkles } from "lucide-react"
+import { ArrowRight, ArrowLeft, Check, Shield, Sparkles } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CodeBlock } from "@/components/ui/code-block"
+import { SkillCard } from "@/components/skill-catalog"
 import { BUILT_IN_SKILLS } from "@/lib/constants"
-import { useSkillInstaller } from "@/components/skill-installer"
-import { cn } from "@/lib/utils"
 
 type Step = 1 | 2 | 3
 
 export function CreateAgentFlow() {
-  const { install } = useSkillInstaller()
   const [step, setStep] = useState<Step>(1)
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [selected, setSelected] = useState<string[]>([])
-  const [agentId, setAgentId] = useState<string | null>(null)
 
   const toggle = (sid: string) =>
     setSelected((prev) => (prev.includes(sid) ? prev.filter((x) => x !== sid) : [...prev, sid]))
 
-  const finish = () => {
-    // Wallet-free: create a local agent identity and install the chosen skills into it.
-    const id = `local-${Date.now()}`
-    setAgentId(id)
-    selected.forEach((sid) => install(id, sid))
-    setStep(3)
-  }
+  const chosen = BUILT_IN_SKILLS.filter((s) => selected.includes(s.skillId))
 
   const steps = [
     { n: 1 as Step, label: "Agent details", icon: Sparkles },
-    { n: 2 as Step, label: "Install skills", icon: Cpu },
+    { n: 2 as Step, label: "Choose skills", icon: Shield },
   ]
 
   return (
@@ -46,7 +37,7 @@ export function CreateAgentFlow() {
           const done = step > s.n
           return (
             <div key={s.n} className="flex flex-1 items-center gap-2">
-              <div className={cn("flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors", active ? "border-primary bg-primary/10 text-primary" : done ? "border-primary/40 text-primary" : "border-border text-muted-foreground")}>
+              <div className={cnBase("flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors", active ? "border-primary bg-primary/10 text-primary" : done ? "border-primary/40 text-primary" : "border-border text-muted-foreground")}>
                 {done ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                 <span className="hidden sm:inline">{s.label}</span>
               </div>
@@ -63,7 +54,7 @@ export function CreateAgentFlow() {
               <div>
                 <h3 className="text-lg font-semibold">Configure your agent</h3>
                 <p className="text-sm text-muted-foreground">
-                  Define the agent identity. No wallet or gas needed — the agent is configured locally and skills are installed into it.
+                  Define the agent identity. No wallet or gas needed — this builds the agent configuration locally.
                 </p>
               </div>
               <div className="grid gap-3">
@@ -87,34 +78,20 @@ export function CreateAgentFlow() {
           {step === 2 && (
             <div className="space-y-4">
               <div>
-                <h3 className="text-lg font-semibold">Install skills</h3>
-                <p className="text-sm text-muted-foreground">Select the capabilities your agent can perform. Each maps to a Ritual precompile.</p>
+                <h3 className="text-lg font-semibold">Choose skills</h3>
+                <p className="text-sm text-muted-foreground">
+                  Select the packages your agent will use. Each card links to its GitHub repo and npm package for installation.
+                </p>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {BUILT_IN_SKILLS.map((s) => {
-                  const checked = selected.includes(s.skillId)
-                  return (
-                    <button key={s.skillId} onClick={() => toggle(s.skillId)} className={cn("flex items-start gap-2 rounded-lg border p-3 text-left transition-colors", checked ? "border-primary bg-primary/5" : "border-border hover:border-primary/40")}>
-                      <div className={cn("mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border", checked ? "border-primary bg-primary text-primary-foreground" : "border-muted-foreground/40")}>
-                        {checked && <Check className="h-3 w-3" />}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="flex items-center gap-1.5 text-sm font-medium">
-                          {s.name}
-                          <span className={cn("rounded-full px-1.5 py-0.5 font-mono text-[9px]", s.precompileType === "HTTP" ? "bg-blue-500/10 text-blue-500" : "bg-primary/10 text-primary")}>
-                            {s.precompileType}
-                          </span>
-                        </p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">{s.description}</p>
-                      </div>
-                    </button>
-                  )
-                })}
+              <div className="grid gap-4 sm:grid-cols-2">
+                {BUILT_IN_SKILLS.map((s) => (
+                  <SkillCard key={s.skillId} skill={s} selected={selected.includes(s.skillId)} onToggle={() => toggle(s.skillId)} />
+                ))}
               </div>
               <div className="flex justify-between">
                 <Button variant="ghost" onClick={() => setStep(1)} className="gap-1.5"><ArrowLeft className="h-4 w-4" /> Back</Button>
-                <Button onClick={finish} className="gap-1.5">
-                  <Shield className="h-4 w-4" /> Create agent &amp; install {selected.length || ""}
+                <Button onClick={() => setStep(3)} className="gap-1.5">
+                  <Shield className="h-4 w-4" /> Review ({selected.length})
                 </Button>
               </div>
             </div>
@@ -124,22 +101,37 @@ export function CreateAgentFlow() {
 
       {step === 3 && (
         <Card className="surface-card border-primary/40">
-          <CardContent className="flex flex-col items-center gap-3 p-12 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary">
-              <Check className="h-6 w-6" />
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center gap-2 text-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary">
+                <Check className="h-6 w-6" />
+              </div>
+              <h3 className="text-xl font-semibold">Agent configuration ready</h3>
+              <p className="max-w-md text-sm text-muted-foreground">
+                <b className="text-foreground">{name}</b> with {chosen.length} skill{chosen.length === 1 ? "" : "s"}. Install each package, then register them on-chain via <code className="font-mono text-xs">setSkills</code>.
+              </p>
             </div>
-            <h3 className="text-xl font-semibold">Agent ready</h3>
-            <p className="max-w-md text-sm text-muted-foreground">
-              <b className="text-foreground">{name}</b> is configured with {selected.length} skill{selected.length === 1 ? "" : "s"}. It now appears in your installed-skills summary.
-            </p>
-            <div className="flex gap-2">
-              <Button asChild><Link href="/skills">Manage skills</Link></Button>
+
+            <div className="mt-5 space-y-3">
+              {chosen.map((s) => (
+                <SkillCard key={s.skillId} skill={s} selected />
+              ))}
+            </div>
+
+            <div className="mt-5 flex flex-wrap justify-center gap-2">
+              <Button asChild><Link href="/skills">Full skill catalog</Link></Button>
               <Button variant="outline" asChild><Link href="/">View marketplace</Link></Button>
             </div>
-            <CodeBlock className="mt-2 w-full max-w-md" lang="agent" code={`name: ${name}\nskills: ${selected.length}\nid: ${agentId}`} />
+
+            <CodeBlock className="mt-4" lang="agent" code={`name: ${name}\ndescription: ${description}\nskills: ${chosen.map((s) => s.name).join(", ") || "none"}`} />
           </CardContent>
         </Card>
       )}
     </div>
   )
+}
+
+// local cn to avoid an extra import line in this file
+function cnBase(...parts: (string | false | undefined)[]) {
+  return parts.filter(Boolean).join(" ")
 }

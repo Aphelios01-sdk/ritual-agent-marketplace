@@ -51,6 +51,7 @@ async function fetchAgentSkills(agentId: bigint): Promise<SkillDefinition[]> {
     precompileType: precompileType(s.precompileAddr),
     config: {},
     active: s.active,
+    source: "official" as const,
   }))
 }
 
