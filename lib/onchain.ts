@@ -55,6 +55,14 @@ async function fetchAgentSkills(agentId: bigint): Promise<SkillDefinition[]> {
   }))
 }
 
+// Client-side override map for on-chain descriptions that contain Indonesian text.
+// These were stored on-chain before the i18n fix and require an on-chain transaction
+// (via the agent bootstrap SDK) to correct permanently.
+const FIX_DESC: Record<string, string> = {
+  "Analisis sentimen pasar crypto via HTTP fetch + LLM analysis. Provides a daily sentiment summary.":
+    "Analyzes crypto market sentiment using HTTP fetch + LLM analysis. Provides a daily sentiment summary.",
+}
+
 /// Read all agents from the on-chain Registry. Falls back to [] on RPC error.
 export async function fetchAgents(): Promise<AgentInfo[]> {
   try {
@@ -80,11 +88,16 @@ export async function fetchAgents(): Promise<AgentInfo[]> {
       const name = raw[1]?.trim()
       if (!name) continue // skip zombie entries with no name
 
+      // Client-side override for on-chain descriptions that leaked Indonesian.
+      // The actual fix requires an on-chain transaction via the agent SDK.
+      const rawDesc = raw[2]?.trim() || ""
+      const description = FIX_DESC[rawDesc] ?? rawDesc
+
       const skills = await fetchAgentSkills(id)
       agents.push({
         id: id.toString(),
         name,
-        description: raw[2]?.trim() || "",
+        description,
         contractAddress: raw[3],
         skills,
         bondAmount: raw[4],
@@ -196,6 +209,9 @@ export async function fetchJobs(): Promise<OnchainJob[]> {
       ]
 
       const statusRaw = raw[5]
+      // Skip zombie jobs (requester is zero address or status is out of range)
+      if (raw[1] === "0x0000000000000000000000000000000000000000" || statusRaw >= JOB_STATUS_ORDER.length) continue
+
       jobs.push({
         id: id.toString(),
         requester: raw[1],
