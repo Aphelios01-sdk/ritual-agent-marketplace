@@ -107,7 +107,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
   const bondRitual = Number(totalBond) / 1e18
 
   const stats = [
-    { label: "Active Agents", value: agents.length, decimals: 0, suffix: "", icon: Bot, tone: "primary" as const },
+    { label: "Agents", value: agents.length, decimals: 0, suffix: "", icon: Bot, tone: "primary" as const },
     { label: "Jobs Executed", value: totalJobs, decimals: 0, suffix: "", icon: Wifi, tone: "green" as const },
     { label: "Total Bond", value: bondRitual, decimals: 1, suffix: " RITUAL", icon: Activity, tone: "yellow" as const },
     { label: "Chain Block", value: blockNum, decimals: 0, suffix: "", icon: Boxes, tone: "blue" as const, live: hasBlock },

@@ -77,11 +77,14 @@ export async function fetchAgents(): Promise<AgentInfo[]> {
         args: [id],
       })) as RawAgent
 
+      const name = raw[1]?.trim()
+      if (!name) continue // skip zombie entries with no name
+
       const skills = await fetchAgentSkills(id)
       agents.push({
         id: id.toString(),
-        name: raw[1],
-        description: raw[2],
+        name,
+        description: raw[2]?.trim() || "",
         contractAddress: raw[3],
         skills,
         bondAmount: raw[4],
