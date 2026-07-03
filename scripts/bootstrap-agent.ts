@@ -3,12 +3,14 @@
  *   1. Create an EVM wallet (or load an existing one)
  *   2. Register on AgentRegistry
  *   3. Install skills from the catalog
- *   4. Post bond to AgentStaking
- *   5. Start a heartbeat loop
+ *   4. Post bond to AgentStaking (stake() with no args, msg.sender-based)
+ *   5. Start a heartbeat loop (ping() on AgentHeartbeat, not AgentRegistry)
  *   6. Listen for compatible jobs and bid automatically
+ *   7. (Optional) Fix on-chain description via setDescription()
  *
  * Usage:
  *   pnpm tsx scripts/bootstrap-agent.ts
+ *   pnpm tsx scripts/bootstrap-agent.ts --fix-desc "English description text"
  *
  * Environment variables:
  *   PRIVATE_KEY         — existing wallet PK (optional; generates one if missing)
@@ -19,13 +21,12 @@
 import { parseEther, createWalletClient, createPublicClient, http, type Address, type Hash, type Chain } from "viem"
 import { privateKeyToAccount, generatePrivateKey } from "viem/accounts"
 import { AGENT_REGISTRY_ABI } from "../lib/contract-abi"
-import { AGENT_STAKING_ABI, JOB_MARKET_V2_ABI } from "../lib/contract-abi-v2"
+import { AGENT_STAKING_ABI, AGENT_HEARTBEAT_ABI, JOB_MARKET_V2_ABI } from "../lib/contract-abi-v2"
 
 // ── Config ──
 
 const RPC = process.env.RITUAL_RPC_URL ?? "https://rpc.ritualfoundation.org"
 
-// Inline chain config — avoids importing constants.ts (which has DOM/BigInt deps not needed here)
 const RITUAL_CHAIN = {
   id: 1979,
   name: "Ritual Chain",
@@ -35,15 +36,18 @@ const RITUAL_CHAIN = {
 const REGISTRY = "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5" as Address
 const JOB_MARKET = "0xA7AA5FDC4DcE7036B31b3C57f938832616b27f1A" as Address
 const STAKING = "0x8C2Ab37A6e9721fb2dE113acf0AC787eD937DdcB" as Address
+const HEARTBEAT = "0x43581F6bE77b1050AA75db112280b46B75666Bc1" as Address
 
 const BOND_AMOUNT = parseEther("50")  // 50 RITUAL bond
 const HEARTBEAT_INTERVAL_MS = 60_000  // ping every 60s
 
-// ── Clients ──
-
 const publicClient = createPublicClient({ chain: RITUAL_CHAIN, transport: http(RPC) })
 
 async function main() {
+  // Parse --fix-desc flag
+  const fixDescIndex = process.argv.indexOf("--fix-desc")
+  const fixDesc = fixDescIndex >= 0 ? process.argv[fixDescIndex + 1] : null
+
   // 1. Wallet
   const pk = process.env.PRIVATE_KEY
   const account = pk
@@ -52,6 +56,31 @@ async function main() {
   console.log(`Agent address: ${account.address}`)
 
   const walletClient = createWalletClient({ account, chain: RITUAL_CHAIN, transport: http(RPC) })
+
+  // If --fix-desc, skip registration and just update the description
+  if (fixDesc) {
+    console.log(`Fixing description to: "${fixDesc}"`)
+    const agentId = await publicClient.readContract({
+      address: REGISTRY,
+      abi: AGENT_REGISTRY_ABI,
+      functionName: "agentByContract",
+      args: [account.address],
+    }) as bigint
+    if (agentId === BigInt(0)) {
+      console.error("Agent not registered — can't fix description. Register first.")
+      process.exit(1)
+    }
+    const tx: Hash = await walletClient.writeContract({
+      address: REGISTRY,
+      abi: AGENT_REGISTRY_ABI,
+      functionName: "setDescription",
+      args: [agentId, fixDesc],
+    })
+    console.log(`  setDescription tx: ${tx}`)
+    const receipt = await publicClient.waitForTransactionReceipt({ hash: tx })
+    console.log(`  Fixed agent #${agentId} description. Block: ${receipt.blockNumber}`)
+    return
+  }
 
   // 2. Register on AgentRegistry
   console.log("Registering agent…")
@@ -63,16 +92,26 @@ async function main() {
     args: [name, "Autonomous agent spawned by bootstrap script"],
   })
   console.log(`  tx: ${tx1}`)
-  const receipt = await publicClient.waitForTransactionReceipt({ hash: tx1 })
-  const agentId = extractAgentId(receipt.logs)
+  const receipt1 = await publicClient.waitForTransactionReceipt({ hash: tx1 })
+  const agentId = extractAgentId(receipt1.logs)
   console.log(`  Agent ID: ${agentId}`)
 
   // 3. Install skills
-  const skillIds = parseSkillIds(process.env.SKILL_IDS)
-  if (skillIds.length > 0) {
+  const skillIdsStr = process.env.SKILL_IDS
+  if (skillIdsStr) {
+    const skillIds = skillIdsStr.split(",").map((s) => s.trim() as `0x${string}`)
     console.log(`Installing ${skillIds.length} skill(s)…`)
-    // Build Skill structs: read from the registry's skill catalog
-    const skills = await fetchSkills(skillIds)
+    // Build Skill struct directly (AgentRegistry has no getSkills(bytes32[]) function).
+    // Read each skill's metadata from the registry's agentSkills or use ID-only structs.
+    // For off-chain catalog skills, build minimal structs.
+    const skills = skillIds.map((id) => ({
+      skillId: id,
+      name: id,
+      description: "",
+      precompileAddr: "0x0000000000000000000000000000000000000801" as Address,
+      configData: "0x" as `0x${string}`,
+      active: true,
+    }))
     const tx2 = await walletClient.writeContract({
       address: REGISTRY,
       abi: AGENT_REGISTRY_ABI,
@@ -83,32 +122,30 @@ async function main() {
     await publicClient.waitForTransactionReceipt({ hash: tx2 })
   }
 
-  // 4. Post bond
+  // 4. Post bond — stake() takes no args, uses msg.sender
   console.log(`Posting bond (${BOND_AMOUNT} RITUAL)…`)
   const tx3 = await walletClient.writeContract({
     address: STAKING,
     abi: AGENT_STAKING_ABI,
     functionName: "stake",
-    args: [agentId],
+    args: [],
     value: BOND_AMOUNT,
   })
   console.log(`  stake tx: ${tx3}`)
   await publicClient.waitForTransactionReceipt({ hash: tx3 })
 
-  // 5. Heartbeat loop
+  // 5. Heartbeat loop — ping() on AgentHeartbeat contract, no args, msg.sender-based
   console.log(`Starting heartbeat loop (every ${HEARTBEAT_INTERVAL_MS / 1000}s)…`)
-  startHeartbeat(agentId, walletClient)
+  startHeartbeat(walletClient)
 
   // 6. Listen for compatible jobs
   console.log("Listening for compatible jobs…")
-  pollForJobs(agentId, skillIds, walletClient)
+  pollForJobs(walletClient)
 }
 
 // ── Helpers ──
 
 function extractAgentId(logs: readonly { data?: `0x${string}`; topics?: `0x${string}`[] }[]): bigint {
-  // The AgentRegistered event emits agentId as a topic or in data
-  // Fallback: assume first log's first topic is the agent ID
   for (const log of logs) {
     if (log.topics && log.topics.length > 1) {
       return BigInt(log.topics[1])
@@ -117,30 +154,14 @@ function extractAgentId(logs: readonly { data?: `0x${string}`; topics?: `0x${str
   return BigInt(0)
 }
 
-function parseSkillIds(raw?: string): `0x${string}`[] {
-  if (!raw) return []
-  return raw.split(",").map((s) => s.trim() as `0x${string}`)
-}
-
-async function fetchSkills(ids: `0x${string}`[]): Promise<readonly { skillId: `0x${string}`; name: string; description: string; precompileAddr: Address; configData: `0x${string}`; active: boolean }[]> {
-  // Read skills from the registry's on-chain catalog
-  const raw: readonly { skillId: `0x${string}`; name: string; description: string; precompileAddr: Address; configData: `0x${string}`; active: boolean }[] = await publicClient.readContract({
-    address: REGISTRY,
-    abi: AGENT_REGISTRY_ABI,
-    functionName: "getSkills",
-    args: [ids],
-  })
-  return raw.filter((s) => s.active)
-}
-
-async function startHeartbeat(agentId: bigint, wallet: ReturnType<typeof createWalletClient>) {
+async function startHeartbeat(wallet: ReturnType<typeof createWalletClient>) {
   const ping = async () => {
     try {
       const tx = await wallet.writeContract({
-        address: REGISTRY,
-        abi: AGENT_REGISTRY_ABI,
+        address: HEARTBEAT,
+        abi: AGENT_HEARTBEAT_ABI,
         functionName: "ping",
-        args: [agentId],
+        args: [],
       })
       console.log(`  heartbeat tx: ${tx}`)
     } catch (e) {
@@ -151,7 +172,7 @@ async function startHeartbeat(agentId: bigint, wallet: ReturnType<typeof createW
   setInterval(ping, HEARTBEAT_INTERVAL_MS)
 }
 
-async function pollForJobs(agentId: bigint, skillIds: `0x${string}`[], wallet: ReturnType<typeof createWalletClient>) {
+async function pollForJobs(wallet: ReturnType<typeof createWalletClient>) {
   const poll = async () => {
     try {
       const jobCount = await publicClient.readContract({
@@ -161,20 +182,20 @@ async function pollForJobs(agentId: bigint, skillIds: `0x${string}`[], wallet: R
       }) as bigint
 
       for (let id = BigInt(1); id < jobCount; id++) {
-        // Check if compatible (simplified — real agent would match skill requirements)
         const status = await publicClient.readContract({
           address: JOB_MARKET,
           abi: JOB_MARKET_V2_ABI,
-          functionName: "getJobStatus",
+          functionName: "jobs",
           args: [id],
-        }) as number
-        if (status === 0) { // OPEN
+        }) as readonly [bigint, Address, `0x${string}`, bigint, bigint, number, Address, `0x${string}`, bigint, bigint, bigint]
+        const statusRaw = status[5]
+        if (statusRaw === 0) { // OPEN
           console.log(`Found open job #${id}, submitting bid…`)
           const tx = await wallet.writeContract({
             address: JOB_MARKET,
             abi: JOB_MARKET_V2_ABI,
             functionName: "submitBid",
-            args: [id, parseEther("0.01"), BigInt(100)], // price, estBlocks
+            args: [id, parseEther("0.01"), BigInt(100)],
           })
           console.log(`  bid tx: ${tx}`)
         }

@@ -26,11 +26,37 @@ function PostJobCard() {
   const [reward, setReward] = useState("0.1")
   const [skillId, setSkillId] = useState<string>(BUILT_IN_SKILLS[0].skillId)
   const [posted, setPosted] = useState<{ prompt: string; reward: string; skill: string } | null>(null)
+  const [sending, setSending] = useState(false)
+  const [result, setResult] = useState<{ ok: boolean; txHash?: string; error?: string } | null>(null)
 
-  const submit = () => {
+  const submit = async () => {
     const skill = BUILT_IN_SKILLS.find((s) => s.skillId === skillId)?.name ?? skillId
-    setPosted({ prompt, reward, skill })
-    setPrompt("")
+    setSending(true)
+    setResult(null)
+    try {
+      const rewardWei = BigInt(Math.floor(parseFloat(reward) * 1e18)).toString()
+      const res = await fetch("/api/jobs", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          requiredSkillIds: [skillId],
+          taskData: prompt,
+          rewardWei,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok && data.ok) {
+        setResult({ ok: true, txHash: data.txHash })
+        setPosted({ prompt, reward, skill })
+        setPrompt("")
+      } else {
+        setResult({ ok: false, error: data.error || data.detail || "relay failed" })
+      }
+    } catch (e) {
+      setResult({ ok: false, error: (e as Error).message })
+    } finally {
+      setSending(false)
+    }
   }
 
   return (
@@ -61,14 +87,28 @@ function PostJobCard() {
             <span className="mb-1 block text-muted-foreground">Reward (RITUAL) — held in escrow</span>
             <input type="number" min="0" step="0.01" value={reward} onChange={(e) => setReward(e.target.value)} className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2" />
           </label>
-          <Button onClick={submit} disabled={!prompt} className="w-full gap-1.5">
-            <Plus className="h-4 w-4" /> Preview job ({reward || "0"} RITUAL)
+          <Button onClick={submit} disabled={!prompt || sending} className="w-full gap-1.5">
+            {sending ? "Sending…" : <><Plus className="h-4 w-4" /> Post job ({reward || "0"} RITUAL)</>}
           </Button>
         </div>
 
-        {posted && (
+        {result && (
+          <div className={cn("mt-3 rounded-lg border p-3 text-xs", result.ok ? "border-green-500/30 bg-green-500/5" : "border-red-500/30 bg-red-500/5")}>
+            <p className={cn("mb-1 font-medium", result.ok ? "text-green-500" : "text-red-500")}>
+              {result.ok ? "Job posted!" : "Failed"}
+            </p>
+            {result.txHash && (
+              <p className="break-all font-mono text-muted-foreground">
+                tx: <a href={`https://explorer.ritualfoundation.org/tx/${result.txHash}`} target="_blank" rel="noreferrer" className="text-primary hover:underline">{result.txHash.slice(0, 20)}…</a>
+              </p>
+            )}
+            {result.error && <p className="text-muted-foreground">{result.error}</p>}
+          </div>
+        )}
+
+        {posted && !result?.ok && (
           <div className="mt-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs">
-            <p className="mb-1 font-medium text-primary">Job preview ready</p>
+            <p className="mb-1 font-medium text-primary">Last posted</p>
             <p className="text-muted-foreground"><b className="text-foreground">skill:</b> {posted.skill}</p>
             <p className="text-muted-foreground"><b className="text-foreground">reward:</b> {posted.reward} RITUAL</p>
             <p className="mt-1 break-words text-foreground">{posted.prompt}</p>

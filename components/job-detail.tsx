@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { Check, Shield, ExternalLink, CircleDot, Clock, AlertTriangle, ArrowRight, Fingerprint, Hash, Scale, Gavel } from "lucide-react"
+import { useState } from "react"
+import { Check, Shield, ExternalLink, CircleDot, Clock, AlertTriangle, ArrowRight, Fingerprint, Hash, Scale, Gavel, Send, Loader2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
@@ -39,6 +40,32 @@ function computeResultHash(data: string): string {
 
 export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: OnchainBid[]; isMock: boolean }) {
   const resultHash = job.resultData ? computeResultHash(job.resultData) : ""
+  const [bidPrice, setBidPrice] = useState("0.01")
+  const [bidSending, setBidSending] = useState(false)
+  const [bidResult, setBidResult] = useState<{ ok: boolean; txHash?: string; error?: string } | null>(null)
+
+  const submitBid = async () => {
+    setBidSending(true)
+    setBidResult(null)
+    try {
+      const priceWei = BigInt(Math.floor(parseFloat(bidPrice) * 1e18)).toString()
+      const res = await fetch("/api/bids", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ jobId: job.id, priceWei, estBlocks: 100 }),
+      })
+      const data = await res.json()
+      if (res.ok && data.ok) {
+        setBidResult({ ok: true, txHash: data.txHash })
+      } else {
+        setBidResult({ ok: false, error: data.error || data.detail || "bid relay failed" })
+      }
+    } catch (e) {
+      setBidResult({ ok: false, error: (e as Error).message })
+    } finally {
+      setBidSending(false)
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -223,6 +250,41 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
               </div>
             </CardContent>
           </Card>
+
+          {/* Bid form — only when OPEN */}
+          {job.status === "OPEN" && (
+            <Card className="surface-card border-blue-500/20">
+              <CardContent className="p-5">
+                <h3 className="mb-3 flex items-center gap-2 font-semibold"><Send className="h-4 w-4 text-blue-500" /> Submit a bid</h3>
+                <div className="space-y-3">
+                  <label className="block text-sm">
+                    <span className="mb-1 block text-muted-foreground">Your price (RITUAL)</span>
+                    <input
+                      type="number"
+                      min="0.001"
+                      step="0.001"
+                      value={bidPrice}
+                      onChange={(e) => setBidPrice(e.target.value)}
+                      className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 ring-ring"
+                    />
+                  </label>
+                  <Button onClick={submitBid} disabled={bidSending || !bidPrice} className="w-full gap-1.5" size="sm">
+                    {bidSending ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />}
+                    {bidSending ? "Submitting…" : "Place bid"}
+                  </Button>
+                  {bidResult && (
+                    <div className={cn("rounded-lg border p-2.5 text-xs", bidResult.ok ? "border-green-500/30 bg-green-500/5 text-green-500" : "border-red-500/30 bg-red-500/5 text-red-500")}>
+                      {bidResult.ok ? (
+                        <p>Bid submitted! tx: <a href={`https://explorer.ritualfoundation.org/tx/${bidResult.txHash}`} target="_blank" rel="noreferrer" className="text-primary hover:underline">{bidResult.txHash?.slice(0, 18)}…</a></p>
+                      ) : (
+                        <p>Failed: {bidResult.error}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Timeline */}
           <Card className="surface-card border-border/60">

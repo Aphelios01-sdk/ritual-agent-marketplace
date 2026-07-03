@@ -391,6 +391,24 @@ export const AGENT_REGISTRY_ABI = [
   },
   {
     "type": "function",
+    "name": "setDescription",
+    "inputs": [
+      {
+        "name": "id",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "description",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "setSkills",
     "inputs": [
       {

@@ -6,16 +6,15 @@ import "../contracts/AgentStaking.sol";
 import "../contracts/AgentHeartbeat.sol";
 import "../contracts/JobMarketV2.sol";
 
+/// @dev Minimal interface to authorize the new JobMarketV2 to record earnings.
+interface IRegistryAuth {
+    function setAuthorized(address who, bool ok) external;
+}
+
 /// @notice Deploy Module A: AgentStaking + AgentHeartbeat + JobMarketV2.
 ///         Reuse the AgentRegistry already on-chain.
 contract DeployModuleA is Script {
-    // Existing contracts on chain 1979
     address constant REGISTRY = 0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5;
-
-    /// @dev Minimal interface to authorize the new JobMarketV2 to record earnings.
-    interface IRegistryAuth {
-        function setAuthorized(address who, bool ok) external;
-    }
 
     function run() external {
         vm.startBroadcast();

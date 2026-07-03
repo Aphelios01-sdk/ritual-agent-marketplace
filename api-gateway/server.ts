@@ -69,6 +69,10 @@ const REGISTRY_ABI = [
   ] }], stateMutability: "view", type: "function" },
 ] as const
 
+const REGISTRY_WRITE_ABI = [
+  { inputs: [{ name: "id", type: "uint256" }, { name: "description", type: "string" }], name: "setDescription", outputs: [], stateMutability: "nonpayable", type: "function" },
+] as const
+
 const JOB_MARKET_ABI = [
   { inputs: [{ type: "uint256" }], name: "jobs", outputs: [{ type: "tuple", components: [
     { name: "requester", type: "address" }, { name: "provider", type: "address" },
@@ -82,6 +86,10 @@ const JOB_MARKET_ABI = [
     { name: "bidder", type: "address" }, { name: "price", type: "uint256" }, { name: "etaBlocks", type: "uint256" }, { name: "active", type: "bool" },
   ] }], stateMutability: "view", type: "function" },
   { inputs: [{ type: "bytes32[]" }, { type: "bytes" }], name: "requestService", outputs: [{ type: "uint256" }], stateMutability: "payable", type: "function" },
+] as const
+
+const JOB_MARKET_WRITE_ABI = [
+  { inputs: [{ name: "jobId", type: "uint256" }, { name: "price", type: "uint256" }, { name: "estBlocks", type: "uint256" }], name: "submitBid", outputs: [], stateMutability: "nonpayable", type: "function" },
 ] as const
 
 const JOB_STATUS_NAMES = ["OPEN", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "DISPUTED", "REFUNDED", "CANCELLED"]
@@ -145,6 +153,41 @@ async function handle(req: http.IncomingMessage, url: URL): Promise<{ status: nu
   if (mProvJobs && req.method === "GET") {
     const ids = await publicClient.readContract({ address: JOB_MARKET_V2, abi: JOB_MARKET_ABI, functionName: "getProviderJobs", args: [mProvJobs[1] as `0x${string}`] }) as bigint[]
     return json({ provider: mProvJobs[1], jobIds: ids.map(String) })
+  }
+
+  // POST /agents/:id/description — update on-chain description (requires agent's own key in SIGNER_PK)
+  const mDesc = p.match(/^\/agents\/(\d+)\/description$/)
+  if (mDesc && req.method === "POST") {
+    if (!SIGNER_PK) return json({ error: "SIGNER_PK not set; relay disabled" }, 503)
+    const raw = JSON.parse(await readBody(req) || "{}")
+    const description = raw.description as string
+    if (!description?.trim()) return json({ error: "description required" }, 400)
+    const { privateKeyToAccount } = await import("viem/accounts")
+    const account = privateKeyToAccount(SIGNER_PK as `0x${string}`)
+    const walletClient = createWalletClient({ account, chain: ritualChain, transport: viemTransport(RPC_URL) })
+    const hash = await walletClient.writeContract({
+      address: REGISTRY, abi: REGISTRY_WRITE_ABI, functionName: "setDescription",
+      args: [BigInt(mDesc[1]), description], account,
+    })
+    return json({ ok: true, txHash: hash, agentId: mDesc[1] }, 202)
+  }
+
+  // POST /jobs/:id/bid — submit a bid on a job (requires SIGNER_PK)
+  const mBid = p.match(/^\/jobs\/(\d+)\/bid$/)
+  if (mBid && req.method === "POST") {
+    if (!SIGNER_PK) return json({ error: "SIGNER_PK not set; relay disabled" }, 503)
+    const raw = JSON.parse(await readBody(req) || "{}")
+    const price = raw.priceWei ? BigInt(raw.priceWei) : BigInt(0)
+    const estBlocks = raw.estBlocks ? BigInt(raw.estBlocks) : BigInt(100)
+    if (price <= BigInt(0)) return json({ error: "priceWei required (>0)" }, 400)
+    const { privateKeyToAccount } = await import("viem/accounts")
+    const account = privateKeyToAccount(SIGNER_PK as `0x${string}`)
+    const walletClient = createWalletClient({ account, chain: ritualChain, transport: viemTransport(RPC_URL) })
+    const hash = await walletClient.writeContract({
+      address: JOB_MARKET_V2, abi: JOB_MARKET_WRITE_ABI, functionName: "submitBid",
+      args: [BigInt(mBid[1]), price, estBlocks], account,
+    })
+    return json({ ok: true, txHash: hash, jobId: mBid[1], priceWei: price.toString() }, 202)
   }
 
   if (p === "/jobs" && req.method === "POST") {
@@ -235,6 +278,6 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(`[api-gateway] Ritual marketplace Web2 gateway on :${PORT} (chain ${CHAIN_ID})`)
   console.log(`  GET  /health | /agents | /agents/:id | /jobs/:id | /jobs/agent/:addr`)
-  console.log(`  POST /jobs ${SIGNER_PK ? "(relay active)" : "(relay OFF — set SIGNER_PK)"}`)
+  console.log(`  POST /jobs | /agents/:id/description | /jobs/:id/bid ${SIGNER_PK ? "(relay active)" : "(relay OFF — set SIGNER_PK)"}`)
   console.log(`  auth: ${API_KEY ? "API key required for writes" : "open (set API_KEY)"} · rate limit: ${RATE_LIMIT_PER_MIN}/min per IP`)
 })

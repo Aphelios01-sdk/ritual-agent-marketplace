@@ -30,6 +30,8 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
   const [liveBlock, setLiveBlock] = useState<bigint | null>(chainInfo?.block ?? null)
   const prevBlockRef = useRef<bigint | null>(chainInfo?.block ?? null)
   const [blockDelta, setBlockDelta] = useState(0)
+  // Live events feed
+  const [liveEvents, setLiveEvents] = useState<{ name: string; block: number; summary: string }[]>([])
 
   useEffect(() => {
     let active = true
@@ -51,6 +53,28 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
       }
     }
     const id = setInterval(poll, 4000)
+    return () => {
+      active = false
+      clearInterval(id)
+    }
+  }, [])
+
+  // Poll live events every 6s
+  useEffect(() => {
+    let active = true
+    const poll = async () => {
+      try {
+        const res = await fetch("/api/events", { cache: "no-store" })
+        if (!res.ok) return
+        const data = await res.json()
+        if (!active || !data?.events) return
+        setLiveEvents(data.events)
+      } catch {
+        /* ignore */
+      }
+    }
+    poll() // immediate fetch
+    const id = setInterval(poll, 6000)
     return () => {
       active = false
       clearInterval(id)
@@ -320,32 +344,47 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                 <div className="mb-3 flex items-center gap-2">
                   <Radio className="h-4 w-4 text-primary" />
                   <h3 className="font-semibold">Recent Activity</h3>
-                  <span className="ml-auto text-xs text-muted-foreground tabular-nums">{activity.length}</span>
+                  <span className="ml-auto text-xs text-muted-foreground tabular-nums">{liveEvents.length || activity.length}</span>
                 </div>
-                {activity.length === 0 ? (
+                {(liveEvents.length > 0 ? liveEvents.slice(0, 12) : activity).length === 0 ? (
                   <p className="py-6 text-center text-xs text-muted-foreground">No recent activity</p>
                 ) : (
                   <ol className="space-y-3">
-                    {activity.map((job) => (
-                      <li key={job.id} className="flex items-start gap-3 text-sm">
-                        <span
-                          className={cn(
-                            "mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full",
-                            job.status === "COMPLETED" && "bg-green-500",
-                            job.status === "OPEN" && "bg-yellow-500",
-                            (job.status === "IN_PROGRESS" || job.status === "ASSIGNED") && "bg-blue-500",
-                            (job.status === "DISPUTED" || job.status === "REFUNDED" || job.status === "CANCELLED") && "bg-muted-foreground"
-                          )}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="font-mono text-xs text-muted-foreground">Job #{job.id}</span>
-                            <span className="text-xs font-medium">{JOB_STATUS_LABELS[job.status]}</span>
+                    {(liveEvents.length > 0 ? liveEvents.slice(0, 12) : activity).map((ev, i) => {
+                      const isEvent = "name" in ev
+                      const name = isEvent ? (ev as any).name : ""
+                      const summary = isEvent ? (ev as any).summary : (ev as any).taskData || ""
+                      const label = isEvent
+                        ? name === "JobRequested" ? "Requested"
+                          : name === "JobAssigned" ? "Assigned"
+                          : name === "JobCompleted" ? "Done"
+                          : name === "JobDisputed" ? "Disputed"
+                          : name === "BidSubmitted" ? "Bid" : ""
+                        : (ev as any).status
+                      const color = isEvent
+                        ? name === "JobCompleted" ? "bg-green-500"
+                          : name === "JobRequested" ? "bg-yellow-500"
+                          : (["JobAssigned", "JobStarted", "BidSubmitted"].includes(name)) ? "bg-blue-500"
+                          : "bg-muted-foreground"
+                        : (ev as any).status === "COMPLETED" ? "bg-green-500"
+                          : (ev as any).status === "OPEN" ? "bg-yellow-500"
+                          : (["IN_PROGRESS", "ASSIGNED"].includes((ev as any).status)) ? "bg-blue-500"
+                          : "bg-muted-foreground"
+                      return (
+                        <li key={i} className="flex items-start gap-3 text-sm">
+                          <span className={cn("mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full", color)} />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-mono text-xs text-muted-foreground">
+                                {isEvent ? `#${(ev as any).block}` : `Job #${(ev as any).id}`}
+                              </span>
+                              <span className="text-xs font-medium">{label}</span>
+                            </div>
+                            <p className="truncate text-xs text-muted-foreground">{summary}</p>
                           </div>
-                          <p className="truncate text-xs text-muted-foreground">{job.taskData}</p>
-                        </div>
-                      </li>
-                    ))}
+                        </li>
+                      )
+                    })}
                   </ol>
                 )}
               </CardContent>

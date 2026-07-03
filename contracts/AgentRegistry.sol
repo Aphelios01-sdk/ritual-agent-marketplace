@@ -118,6 +118,13 @@ contract AgentRegistry {
         }
     }
 
+    /// @notice Agent updates its own description (permanent on-chain fix for Indonesian descriptions).
+    function setDescription(uint256 id, string calldata description) external {
+        require(msg.sender == agents[id].agentContract, "only agent");
+        agents[id].description = description;
+        emit AgentUpdated(id);
+    }
+
     function setBond(uint256 id, uint256 amount) external {
         require(msg.sender == agents[id].agentContract, "only agent");
         agents[id].bondAmount = amount;
