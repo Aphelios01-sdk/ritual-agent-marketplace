@@ -2,13 +2,13 @@
 
 import Link from "next/link"
 import { useState } from "react"
-import { Check, Shield, ExternalLink, CircleDot, Clock, AlertTriangle, ArrowRight, Fingerprint, Hash, Scale, Gavel, Send, Loader2, Wallet } from "lucide-react"
+import { Check, Shield, ExternalLink, CircleDot, Clock, AlertTriangle, ArrowRight, Fingerprint, Hash, Scale, Gavel, Send, Loader2, Key } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob, type OnchainBid } from "@/lib/onchain"
 import { cn, formatRitual, truncateAddress } from "@/lib/utils"
-import { connectWallet, submitBid as submitBidOnChain, type WalletState } from "@/lib/wallet"
+import { getAgentWallet, submitBid as submitBidOnChain } from "@/lib/agent-wallet"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
 
@@ -44,27 +44,14 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
   const [bidPrice, setBidPrice] = useState("0.01")
   const [bidSending, setBidSending] = useState(false)
   const [bidResult, setBidResult] = useState<{ ok: boolean; txHash?: string; error?: string } | null>(null)
-  const [wallet, setWallet] = useState<WalletState | null>(null)
-
-  const connect = async () => {
-    try {
-      const w = await connectWallet()
-      setWallet(w)
-    } catch (e: any) {
-      setBidResult({ ok: false, error: e?.message || String(e) })
-    }
-  }
 
   const submitBid = async () => {
-    if (!wallet) {
-      await connect()
-      if (!wallet) return
-    }
     setBidSending(true)
     setBidResult(null)
     try {
+      const wallet = getAgentWallet()
       const priceWei = BigInt(Math.floor(parseFloat(bidPrice) * 1e18))
-      const hash = await submitBidOnChain(wallet!, BigInt(job.id), priceWei)
+      const hash = await submitBidOnChain(wallet, BigInt(job.id), priceWei)
       setBidResult({ ok: true, txHash: hash })
     } catch (e: any) {
       setBidResult({ ok: false, error: e?.shortMessage || e?.message || String(e) })
@@ -262,15 +249,8 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
             <Card className="surface-card border-blue-500/20">
               <CardContent className="p-5">
                 <h3 className="mb-3 flex items-center gap-2 font-semibold"><Send className="h-4 w-4 text-blue-500" /> Submit a bid</h3>
+                <p className="mb-3 text-[11px] text-muted-foreground">Agent signs from its local wallet. No popup, no MetaMask.</p>
                 <div className="space-y-3">
-                  {!wallet && (
-                    <Button onClick={connect} variant="outline" className="w-full gap-1.5" size="sm">
-                      <Wallet className="h-3.5 w-3.5" /> Connect wallet to bid
-                    </Button>
-                  )}
-                  {wallet && (
-                    <p className="font-mono text-[11px] text-primary">Connected: {truncateAddress(wallet.address)}</p>
-                  )}
                   <label className="block text-sm">
                     <span className="mb-1 block text-muted-foreground">Your price (RITUAL)</span>
                     <input

@@ -1,14 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Plus, ExternalLink, Inbox, Info, Wallet, Loader2 } from "lucide-react"
+import { Plus, ExternalLink, Inbox, Info, Loader2, Key, Copy, Check } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { BUILT_IN_SKILLS, CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob } from "@/lib/onchain"
 import { cn, formatRitual, truncateAddress } from "@/lib/utils"
-import { connectWallet, postJob, type WalletState } from "@/lib/wallet"
+import { getAgentWallet, postJob, type AgentWallet } from "@/lib/agent-wallet"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
 
@@ -22,33 +22,45 @@ const STATUS_COLOR: Record<JobStatus, string> = {
   CANCELLED: "bg-muted text-muted-foreground",
 }
 
+function AgentWalletBadge() {
+  const [wallet, setWallet] = useState<AgentWallet | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    try { setWallet(getAgentWallet()) } catch { /* SSR */ }
+  }, [])
+
+  if (!wallet) return null
+
+  const copyAddr = async () => {
+    await navigator.clipboard.writeText(wallet.address)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1200)
+  }
+
+  return (
+    <button onClick={copyAddr} className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-2.5 py-1 font-mono text-[11px] text-primary transition-colors hover:border-primary/50">
+      <Key className="h-3 w-3" />
+      {truncateAddress(wallet.address)}
+      {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+    </button>
+  )
+}
+
 function PostJobCard() {
   const [prompt, setPrompt] = useState("")
   const [reward, setReward] = useState("0.1")
   const [skillId, setSkillId] = useState<string>(BUILT_IN_SKILLS[0].skillId)
-  const [wallet, setWallet] = useState<WalletState | null>(null)
   const [sending, setSending] = useState(false)
   const [result, setResult] = useState<{ ok: boolean; txHash?: string; error?: string } | null>(null)
 
-  const connect = async () => {
-    try {
-      const w = await connectWallet()
-      setWallet(w)
-    } catch (e) {
-      setResult({ ok: false, error: (e as Error).message })
-    }
-  }
-
   const submit = async () => {
-    if (!wallet) {
-      await connect()
-      if (!wallet) return
-    }
     setSending(true)
     setResult(null)
     try {
+      const wallet = getAgentWallet()
       const rewardWei = BigInt(Math.floor(parseFloat(reward) * 1e18))
-      const hash = await postJob(wallet!, [skillId as `0x${string}`], prompt, rewardWei)
+      const hash = await postJob(wallet, [skillId as `0x${string}`], prompt, rewardWei)
       setResult({ ok: true, txHash: hash })
       setPrompt("")
     } catch (e: any) {
@@ -67,17 +79,12 @@ function PostJobCard() {
         </div>
         <p className="mb-3 flex items-start gap-1.5 rounded-lg border border-border/60 bg-muted/30 p-2 text-[11px] text-muted-foreground">
           <Info className="mt-0.5 h-3 w-3 shrink-0" />
-          Your wallet signs the transaction directly. You pay gas + reward. Requester = your address.
+          Agent signs directly from its local wallet. No MetaMask, no popup — the agent pays gas and reward from its own balance.
         </p>
 
-        {!wallet && (
-          <Button onClick={connect} variant="outline" className="mb-3 w-full gap-1.5">
-            <Wallet className="h-3.5 w-3.5" /> Connect wallet
-          </Button>
-        )}
-        {wallet && (
-          <p className="mb-3 font-mono text-[11px] text-primary">{truncateAddress(wallet.address)}</p>
-        )}
+        <div className="mb-3">
+          <AgentWalletBadge />
+        </div>
 
         <div className="space-y-3">
           <label className="block text-sm">
