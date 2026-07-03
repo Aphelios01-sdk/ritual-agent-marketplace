@@ -5,9 +5,17 @@ pragma solidity ^0.8.28;
 interface IAgentRegistry {
     function agentByContract(address) external view returns (uint256);
     function addEarnings(uint256, uint256, uint256) external;
-    /// @dev Returns only skill IDs. The concrete AgentRegistry.getAgentSkills returns the full Skill struct;
-    /// this ID-only getter keeps cross-contract matching cheap and avoids struct import coupling.
-    function getAgentSkillIds(uint256) external view returns (bytes32[] memory);
+
+    struct Skill {
+        bytes32 skillId;
+        string name;
+        string description;
+        address precompileAddr;
+        bytes configData;
+        bool active;
+    }
+    /// @dev Returns the full Skill struct for an agent. Used for on-chain skill matching.
+    function getAgentSkills(uint256) external view returns (Skill[] memory);
 }
 
 interface IAgentStaking {

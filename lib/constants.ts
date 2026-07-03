@@ -13,18 +13,18 @@ export const RITUAL_CHAIN = {
 export const CONTRACT_ADDRESSES = {
   agentRegistry: "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5" as const,
   jobMarket: "0x5d87fE0d14d5c72B915Cf4C1dddb6e6ac86d84Cd" as const,        // v1 (legacy)
-  jobMarketV2: "0xA7AA5FDC4DcE7036B31b3C57f938832616b27f1A" as const,       // Module A v2 (audit-fix): access control + escrow refund + .call + treasury
+  jobMarketV2: "0xF4805CDe60029c344A8bA3cFEc01b8B949FD2772" as const,       // v2 (getAgentSkills fix)
   agentFactory: "0x4567a3EdAa03B52eb2f6d23c3a68FdfB4A67419b" as const,
-  agentStaking: "0x8C2Ab37A6e9721fb2dE113acf0AC787eD937DdcB" as const,      // Module A v2 (audit-fix): onlyAuthorized + claimTreasury
-  agentHeartbeat: "0x43581F6bE77b1050AA75db112280b46B75666Bc1" as const,    // Module A v2 (audit-fix): bounded grace
-  agentReputation: "0x5221A9a7DF7E2BC888bD1C1eEa5F1549A68eE253" as const,   // Module B v2 (audit-fix): onlyAuthorized
-  agentDirectory: "0x81f8944e57179f386daaa662fe7e86df2e597e5d" as const,    // Module B
-  jobTemplates: "0xebe50c17951cf42fcc73824f755419436c34cc2f" as const,      // Module B
-  disputeCouncil: "0x540A04d366C156DADF22130eF48A28Ed54D291B5" as const,   // Module C v2 (audit-fix): appeal round reset
-  agentSubcontractor: "0x0636a24da36d73526eeec2c73cd79703bcb137ca" as const, // Module C
-  subscriptionManager: "0x256cb7547f97b39aaad3941b3e842cdb60b88e79" as const, // Module C
-  bulkJobBatcher: "0x01d39cf9d5bcc6953a85f2377dfd1372d812788a" as const,    // Module C
-  webhookRegistry: "0x88D99b82e04903bd71f36e57B708e6D357f2DfEb" as const,   // Module C v2 (audit-fix): authorized keeper + caps
+  agentStaking: "0xd21785b995cd731FD93d16761dff997198D8DC73" as const,      // v2 (redeployed)
+  agentHeartbeat: "0x38E26696EF1985CC21A4F1742fc60c2665E2a7eB" as const,    // v2 (redeployed)
+  agentReputation: "0x5221A9a7DF7E2BC888bD1C1eEa5F1549A68eE253" as const,
+  agentDirectory: "0x81f8944e57179f386daaa662fe7e86df2e597e5d" as const,
+  jobTemplates: "0xebe50c17951cf42fcc73824f755419436c34cc2f" as const,
+  disputeCouncil: "0x540A04d366C156DADF22130eF48A28Ed54D291B5" as const,
+  agentSubcontractor: "0x0636a24da36d73526eeec2c73cd79703bcb137ca" as const,
+  subscriptionManager: "0x256cb7547f97b39aaad3941b3e842cdb60b88e79" as const,
+  bulkJobBatcher: "0x01d39cf9d5bcc6953a85f2377dfd1372d812788a" as const,
+  webhookRegistry: "0x88D99b82e04903bd71f36e57B708e6D357f2DfEb" as const,
 }
 
 export const PRECOMPILE_ADDRESSES = {
