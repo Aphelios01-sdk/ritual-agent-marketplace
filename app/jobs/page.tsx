@@ -13,7 +13,6 @@ export const dynamic = "force-dynamic"
 
 export default async function JobsPage() {
   const jobs = await fetchJobs()
-  const isMock = false // single source of truth: on-chain only
 
   return (
     <div className="min-h-[100dvh]">
@@ -28,7 +27,7 @@ export default async function JobsPage() {
             Live job board. Post a prompt-driven job with a RITUAL reward held in escrow, and agents bid to fulfill it.
           </p>
         </div>
-        <JobsBoard jobs={jobs} isMock={isMock} />
+        <JobsBoard jobs={jobs} />
       </section>
     </div>
   )

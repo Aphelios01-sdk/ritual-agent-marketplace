@@ -2,12 +2,13 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Plus, ExternalLink, Inbox, Info } from "lucide-react"
+import { Plus, ExternalLink, Inbox, Info, Wallet, Loader2 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { BUILT_IN_SKILLS, CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob } from "@/lib/onchain"
 import { cn, formatRitual, truncateAddress } from "@/lib/utils"
+import { connectWallet, postJob, type WalletState } from "@/lib/wallet"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
 
@@ -25,35 +26,33 @@ function PostJobCard() {
   const [prompt, setPrompt] = useState("")
   const [reward, setReward] = useState("0.1")
   const [skillId, setSkillId] = useState<string>(BUILT_IN_SKILLS[0].skillId)
-  const [posted, setPosted] = useState<{ prompt: string; reward: string; skill: string } | null>(null)
+  const [wallet, setWallet] = useState<WalletState | null>(null)
   const [sending, setSending] = useState(false)
   const [result, setResult] = useState<{ ok: boolean; txHash?: string; error?: string } | null>(null)
 
+  const connect = async () => {
+    try {
+      const w = await connectWallet()
+      setWallet(w)
+    } catch (e) {
+      setResult({ ok: false, error: (e as Error).message })
+    }
+  }
+
   const submit = async () => {
-    const skill = BUILT_IN_SKILLS.find((s) => s.skillId === skillId)?.name ?? skillId
+    if (!wallet) {
+      await connect()
+      if (!wallet) return
+    }
     setSending(true)
     setResult(null)
     try {
-      const rewardWei = BigInt(Math.floor(parseFloat(reward) * 1e18)).toString()
-      const res = await fetch("/api/jobs", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          requiredSkillIds: [skillId],
-          taskData: prompt,
-          rewardWei,
-        }),
-      })
-      const data = await res.json()
-      if (res.ok && data.ok) {
-        setResult({ ok: true, txHash: data.txHash })
-        setPosted({ prompt, reward, skill })
-        setPrompt("")
-      } else {
-        setResult({ ok: false, error: data.error || data.detail || "relay failed" })
-      }
-    } catch (e) {
-      setResult({ ok: false, error: (e as Error).message })
+      const rewardWei = BigInt(Math.floor(parseFloat(reward) * 1e18))
+      const hash = await postJob(wallet!, [skillId as `0x${string}`], prompt, rewardWei)
+      setResult({ ok: true, txHash: hash })
+      setPrompt("")
+    } catch (e: any) {
+      setResult({ ok: false, error: e?.shortMessage || e?.message || String(e) })
     } finally {
       setSending(false)
     }
@@ -64,12 +63,22 @@ function PostJobCard() {
       <CardContent className="p-5">
         <div className="mb-3 flex items-center gap-2">
           <Plus className="h-4 w-4 text-primary" />
-          <h3 className="font-semibold">Compose a job</h3>
+          <h3 className="font-semibold">Post a job</h3>
         </div>
         <p className="mb-3 flex items-start gap-1.5 rounded-lg border border-border/60 bg-muted/30 p-2 text-[11px] text-muted-foreground">
           <Info className="mt-0.5 h-3 w-3 shrink-0" />
-          Wallet-free demo: this previews how a job request is composed. On-chain posting requires a connected agent signer.
+          Your wallet signs the transaction directly. You pay gas + reward. Requester = your address.
         </p>
+
+        {!wallet && (
+          <Button onClick={connect} variant="outline" className="mb-3 w-full gap-1.5">
+            <Wallet className="h-3.5 w-3.5" /> Connect wallet
+          </Button>
+        )}
+        {wallet && (
+          <p className="mb-3 font-mono text-[11px] text-primary">{truncateAddress(wallet.address)}</p>
+        )}
+
         <div className="space-y-3">
           <label className="block text-sm">
             <span className="mb-1 block text-muted-foreground">Required skill</span>
@@ -88,30 +97,21 @@ function PostJobCard() {
             <input type="number" min="0" step="0.01" value={reward} onChange={(e) => setReward(e.target.value)} className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2" />
           </label>
           <Button onClick={submit} disabled={!prompt || sending} className="w-full gap-1.5">
-            {sending ? "Sending…" : <><Plus className="h-4 w-4" /> Post job ({reward || "0"} RITUAL)</>}
+            {sending ? <><Loader2 className="h-4 w-4 animate-spin" /> Signing…</> : <><Plus className="h-4 w-4" /> Post job ({reward || "0"} RITUAL)</>}
           </Button>
         </div>
 
         {result && (
           <div className={cn("mt-3 rounded-lg border p-3 text-xs", result.ok ? "border-green-500/30 bg-green-500/5" : "border-red-500/30 bg-red-500/5")}>
             <p className={cn("mb-1 font-medium", result.ok ? "text-green-500" : "text-red-500")}>
-              {result.ok ? "Job posted!" : "Failed"}
+              {result.ok ? "Job posted on-chain!" : "Failed"}
             </p>
             {result.txHash && (
               <p className="break-all font-mono text-muted-foreground">
-                tx: <a href={`https://explorer.ritualfoundation.org/tx/${result.txHash}`} target="_blank" rel="noreferrer" className="text-primary hover:underline">{result.txHash.slice(0, 20)}…</a>
+                tx: <a href={`${EXPLORER}/tx/${result.txHash}`} target="_blank" rel="noreferrer" className="text-primary hover:underline">{result.txHash.slice(0, 20)}…</a>
               </p>
             )}
             {result.error && <p className="text-muted-foreground">{result.error}</p>}
-          </div>
-        )}
-
-        {posted && !result?.ok && (
-          <div className="mt-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-xs">
-            <p className="mb-1 font-medium text-primary">Last posted</p>
-            <p className="text-muted-foreground"><b className="text-foreground">skill:</b> {posted.skill}</p>
-            <p className="text-muted-foreground"><b className="text-foreground">reward:</b> {posted.reward} RITUAL</p>
-            <p className="mt-1 break-words text-foreground">{posted.prompt}</p>
           </div>
         )}
       </CardContent>
@@ -119,7 +119,7 @@ function PostJobCard() {
   )
 }
 
-export function JobsBoard({ jobs, isMock }: { jobs: OnchainJob[]; isMock: boolean }) {
+export function JobsBoard({ jobs }: { jobs: OnchainJob[] }) {
   return (
     <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
       <div className="lg:sticky lg:top-20 lg:self-start">
@@ -135,7 +135,7 @@ export function JobsBoard({ jobs, isMock }: { jobs: OnchainJob[]; isMock: boolea
           <Card className="surface-card border-border/60">
             <CardContent className="flex flex-col items-center gap-2 p-12 text-center text-muted-foreground">
               <Inbox className="h-6 w-6" />
-              <p className="text-sm">No jobs yet.</p>
+              <p className="text-sm">No jobs yet. Post the first one above.</p>
             </CardContent>
           </Card>
         ) : (
