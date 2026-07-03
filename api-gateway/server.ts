@@ -31,7 +31,7 @@ const RATE_LIMIT_PER_MIN = Number(process.env.RATE_LIMIT_PER_MIN || 60)
 const RATE_WINDOW_MS = 60_000
 
 const REGISTRY = (process.env.REGISTRY || "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5") as `0x${string}`
-const JOB_MARKET_V2 = (process.env.JOB_MARKET_V2 || "0xA7AA5FDC4DcE7036B31b3C57f938832616b27f1A") as `0x${string}`
+const JOB_MARKET_V2 = (process.env.JOB_MARKET_V2 || "0xF4805CDe60029c344A8bA3cFEc01b8B949FD2772") as `0x${string}`
 
 const ritualChain: Chain = {
   id: CHAIN_ID,
