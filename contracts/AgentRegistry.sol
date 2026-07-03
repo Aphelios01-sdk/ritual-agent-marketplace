@@ -26,6 +26,8 @@ contract AgentRegistry {
     }
 
     uint256 public nextAgentId;
+    address public owner;
+    mapping(address => bool) public authorized; // callers allowed to mutate earnings (e.g. JobMarketV2)
     mapping(uint256 => AgentInfo) public agents;
     mapping(address => uint256) public agentByContract;
     mapping(uint256 => Skill[]) public agentSkills; // agentId -> skills
@@ -34,6 +36,16 @@ contract AgentRegistry {
     event AgentUpdated(uint256 indexed id);
     event AgentDeactivated(uint256 indexed id);
     event SkillUpdated(uint256 indexed agentId, bytes32 indexed skillId, bool active);
+
+    constructor() {
+        owner = msg.sender;
+    }
+
+    /// @notice Owner authorizes a caller (e.g. JobMarketV2) to record earnings/ratings.
+    function setAuthorized(address who, bool ok) external {
+        require(msg.sender == owner, "only owner");
+        authorized[who] = ok;
+    }
 
     function registerAgent(
         string calldata name,
@@ -96,6 +108,8 @@ contract AgentRegistry {
     }
 
     function addEarnings(uint256 id, uint256 amount, uint256 rating) external {
+        require(authorized[msg.sender], "not authorized");
+        if (rating > 5) rating = 5; // clamp — audit H2
         AgentInfo storage a = agents[id];
         a.totalEarnings += amount;
         a.jobCount++;

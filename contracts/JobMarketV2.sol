@@ -45,6 +45,7 @@ contract JobMarketV2 {
     uint256 public nextJobId;
     mapping(uint256 => JobRequest) public jobs;
     mapping(uint256 => Bid[]) public bids;           // jobId -> bids
+    mapping(uint256 => mapping(address => bool)) private _hasBid; // dedup: one bid per provider per job
     mapping(address => uint256[]) private _providerJobs;
     mapping(address => uint256) private _activeCount; // provider -> number of IN_PROGRESS/ASSIGNED jobs
 
@@ -119,6 +120,8 @@ contract JobMarketV2 {
         require(address(heartbeat) == address(0) || heartbeat.isAlive(msg.sender), "agent not alive");
         require(_activeCount[msg.sender] < MAX_CONCURRENT, "rate limit: too many active jobs");
         require(_hasMatchingSkill(j.requiredSkillIds, msg.sender), "no matching skill");
+        // One bid per provider per job — prevents gas-griefing & bid-index manipulation (audit M3).
+        require(!_hasBid[jobId][msg.sender], "already bid");
 
         bids[jobId].push(Bid({
             provider: msg.sender,
@@ -126,6 +129,7 @@ contract JobMarketV2 {
             estBlocks: estBlocks,
             submittedAt: block.number
         }));
+        _hasBid[jobId][msg.sender] = true;
         emit BidSubmitted(jobId, msg.sender, price, estBlocks);
     }
 
@@ -142,6 +146,12 @@ contract JobMarketV2 {
         if (finalPrice > j.reward) {
             uint256 topUp = finalPrice - j.reward;
             require(msg.value >= topUp, "top-up required for premium bid");
+        }
+        // Refund any excess msg.value above the top-up so it is not stranded (audit M1).
+        if (msg.value > 0 && finalPrice <= j.reward) {
+            _send(j.requester, msg.value);
+        } else if (finalPrice > j.reward && msg.value > (finalPrice - j.reward)) {
+            _send(j.requester, msg.value - (finalPrice - j.reward));
         }
 
         j.provider = b.provider;
@@ -174,9 +184,12 @@ contract JobMarketV2 {
     }
 
     /// @notice Provider submits the result. Escrow release + bond returned + rating hook.
+    /// @dev Bond must already be posted via startProcessing (IN_PROGRESS). Allowing ASSIGNED
+    ///      here would let a provider skip the bond and still receive `j.bondRequired` it never
+    ///      deposited — draining other escrows. See audit C1.
     function submitResult(uint256 jobId, bytes calldata resultData) external {
         JobRequest storage j = jobs[jobId];
-        require(j.status == JobStatus.IN_PROGRESS || j.status == JobStatus.ASSIGNED, "not in progress");
+        require(j.status == JobStatus.IN_PROGRESS, "must start processing first");
         require(msg.sender == j.provider, "only provider");
         require(block.number <= j.deadline, "result timeout");
 
@@ -224,6 +237,10 @@ contract JobMarketV2 {
             _activeCount[j.provider]--;
             // bond stays in the contract — slash the provider (no submission)
             try staking.slash(j.provider, 2500, "timeout no result") {} catch {}
+            // The bond posted at startProcessing is slashed to treasury (was previously stuck).
+            if (j.status == JobStatus.IN_PROGRESS) {
+                _send(treasury, j.bondRequired);
+            }
         }
         j.status = JobStatus.REFUNDED;
         _send(j.requester, j.reward);

@@ -9,6 +9,7 @@ contract AgentContract {
 
     address public registry;
     address public jobMarket;
+    address public owner;
     uint256 public agentId;
 
     // current job processing state
@@ -29,9 +30,15 @@ contract AgentContract {
         _;
     }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "only owner");
+        _;
+    }
+
     constructor(address _registry, address _jobMarket) {
         registry = _registry;
         jobMarket = _jobMarket;
+        owner = msg.sender; // the factory / deployer controls initial skill setup
     }
 
     /// @notice Called by factory after deployment: set agentId from registry
@@ -113,14 +120,14 @@ contract AgentContract {
         }
     }
 
-    /// @notice Install a skill config
-    function installSkill(bytes32 skillId, address precompileAddr, bytes calldata configData) external {
+    /// @notice Install a skill config (only owner — audit H3).
+    function installSkill(bytes32 skillId, address precompileAddr, bytes calldata configData) external onlyOwner {
         skillConfigs.push(SkillConfig(skillId, precompileAddr, configData));
     }
 
     /// @notice Forward skill registration to Registry (msg.sender to Registry = this agent)
-    /// @dev Called by factory during setup. Registry has an only-agent guard.
-    function setSkillsOnRegistry(bytes calldata registryCallData) external {
+    /// @dev Called by owner (factory) during setup. Registry has an only-agent guard. (audit H1)
+    function setSkillsOnRegistry(bytes calldata registryCallData) external onlyOwner {
         (bool ok,) = registry.call(registryCallData);
         require(ok, "registry call failed");
     }
