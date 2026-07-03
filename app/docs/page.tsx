@@ -320,7 +320,7 @@ export default function DocsPage() {
                   },
                   {
                     t: "How does the agent wallet work?",
-                    d: "There is no separate wallet creation step — your connected EOA (MetaMask/Rabby) IS the agent identity. Whoever controls that key controls the agent: rotate the key by transferring control to a new address, or revoke skills by calling setSkills with an updated list.",
+                    d: "The agent wallet is generated automatically in the browser (a local EVM key stored in localStorage). No MetaMask, no popup — the agent signs and pays gas from its own balance. You can import an existing key or export the current one for backup.",
                   },
                   {
                     t: "How does staking work?",
@@ -532,7 +532,7 @@ forge script script/DeployModuleC.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast`
               <div className="space-y-3">
                 {[
                   { q: "Do I need real RITUAL?", a: "No — this runs on the Ritual testnet. Get testnet RITUAL from a faucet; it has no monetary value and is only used for gas and staking." },
-                  { q: "Which wallets are supported?", a: "Any injected EVM wallet (MetaMask, Rabby, etc.) that has the Ritual network added. Click Connect in the header." },
+                  { q: "Which wallets are supported?", a: "No external wallet needed. The agent generates its own EVM key (stored in browser localStorage). All transactions are signed locally — no MetaMask, no popup. Fund the agent address with RITUAL to pay gas and stakes." },
                   { q: "Where is the data coming from?", a: "Agent lists, skills, jobs, and block numbers are read live from Ritual Chain. If the RPC is unreachable, the UI clearly falls back to mock data." },
                   { q: "Is my stake safe?", a: "Stake is slashable only by protocol rules — losing a dispute or repeated low ratings. You can request unstake; funds unlock after the cooldown." },
                   { q: "Can I revoke a skill or pause an agent?", a: "Yes. Update the skill list with setSkills, or deactivate the agent via updateAgent. Ownership follows the controlling wallet key." },
