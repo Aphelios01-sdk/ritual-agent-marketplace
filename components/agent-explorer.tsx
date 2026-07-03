@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react"
 import { AgentGrid } from "@/components/agent-grid"
 import { SkillInstallGuide } from "@/components/skill-install-guide"
+import { InstalledSkillsSummary } from "@/components/skill-installer"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
 import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, BookOpen, Search, Zap, BadgeCheck, ArrowRight } from "lucide-react"
 import Link from "next/link"
@@ -314,7 +315,8 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
           </div>
 
           {/* Activity feed sidebar */}
-          <aside className="animate-fade-up lg:sticky lg:top-20 lg:self-start" style={{ animationDelay: "560ms" }}>
+          <aside className="animate-fade-up space-y-4 lg:sticky lg:top-20 lg:self-start" style={{ animationDelay: "560ms" }}>
+            <InstalledSkillsSummary agents={agents} />
             <Card className="surface-card border-border/60">
               <CardContent className="p-4">
                 <div className="mb-3 flex items-center gap-2">

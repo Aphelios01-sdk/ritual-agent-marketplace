@@ -1,28 +1,13 @@
 "use client"
 
-import { useState } from "react"
-import { useAccount, useWriteContract } from "wagmi"
-import { type Address, toHex, parseEther } from "viem"
 import Link from "next/link"
-import {
-  Loader2,
-  Check,
-  Gavel,
-  Send,
-  Star,
-  Shield,
-  ExternalLink,
-  CircleDot,
-  AlertTriangle,
-} from "lucide-react"
+import { Check, Shield, ExternalLink, CircleDot, Clock, AlertTriangle, ArrowRight } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { JOB_MARKET_V2_ABI } from "@/lib/contract-abi-v2"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob, type OnchainBid } from "@/lib/onchain"
 import { cn, formatRitual, truncateAddress } from "@/lib/utils"
 
-const JOB_MARKET_V2 = CONTRACT_ADDRESSES.jobMarketV2 as Address
 const EXPLORER = "https://explorer.ritualfoundation.org"
 
 const STATUS_TONE: Record<JobStatus, string> = {
@@ -35,7 +20,6 @@ const STATUS_TONE: Record<JobStatus, string> = {
   CANCELLED: "bg-muted text-muted-foreground",
 }
 
-// Timeline steps derived from status.
 function timeline(status: JobStatus) {
   const steps = ["Posted", "Assigned", "In progress", "Result submitted", "Completed"]
   const idx = { OPEN: 0, ASSIGNED: 1, IN_PROGRESS: 2, COMPLETED: 4, DISPUTED: 3, REFUNDED: 0, CANCELLED: 0 }[status] ?? 0
@@ -43,30 +27,6 @@ function timeline(status: JobStatus) {
 }
 
 export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: OnchainBid[]; isMock: boolean }) {
-  const { address, isConnected } = useAccount()
-  const { writeContractAsync } = useWriteContract()
-  const [result, setResult] = useState("")
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [ok, setOk] = useState<string | null>(null)
-
-  async function run(label: string, fn: () => Promise<`0x${string}`>) {
-    setError(null)
-    setOk(null)
-    setBusy(true)
-    try {
-      await fn()
-      setOk(`${label} transaction sent. Refresh in a moment to see updated state.`)
-    } catch (e) {
-      setError(e instanceof Error ? e.message : `${label} failed`)
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  const isRequester = !!address && address.toLowerCase() === job.requester.toLowerCase()
-  const isProvider = !!address && job.provider !== "0x0000000000000000000000000000000000000000" && address.toLowerCase() === job.provider.toLowerCase()
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -99,7 +59,7 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
                 {job.provider !== "0x0000000000000000000000000000000000000000" && (
                   <span>Provider <span className="font-mono text-foreground">{truncateAddress(job.provider)}</span></span>
                 )}
-                <a href={`${EXPLORER}/address/${JOB_MARKET_V2}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-primary hover:underline">
+                <a href={`${EXPLORER}/address/${CONTRACT_ADDRESSES.jobMarketV2}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 text-primary hover:underline">
                   View contract <ExternalLink className="h-3 w-3" />
                 </a>
               </div>
@@ -138,20 +98,25 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
                         <span className="font-mono text-xs">{truncateAddress(b.provider)}</span>
                         <span className="text-xs text-muted-foreground">· {Number(b.estBlocks)} blocks est.</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm font-medium text-primary">{formatRitual(b.price)}</span>
-                        {isRequester && job.status === "OPEN" && (
-                          <Button size="sm" variant="outline" disabled={busy} onClick={() => run("Assign", () => writeContractAsync({ address: JOB_MARKET_V2, abi: JOB_MARKET_V2_ABI, functionName: "assignJob", args: [BigInt(job.id), BigInt(i)], value: parseEther("0") }))} className="h-7 px-2 text-xs">
-                            {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : "Assign"}
-                          </Button>
-                        )}
-                      </div>
+                      <span className="font-mono text-sm font-medium text-primary">{formatRitual(b.price)}</span>
                     </div>
                   ))}
                 </div>
               )}
             </CardContent>
           </Card>
+
+          {/* Dispute / action info */}
+          {job.status === "DISPUTED" && (
+            <Card className="surface-card border-red-500/30">
+              <CardContent className="p-5">
+                <h3 className="mb-1 flex items-center gap-2 font-semibold text-red-500">
+                  <AlertTriangle className="h-4 w-4" /> Under dispute
+                </h3>
+                <p className="text-sm text-muted-foreground">This job is being resolved by the DisputeCouncil. Escrow is frozen until a verdict.</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -176,7 +141,7 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
           {/* Timeline */}
           <Card className="surface-card border-border/60">
             <CardContent className="p-5">
-              <h3 className="mb-3 font-semibold">Timeline</h3>
+              <h3 className="mb-3 flex items-center gap-2 font-semibold"><Clock className="h-4 w-4 text-primary" /> Timeline</h3>
               <ol className="space-y-3">
                 {timeline(job.status).map((s, i) => (
                   <li key={i} className="flex items-center gap-2.5 text-sm">
@@ -191,64 +156,22 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
             </CardContent>
           </Card>
 
-          {/* Actions */}
-          {isConnected && (
-            <Card className="surface-card border-border/60">
-              <CardContent className="p-5 space-y-4">
-                <h3 className="font-semibold">Actions</h3>
-
-                {/* Provider: submit result */}
-                {isProvider && (job.status === "ASSIGNED" || job.status === "IN_PROGRESS") && (
-                  <div>
-                    <label className="mb-1 block text-xs text-muted-foreground">Submit result (provider)</label>
-                    <textarea value={result} onChange={(e) => setResult(e.target.value)} rows={3} placeholder="Result data / prompt output" className="mb-2 w-full resize-none rounded-lg border border-border bg-transparent px-3 py-2 text-xs outline-none ring-ring focus-visible:ring-2" />
-                    <Button size="sm" disabled={busy || !result} onClick={() => run("Submit result", () => writeContractAsync({ address: JOB_MARKET_V2, abi: JOB_MARKET_V2_ABI, functionName: "submitResult", args: [BigInt(job.id), toHex(result)] }))} className="w-full gap-1.5">
-                      {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Send className="h-3.5 w-3.5" />} Submit result
-                    </Button>
-                  </div>
-                )}
-
-                {/* Requester: rate provider */}
-                {isRequester && job.status === "COMPLETED" && (
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs text-muted-foreground">Rate provider</span>
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((r) => (
-                        <Button key={r} size="sm" variant="outline" disabled={busy} onClick={() => run("Rate", () => writeContractAsync({ address: JOB_MARKET_V2, abi: JOB_MARKET_V2_ABI, functionName: "rateProvider", args: [BigInt(job.id), BigInt(r)] }))} className="h-7 w-7 p-0">
-                          <Star className="h-3 w-3" />
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Requester/Provider: dispute */}
-                {(isRequester || isProvider) && (job.status === "COMPLETED" || job.status === "ASSIGNED" || job.status === "IN_PROGRESS") && (
-                  <Button size="sm" variant="outline" disabled={busy} onClick={() => run("Dispute", () => writeContractAsync({ address: JOB_MARKET_V2, abi: JOB_MARKET_V2_ABI, functionName: "dispute", args: [BigInt(job.id)] }))} className="w-full gap-1.5 border-red-500/30 text-red-500 hover:bg-red-500/10">
-                    {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <AlertTriangle className="h-3.5 w-3.5" />} Open dispute
-                  </Button>
-                )}
-
-                {!isProvider && !isRequester && (
-                  <p className="text-xs text-muted-foreground">Connect as this job&apos;s requester or provider to act on it.</p>
-                )}
-              </CardContent>
-            </Card>
-          )}
+          <Card className="surface-card border-border/60">
+            <CardContent className="p-5">
+              <p className="text-sm text-muted-foreground">
+                On-chain actions (assign, submit, rate, dispute) are performed by the agent&apos;s signer — install the right skills to enable them.
+              </p>
+              <Button asChild variant="outline" size="sm" className="mt-3 w-full gap-1.5">
+                <Link href="/skills">Browse skills <ArrowRight className="h-3.5 w-3.5" /></Link>
+              </Button>
+            </CardContent>
+          </Card>
 
           <p className="text-center text-xs text-muted-foreground">
             <Link href="/jobs" className="text-primary hover:underline">← All jobs</Link>
           </p>
         </aside>
       </div>
-
-      {(error || ok) && (
-        <Card className={cn("border-border/60", error ? "border-red-500/40 bg-red-500/5" : "border-green-500/40 bg-green-500/5")}>
-          <CardContent className="p-4 text-sm">
-            {error ? <span className="text-red-500"><b>Error:</b> {error}</span> : <span className="text-green-500"><Gavel className="mr-1 inline h-3.5 w-3.5" />{ok}</span>}
-          </CardContent>
-        </Card>
-      )}
     </div>
   )
 }
