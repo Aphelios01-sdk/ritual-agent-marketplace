@@ -55,13 +55,13 @@ async function fetchAgentSkills(agentId: bigint): Promise<SkillDefinition[]> {
   }))
 }
 
-// Client-side override map for on-chain descriptions that contain Indonesian text.
-// These were stored on-chain before the i18n fix and require an on-chain transaction
-// (via the agent bootstrap SDK) to correct permanently.
-const FIX_DESC: Record<string, string> = {
-  "Analisis sentimen pasar crypto via HTTP fetch + LLM analysis. Provides a daily sentiment summary.":
-    "Analyzes crypto market sentiment using HTTP fetch + LLM analysis. Provides a daily sentiment summary.",
-}
+// Client-side override for on-chain descriptions that contain Indonesian text.
+// These were stored on-chain before the i18n fix. Uses prefix match because
+// the exact on-chain string may differ from what we assume.
+const FIX_DESC_PREFIX: [string, string][] = [
+  ["Analisis sentimen pasar crypto via HTTP fetch + LLM analysis",
+   "Analyzes crypto market sentiment using HTTP fetch + LLM analysis. Provides a daily sentiment summary."],
+]
 
 /// Read all agents from the on-chain Registry. Falls back to [] on RPC error.
 export async function fetchAgents(): Promise<AgentInfo[]> {
@@ -91,7 +91,7 @@ export async function fetchAgents(): Promise<AgentInfo[]> {
       // Client-side override for on-chain descriptions that leaked Indonesian.
       // The actual fix requires an on-chain transaction via the agent SDK.
       const rawDesc = raw[2]?.trim() || ""
-      const description = FIX_DESC[rawDesc] ?? rawDesc
+      const description = FIX_DESC_PREFIX.find(([p]) => rawDesc.startsWith(p))?.[1] ?? rawDesc
 
       const skills = await fetchAgentSkills(id)
       agents.push({

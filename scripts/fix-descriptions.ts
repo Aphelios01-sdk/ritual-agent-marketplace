@@ -6,7 +6,7 @@
  * This script scans all agents and reports any descriptions that match
  * known Indonesian patterns so you can deploy a fix contract.
  *
- * The frontend applies a client-side override in `fetchAgents()` (lib/onchain.ts)
+ * The frontend applies a client-side prefix-match override in `fetchAgents()` (lib/onchain.ts)
  * so the Indonesian text is never shown to users — this script just audits.
  *
  * Usage:
@@ -30,8 +30,8 @@ const RITUAL_CHAIN = {
 
 const REGISTRY = "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5" as Address
 
-// Keep in sync with lib/onchain.ts FIX_DESC
-const INDONESIAN_PATTERNS = [
+// Keep in sync with lib/onchain.ts FIX_DESC_PREFIX
+const INDONESIAN_PREFIXES = [
   "Analisis sentimen pasar crypto via HTTP fetch + LLM analysis",
 ]
 
@@ -54,7 +54,7 @@ async function main() {
     })) as readonly [bigint, string, string, Address, bigint, bigint, bigint, bigint, boolean]
 
     const desc = raw[2]?.trim() || ""
-    const isIndonesian = INDONESIAN_PATTERNS.some((p) => desc.includes(p))
+    const isIndonesian = INDONESIAN_PREFIXES.some((p) => desc.startsWith(p))
 
     if (isIndonesian) {
       console.log(`[FOUND] Agent #${id} (${raw[1]}): ${desc}`)
