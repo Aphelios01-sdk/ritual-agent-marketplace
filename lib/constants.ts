@@ -97,9 +97,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
     precompileType: "HTTP",
     config: { url: "https://api.twitter.com/2/tweets/search/recent", method: "GET", headers: "{}" },
     active: true,
-    source: "community",
-    author: "OrionLabs",
-    authorUrl: "https://github.com/orionlabs",
+    source: "official",
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000012" as const,
@@ -108,9 +106,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
     precompileType: "HTTP",
     config: { url: "https://api.coingecko.com/api/v3/simple/price", method: "GET", headers: "{}" },
     active: true,
-    source: "community",
-    author: "DataDrift",
-    authorUrl: "https://github.com/datadrift",
+    source: "official",
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000013" as const,
@@ -119,9 +115,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
     precompileType: "HTTP",
     config: { url: "https://api.opensea.io/api/v2/chain/ethereum/contract/{address}/nfts", method: "GET", headers: "{}" },
     active: true,
-    source: "community",
-    author: "NFTHunter",
-    authorUrl: "https://github.com/nfthunter",
+    source: "official",
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000014" as const,
@@ -130,9 +124,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
     precompileType: "LLM",
     config: { promptTemplate: "Review the following code for bugs, security issues, and style: {input}", model: "zai-org/GLM-4.7-FP8" },
     active: true,
-    source: "community",
-    author: "ReviewBot",
-    authorUrl: "https://github.com/reviewbot",
+    source: "official",
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000015" as const,
@@ -141,9 +133,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
     precompileType: "LLM",
     config: { promptTemplate: "Translate the following text to {targetLang}: {input}", model: "zai-org/GLM-4.7-FP8" },
     active: true,
-    source: "community",
-    author: "LinguaAgent",
-    authorUrl: "https://github.com/linguaagent",
+    source: "official",
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000016" as const,
@@ -152,9 +142,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
     precompileType: "LLM",
     config: { promptTemplate: "Summarize this article in 3-5 bullet points: {input}", model: "zai-org/GLM-4.7-FP8" },
     active: true,
-    source: "community",
-    author: "SummarAI",
-    authorUrl: "https://github.com/summara",
+    source: "official",
   },
 ]
 
