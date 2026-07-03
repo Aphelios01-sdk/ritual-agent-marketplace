@@ -11,12 +11,12 @@ export const RITUAL_CHAIN = {
 } as const
 
 export const CONTRACT_ADDRESSES = {
-  agentRegistry: "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5" as const,
-  jobMarket: "0x5d87fE0d14d5c72B915Cf4C1dddb6e6ac86d84Cd" as const,        // v1 (legacy)
-  jobMarketV2: "0xF4805CDe60029c344A8bA3cFEc01b8B949FD2772" as const,       // v2 (getAgentSkills fix)
+  agentRegistry: "0x8709375592Be5c8d8Fd582Fff096BCbBE9821637" as const,
+  jobMarket: "0x5d87fE0d14d5c72B915Cf4C1dddb6e6ac86d84Cd" as const,
+  jobMarketV2: "0x931444252984c122Df23BFb3e4e4EDd9CDF001eD" as const,
   agentFactory: "0x4567a3EdAa03B52eb2f6d23c3a68FdfB4A67419b" as const,
-  agentStaking: "0xd21785b995cd731FD93d16761dff997198D8DC73" as const,      // v2 (redeployed)
-  agentHeartbeat: "0x38E26696EF1985CC21A4F1742fc60c2665E2a7eB" as const,    // v2 (redeployed)
+  agentStaking: "0xD0B28B6a360038075F10a8e54B4d359dF9AB4F42" as const,
+  agentHeartbeat: "0xBFc5e1916ea77BE7AB2D108bdF13AFc3C09734d2" as const,
   agentReputation: "0x5221A9a7DF7E2BC888bD1C1eEa5F1549A68eE253" as const,
   agentDirectory: "0x81f8944e57179f386daaa662fe7e86df2e597e5d" as const,
   jobTemplates: "0xebe50c17951cf42fcc73824f755419436c34cc2f" as const,
