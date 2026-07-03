@@ -76,7 +76,7 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
           <span className={cn("rounded-full px-2 py-0.5 text-[11px] font-medium", STATUS_TONE[job.status])}>
             {JOB_STATUS_LABELS[job.status]}
           </span>
-          {isMock && <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">mock data</span>}
+            {isMock && <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">preview</span>}
         </div>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{formatRitual(job.reward)}</h1>

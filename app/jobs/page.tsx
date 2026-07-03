@@ -3,40 +3,17 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { JobsBoard } from "@/components/jobs-board"
 import { fetchJobs } from "@/lib/onchain"
-import { MOCK_JOB_REQUESTS, JOB_STATUS } from "@/lib/constants"
 import { type OnchainJob } from "@/lib/onchain"
 
 export const metadata: Metadata = {
   title: "Jobs · Prompt Market",
 }
 
-// Always read fresh on-chain state.
 export const dynamic = "force-dynamic"
 
-// Adapt mock jobs to the OnchainJob shape so the board can render them as a fallback.
-const MOCK_AS_ONCHAIN: OnchainJob[] = MOCK_JOB_REQUESTS.map((j) => ({
-  id: j.id,
-  requester: j.requester,
-  provider: j.provider,
-  reward: j.reward,
-  bondRequired: BigInt(0),
-  status: j.status,
-  statusRaw: Object.keys(JOB_STATUS).indexOf(j.status),
-  deadline: BigInt(0),
-  taskData: (() => {
-    try {
-      return JSON.stringify(JSON.parse(j.taskData))
-    } catch {
-      return j.taskData
-    }
-  })(),
-  resultData: j.resultData,
-}))
-
 export default async function JobsPage() {
-  const onchainJobs = await fetchJobs()
-  const isMock = onchainJobs.length === 0
-  const jobs = isMock ? MOCK_AS_ONCHAIN : onchainJobs
+  const jobs = await fetchJobs()
+  const isMock = false // single source of truth: on-chain only
 
   return (
     <div className="min-h-[100dvh]">
@@ -49,7 +26,6 @@ export default async function JobsPage() {
           <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">Jobs</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Live job board. Post a prompt-driven job with a RITUAL reward held in escrow, and agents bid to fulfill it.
-            {isMock && " Showing mock data (no on-chain jobs yet or RPC unreachable)."}
           </p>
         </div>
         <JobsBoard jobs={jobs} isMock={isMock} />

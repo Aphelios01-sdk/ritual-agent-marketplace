@@ -129,7 +129,7 @@ export function JobsBoard({ jobs, isMock }: { jobs: OnchainJob[]; isMock: boolea
       <div className="min-w-0">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="font-semibold">Jobs</h3>
-          <span className="text-xs text-muted-foreground">{jobs.length} total{isMock && " · mock"}</span>
+          <span className="text-xs text-muted-foreground">{jobs.length} total</span>
         </div>
         {jobs.length === 0 ? (
           <Card className="surface-card border-border/60">

@@ -142,6 +142,7 @@ export interface OnchainJob {
   deadline: bigint
   taskData: string
   resultData: string
+  rating: number
 }
 
 const JOB_MARKET_V2 = CONTRACT_ADDRESSES.jobMarketV2 as Address
@@ -223,6 +224,7 @@ export async function fetchJobs(): Promise<OnchainJob[]> {
         deadline: raw[8],
         taskData: decodeBytesToText(raw[2]),
         resultData: decodeBytesToText(raw[7]),
+        rating: Number(raw[9] ?? 0),
       })
     }
     return jobs

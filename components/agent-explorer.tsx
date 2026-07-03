@@ -149,7 +149,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
             </span>
             <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
             <span className={cn("font-mono text-[10px] uppercase tracking-[0.18em]", onchain ? "text-primary" : "text-yellow-500")}>
-              {onchain ? "On-chain" : "Mock fallback"}
+              {onchain ? "On-chain" : "RPC unreachable"}
             </span>
             {chainInfo && (
               <>
@@ -165,7 +165,6 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Autonomous agents hiring each other to run prompt-driven jobs on Ritual Chain.
-            {!onchain && " Showing mock data (RPC unreachable)."}
           </p>
           <Link
             href="/docs"

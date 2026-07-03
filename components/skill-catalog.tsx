@@ -10,12 +10,10 @@ import { cn } from "@/lib/utils"
 const REPO = "https://github.com/Aphelios01-sdk/ritual-agent-marketplace"
 
 function skillPackage(s: SkillDefinition) {
-  const pkg = `@prompt-market/${s.name}`
   return {
-    pkg,
-    npm: `https://www.npmjs.com/package/${pkg}`,
-    github: `${REPO}#skills`,
-    install: `pnpm add ${pkg}`,
+    skillId: s.skillId,
+    github: `${REPO}/blob/main/contracts/AgentRegistry.sol#L7-L13`,
+    install: `# on-chain: register skill via AgentRegistry\nregistry.setSkills(agentId, [{\n  skillId: "${s.skillId}",\n  name: "${s.name}",\n  precompileAddr: "${s.precompileType === "HTTP" ? "0x0000000000000000000000000000000000000801" : "0x0000000000000000000000000000000000000802"}",\n  active: true\n}])`,
   }
 }
 
@@ -78,7 +76,7 @@ export function SkillCard({
                 <span className={cn("rounded-full px-1.5 py-0.5 font-mono text-[9px]", tone === "primary" ? "bg-primary/10 text-primary" : "bg-blue-500/10 text-blue-500")}>
                   {skill.precompileType}
                 </span>
-                <span className="font-mono text-[10px] text-muted-foreground">{pkg.pkg}</span>
+                <span className="font-mono text-[10px] text-muted-foreground">{pkg.skillId.slice(0, 10)}…</span>
               </div>
             </div>
           </div>
@@ -112,27 +110,18 @@ export function SkillCard({
               onClick={(e) => selectable && e.stopPropagation()}
               className="inline-flex items-center gap-1 rounded-md border border-border/70 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
             >
-              <Code2 className="h-3 w-3" /> GitHub <ExternalLink className="h-2.5 w-2.5" />
-            </a>
-            <a
-              href={pkg.npm}
-              target="_blank"
-              rel="noreferrer"
-              onClick={(e) => selectable && e.stopPropagation()}
-              className="inline-flex items-center gap-1 rounded-md border border-border/70 px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
-            >
-              npm <ExternalLink className="h-2.5 w-2.5" />
+              <Code2 className="h-3 w-3" /> Source <ExternalLink className="h-2.5 w-2.5" />
             </a>
           </div>
 
-          <div className="flex items-center gap-1.5 rounded-lg border border-border/70 bg-muted/40 px-2.5 py-1.5">
-            <span className="font-mono text-[11px] text-foreground">$ {pkg.install}</span>
+          <div className="rounded-lg border border-border/70 bg-muted/40 px-2.5 py-1.5">
+            <pre className="overflow-x-auto whitespace-pre-wrap break-all font-mono text-[10px] leading-relaxed text-foreground">{pkg.install}</pre>
             <button
               onClick={(e) => {
                 e.stopPropagation()
                 copy(pkg.install)
               }}
-              className="ml-auto inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground"
+              className="mt-1 ml-auto flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground"
             >
               {copied ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />}
               {copied ? "Copied" : "Copy"}
@@ -214,11 +203,18 @@ export function SkillCatalog() {
 
       <Card className="surface-card border-border/60">
         <CardContent className="p-5 text-sm text-muted-foreground">
-          <p className="mb-2 font-semibold text-foreground">Install a skill into an agent</p>
-          <p>Skills are versioned packages. Install via your package manager, then register the skill on-chain with <code className="font-mono text-xs text-foreground">AgentRegistry.setSkills(agentId, [skill])</code>:</p>
-          <pre className="mt-2 overflow-x-auto rounded-lg bg-muted/40 p-3 text-xs leading-relaxed"><code className="font-mono">{`pnpm add @prompt-market/fetch-token-price
-# then in your agent's setup:
-registry.setSkills(agentId, [skill])`}</code></pre>
+          <p className="mb-2 font-semibold text-foreground">Register a skill on-chain</p>
+          <p>Skills are on-chain definitions stored in <code className="font-mono text-xs text-foreground">AgentRegistry</code>. Register a skill onto your agent by calling <code className="font-mono text-xs text-foreground">setSkills(agentId, [skill])</code>:</p>
+          <pre className="mt-2 overflow-x-auto rounded-lg bg-muted/40 p-3 text-xs leading-relaxed"><code className="font-mono">{`// AgentRegistry.setSkills(agentId, [skill])
+const skill = {
+  skillId: "0x0000…0001",
+  name: "fetch-token-price",
+  precompileAddr: "0x…0801", // HTTP
+  active: true
+}
+await registry.setSkills(agentId, [skill])`}</code></pre>
+          <p className="mt-2 text-xs">Run the bootstrap SDK to register an agent and install skills automatically:</p>
+          <pre className="mt-1 overflow-x-auto rounded-lg bg-muted/40 p-2 text-xs"><code className="font-mono">pnpm tsx scripts/bootstrap-agent.ts</code></pre>
           <Button asChild variant="outline" size="sm" className="mt-3 gap-1.5">
             <a href={`${REPO}`} target="_blank" rel="noreferrer">
               <Code2 className="h-3.5 w-3.5" /> View repository

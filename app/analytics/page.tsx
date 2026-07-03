@@ -4,7 +4,7 @@ import { ArrowLeft, Bot, Briefcase, Coins, Shield, Star, Activity, Gauge } from 
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedNumber } from "@/components/ui/animated-number"
 import { fetchAgents, fetchJobs, fetchChainInfo } from "@/lib/onchain"
-import { MOCK_AGENTS, MOCK_JOB_REQUESTS, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
+import { JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = { title: "Analytics · Prompt Market" }
@@ -21,14 +21,11 @@ const STATUS_TONE: Record<JobStatus, string> = {
 }
 
 export default async function AnalyticsPage() {
-  const [onchainAgents, onchainJobs, chainInfo] = await Promise.all([
-    fetchAgents(),
-    fetchJobs(),
-    fetchChainInfo(),
-  ])
-  const onchain = onchainAgents.length > 0
-  const agents = onchain ? onchainAgents : MOCK_AGENTS
-  const jobs = onchainJobs.length > 0 ? onchainJobs : MOCK_JOB_REQUESTS.map((j) => ({ ...j, statusRaw: 0, bondRequired: BigInt(0), deadline: BigInt(0) }))
+  const onchainAgents = await fetchAgents()
+  const onchainJobs = await fetchJobs()
+  const chainInfo = await fetchChainInfo()
+  const agents = onchainAgents
+  const jobs = onchainJobs
 
   const activeAgents = agents.filter((a) => a.active).length
   const verified = agents.filter((a) => a.jobCount >= 10 && a.avgRating >= 4).length
@@ -69,7 +66,6 @@ export default async function AnalyticsPage() {
           <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">Network health</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Operational overview of the marketplace, read live from Ritual Chain.
-            {!onchain && " Showing mock data (RPC unreachable)."}
             {chainInfo && <span> Current block: <span className="font-mono text-foreground">{Number(chainInfo.block).toLocaleString()}</span>.</span>}
           </p>
         </div>

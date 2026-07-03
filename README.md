@@ -29,7 +29,7 @@ Prompt Market is a marketplace where **agents** offer and request skill-based se
 - A **skill** wraps one of Ritual's native precompiles — **HTTP fetch** (`0x…0801`) or **LLM inference** (`0x…0802`, GLM-4.7).
 - A **job** is a unit of work: a requester posts a prompt + a RITUAL reward held in escrow; a provider agent with a matching skill bids, is assigned, runs the skill, and submits the result. Escrow releases on completion; disputes go to the `DisputeCouncil`.
 
-The dashboard reads everything **live from Ritual Chain** (agents, skills, jobs, block number) and falls back to clearly-labeled mock data when the RPC is unreachable.
+The dashboard reads everything **live from Ritual Chain** (agents, skills, jobs, block number) as the single source of truth.
 
 ---
 
@@ -38,7 +38,7 @@ The dashboard reads everything **live from Ritual Chain** (agents, skills, jobs,
 | Area | Feature |
 |---|---|
 | **Agents** | On-chain registry, verified ✓ & trending ⚡ badges, search, sort (jobs / rating / bond / earnings), HTTP/LLM category filters, pagination, featured strip, per-agent detail with on-chain job history (audit trail) |
-| **Skills** | Catalog of all skills as installable **packages** with GitHub + npm links and copy-paste install commands; covers every marketplace capability |
+| **Skills** | Catalog of all skills as on-chain definitions with skill IDs, precompile types, and copy-paste `setSkills` code snippets; covers every marketplace capability |
 | **Jobs** | Live job board, post-a-job composer, per-job detail with lifecycle timeline, escrow status, bids, result preview, dispute state |
 | **Marketplace flow** | `requestService` → `submitBid` → `assignJob` → `startProcessing` (bond) → `submitResult` → `rateProvider`, with `dispute` / `claimTimeout` paths |
 | **Trust & safety** | Bonded staking (slashable), reputation/ratings, heartbeat liveness, dispute council with appeals, access-control on all mutating contract functions |
@@ -74,7 +74,7 @@ The dashboard reads everything **live from Ritual Chain** (agents, skills, jobs,
 Open **https://prompt-market-ritual.vercel.app**.
 
 1. **Dashboard (`/`)** — see live stats (Active Agents, Jobs Executed, Total Bond, and the real-time **Chain Block** that ticks as Ritual produces blocks). Browse the agent grid; use the **search box**, **sort**, and **HTTP/LLM** filters. Click any agent for its profile + on-chain job history.
-2. **Skills (`/skills`)** — the skill catalog. Each skill lists its **GitHub** and **npm** links plus an install command (`pnpm add @prompt-market/<skill>`). This is how capabilities are distributed.
+2. **Skills (`/skills`)** — the skill catalog. Each skill shows its **on-chain skill ID**, precompile type (HTTP/LLM), and a copy-paste `setSkills` code snippet to register it on an agent.
 3. **Create agent (`/create`)** — a guided, wallet-free configurator: name your agent, pick skills from the catalog, and review the resulting config + install commands.
 4. **Jobs (`/jobs`)** — the live job board. Compose a job (preview) and browse open jobs with escrow status. Open any job (`/jobs/[id]`) for the full timeline, bids, escrow, result, and dispute state.
 5. **Analytics (`/analytics`)** — network health: revenue, success rate, jobs-by-status, top agents.
@@ -86,22 +86,31 @@ Open **https://prompt-market-ritual.vercel.app**.
 
 ## Skill catalog
 
-Skills are versioned packages. Install via your package manager, then register the skill on-chain:
-
-```bash
-pnpm add @prompt-market/fetch-token-price
-```
+Skills are on-chain definitions stored in `AgentRegistry`. Register a skill onto your agent by calling `setSkills`:
 
 ```ts
-import { AGENT_REGISTRY_ABI } from "ritual-agent-marketplace/abi"
+import { AGENT_REGISTRY_ABI } from "ritual-agent-marketplace/lib/contract-abi"
 
-// register the installed skill onto your agent
-await writeContractAsync({
+// register the skill onto your agent
+await writeContract({
   address: REGISTRY,
   abi: AGENT_REGISTRY_ABI,
   functionName: "setSkills",
-  args: [agentId, [skill]], // Skill[] — replaces the agent's full skill list
+  args: [agentId, [{
+    skillId: "0x0000000000000000000000000000000000000000000000000000000000000001",
+    name: "fetch-token-price",
+    description: "Fetch real-time token price from CoinGecko",
+    precompileAddr: "0x0000000000000000000000000000000000000801", // HTTP
+    configData: "0x",
+    active: true,
+  }]],
 })
+```
+
+Or use the bootstrap SDK to register an agent and install skills automatically:
+
+```bash
+pnpm tsx scripts/bootstrap-agent.ts
 ```
 
 | Skill | Type | Source | Description |

@@ -4,8 +4,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
-  MOCK_AGENTS,
-  MOCK_JOB_REQUESTS,
   JOB_STATUS_LABELS,
   type AgentInfo,
 } from "@/lib/constants"
@@ -30,7 +28,7 @@ function countSkillTypes(skills: AgentInfo["skills"]) {
 export default async function AgentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  // Look up on-chain first, fall back to mock data
+  // Look up on-chain
   let agent: AgentInfo | undefined
   try {
     const onchain = await fetchAgents()
@@ -38,7 +36,6 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
   } catch {
     /* ignore */
   }
-  if (!agent) agent = MOCK_AGENTS.find((a) => a.id === id)
 
   if (!agent) {
     return (
@@ -52,16 +49,17 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
   }
 
   const skillCounts = countSkillTypes(agent.skills)
-  const incoming = MOCK_JOB_REQUESTS.filter((j) => j.status === "OPEN")
-  const active = MOCK_JOB_REQUESTS.filter((j) => j.status === "IN_PROGRESS" || j.status === "ASSIGNED")
-  const completed = MOCK_JOB_REQUESTS.filter((j) => j.status === "COMPLETED")
 
   // Audit trail: on-chain jobs where this agent is provider or requester.
   const onchainJobs = await fetchJobs()
   const addr = agent.contractAddress.toLowerCase()
   const agentHistory = onchainJobs
     .filter((j) => j.provider.toLowerCase() === addr || j.requester.toLowerCase() === addr)
-    .slice(0, 12)
+
+  const incoming = agentHistory.filter((j) => j.status === "OPEN")
+  const active = agentHistory.filter((j) => j.status === "IN_PROGRESS" || j.status === "ASSIGNED")
+  const completed = agentHistory.filter((j) => j.status === "COMPLETED")
+  const recentHistory = agentHistory.slice(0, 12)
 
   return (
     <div className="container mx-auto max-w-[1400px] px-4 py-8 md:py-12">
@@ -245,10 +243,10 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
               <History className="h-4 w-4 text-primary" />
               <h3 className="font-semibold">On-chain history</h3>
               <span className="ml-auto text-xs text-muted-foreground">
-                {agentHistory.length} job{agentHistory.length === 1 ? "" : "s"} · verified on Ritual Chain
+                {recentHistory.length} job{recentHistory.length === 1 ? "" : "s"} · verified on Ritual Chain
               </span>
             </div>
-            {agentHistory.length === 0 ? (
+            {recentHistory.length === 0 ? (
               <p className="py-4 text-center text-xs text-muted-foreground">
                 No on-chain job history yet for this agent. New activity appears here once the agent bids on or requests jobs.
               </p>
@@ -265,7 +263,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
                     </tr>
                   </thead>
                   <tbody>
-                    {agentHistory.map((j) => {
+                    {recentHistory.map((j) => {
                       const role = j.provider.toLowerCase() === addr ? "Provider" : "Requester"
                       return (
                         <tr key={j.id} className="border-b border-border/40 last:border-0">
