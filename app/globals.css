@@ -187,8 +187,172 @@ body {
 .is-tick { animation: tick-flash 0.65s ease-out; }
 .live-block-delta { animation: delta-pop 1.6s ease-out forwards; }
 
+/* ── Brand deploy animation (loop ~12s, silent) ── */
+.brand-anim-stage {
+  --dur: 12s;
+}
+
+.brand-caption {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.brand-c1 { animation: brand-cap 12s linear infinite; }
+.brand-c2 { animation: brand-cap 12s linear infinite; animation-delay: -3s; }
+.brand-c3 { animation: brand-cap 12s linear infinite; animation-delay: -6s; }
+.brand-c4 { animation: brand-cap 12s linear infinite; animation-delay: -9s; }
+@keyframes brand-cap {
+  0%, 2% { opacity: 0; transform: translateY(4px); }
+  6%, 20% { opacity: 1; transform: translateY(0); }
+  24%, 100% { opacity: 0; transform: translateY(-4px); }
+}
+
+/* Laptop lid opens 0–2.5s */
+.brand-lid {
+  width: 7.5rem;
+  height: 5rem;
+  transform-origin: bottom center;
+  animation: brand-lid var(--dur) ease-in-out infinite;
+}
+@media (min-width: 640px) {
+  .brand-lid { width: 9rem; height: 5.75rem; }
+}
+@keyframes brand-lid {
+  0%, 4% {
+    transform: perspective(420px) rotateX(78deg) scaleY(0.35);
+    opacity: 0.9;
+  }
+  12%, 88% {
+    transform: perspective(420px) rotateX(0deg) scaleY(1);
+    opacity: 1;
+  }
+  96%, 100% {
+    transform: perspective(420px) rotateX(78deg) scaleY(0.35);
+    opacity: 0.9;
+  }
+}
+
+.brand-screen {
+  opacity: 0;
+  animation: brand-screen var(--dur) ease-in-out infinite;
+}
+@keyframes brand-screen {
+  0%, 10% { opacity: 0; }
+  16%, 90% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+
+.brand-deploy-btn {
+  animation: brand-btn-pulse var(--dur) ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes brand-btn-pulse {
+  0%, 38% { transform: scale(1); box-shadow: none; }
+  42% { transform: scale(0.92); box-shadow: 0 0 12px rgba(0, 255, 153, 0.6); }
+  48%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(0, 255, 153, 0.25); }
+}
+
+.brand-screen-agent {
+  opacity: 0;
+  transform: scale(0.4);
+  animation: brand-screen-agent var(--dur) ease-out infinite;
+}
+@keyframes brand-screen-agent {
+  0%, 44% { opacity: 0; transform: scale(0.4); }
+  52%, 88% { opacity: 1; transform: scale(1); }
+  96%, 100% { opacity: 0; transform: scale(0.6); }
+}
+
+.brand-agent-float {
+  opacity: 0;
+  transform: translate(-50%, 12px) scale(0.6);
+  animation: brand-agent-float var(--dur) ease-out infinite;
+}
+@keyframes brand-agent-float {
+  0%, 48% { opacity: 0; transform: translate(-50%, 16px) scale(0.5); }
+  56%, 86% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  94%, 100% { opacity: 0; transform: translate(-50%, -8px) scale(0.85); }
+}
+
+.brand-viewer {
+  opacity: 0;
+  transform: translateY(16px) scale(0.9);
+  position: relative;
+  animation: brand-viewer var(--dur) ease-out infinite;
+}
+.brand-viewer-0 { animation-delay: 0s; }
+.brand-viewer-1 { animation-delay: 0.12s; }
+.brand-viewer-2 { animation-delay: 0.24s; }
+.brand-viewer-3 { animation-delay: 0.36s; }
+@keyframes brand-viewer {
+  0%, 58% { opacity: 0; transform: translateY(16px) scale(0.9); }
+  68%, 90% { opacity: 1; transform: translateY(0) scale(1); }
+  97%, 100% { opacity: 0; transform: translateY(-6px) scale(0.95); }
+}
+
+.brand-notif {
+  opacity: 0;
+  transform: translateY(6px) scale(0.85);
+  animation: brand-notif var(--dur) ease-out infinite;
+}
+.brand-viewer-0 .brand-notif { animation-delay: 0.05s; }
+.brand-viewer-1 .brand-notif { animation-delay: 0.18s; }
+.brand-viewer-2 .brand-notif { animation-delay: 0.3s; }
+.brand-viewer-3 .brand-notif { animation-delay: 0.42s; }
+@keyframes brand-notif {
+  0%, 62% { opacity: 0; transform: translateY(8px) scale(0.8); }
+  70%, 88% { opacity: 1; transform: translateY(0) scale(1); }
+  96%, 100% { opacity: 0; transform: translateY(-4px) scale(0.9); }
+}
+
+.brand-progress {
+  width: 0%;
+  animation: brand-progress var(--dur) linear infinite;
+}
+@keyframes brand-progress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+.brand-arm-l {
+  transform: rotate(25deg);
+  animation: brand-arm-l var(--dur) ease-in-out infinite;
+}
+.brand-arm-r {
+  transform: rotate(-25deg);
+  animation: brand-arm-r var(--dur) ease-in-out infinite;
+}
+@keyframes brand-arm-l {
+  0%, 5% { transform: rotate(55deg); }
+  14%, 90% { transform: rotate(18deg); }
+  98%, 100% { transform: rotate(55deg); }
+}
+@keyframes brand-arm-r {
+  0%, 5% { transform: rotate(-55deg); }
+  14%, 90% { transform: rotate(-18deg); }
+  98%, 100% { transform: rotate(-55deg); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up, .animate-fade-in { animation: none; }
   .inf-card { transition: none; }
   .is-tick, .live-block-delta { animation: none; }
+  .brand-lid,
+  .brand-screen,
+  .brand-deploy-btn,
+  .brand-screen-agent,
+  .brand-agent-float,
+  .brand-viewer,
+  .brand-notif,
+  .brand-progress,
+  .brand-arm-l,
+  .brand-arm-r,
+  .brand-c1, .brand-c2, .brand-c3, .brand-c4 {
+    animation: none !important;
+  }
+  .brand-lid { height: 5rem; transform: none; opacity: 1; }
+  .brand-screen { opacity: 1; }
+  .brand-agent-float { opacity: 1; transform: translate(-50%, 0); }
+  .brand-viewer { opacity: 1; transform: none; }
+  .brand-notif { opacity: 1; transform: none; }
 }

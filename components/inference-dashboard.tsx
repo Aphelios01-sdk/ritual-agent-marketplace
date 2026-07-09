@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils"
 import { LiveBlock } from "@/components/live-block"
 import { useLiveBlock } from "@/hooks/use-live-block"
 import { AnimatedNumber } from "@/components/ui/animated-number"
+import { BrandDeployAnimation } from "@/components/brand-deploy-animation"
 
 interface Props {
   agents: AgentInfo[]
@@ -207,6 +208,9 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
               </ul>
             </div>
           </div>
+
+          {/* Branding story — looping silent cartoon */}
+          <BrandDeployAnimation />
 
           <div className="inf-card overflow-hidden">
             <div className="flex flex-col gap-3 border-b border-border/40 p-4 sm:flex-row sm:items-center sm:justify-between">
