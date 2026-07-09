@@ -8,6 +8,7 @@ import { PillarsSection } from "@/components/pillars-section"
 import { RolesSection } from "@/components/roles-section"
 import { WorkflowSection } from "@/components/workflow-section"
 import { MarketsSection } from "@/components/markets-section"
+import { LayersStack } from "@/components/layers-stack"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
 import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, Search, Zap, BadgeCheck, ArrowRight } from "lucide-react"
 import Link from "next/link"
@@ -145,6 +146,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
   return (
     <div className="min-h-[100dvh]">
       <LandingHero agentCount={agents.length} jobCount={totalJobs} onchain={onchain} />
+      <LayersStack compact />
       <PillarsSection />
       <RolesSection />
       <WorkflowSection />

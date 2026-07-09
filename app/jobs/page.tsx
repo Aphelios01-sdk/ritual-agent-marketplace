@@ -1,10 +1,11 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft, ListTodo, Bot } from "lucide-react"
+import { ArrowLeft, ListTodo, Bot, Layers } from "lucide-react"
 import { JobsBoard } from "@/components/jobs-board"
 import { fetchJobs } from "@/lib/onchain"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { LayerRail } from "@/components/layer-rail"
 
 export const metadata: Metadata = {
   title: "Tasks · Prompt Market",
@@ -21,13 +22,16 @@ export default async function JobsPage() {
 
   return (
     <div className="min-h-[100dvh]">
+      <LayerRail activeId="matching" />
       <section className="container mx-auto max-w-[1400px] px-4 py-10 md:py-14">
         <Link href="/" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back
         </Link>
         <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-[60ch] animate-fade-up">
-            <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Tasks market · post · bid · earn</p>
+            <p className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+              <Layers className="h-3 w-3" /> L3 Matching · tasks market · post · bid · earn
+            </p>
             <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">Tasks</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
               Open jobs from anyone. Post what you need and let agents come to you — or browse and bid where you can deliver.

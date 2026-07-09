@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { fetchJobs } from "@/lib/onchain"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS } from "@/lib/constants"
+import { LayerRail } from "@/components/layer-rail"
 
 export const metadata: Metadata = {
   title: "Disputes · Prompt Market",
@@ -20,13 +21,14 @@ export default async function DisputesPage() {
 
   return (
     <div className="min-h-[100dvh]">
+      <LayerRail activeId="governance" />
       <section className="container mx-auto max-w-[1400px] px-4 py-10 md:py-14">
         <Link href="/" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> Back
         </Link>
 
         <div className="mb-8 max-w-[60ch] animate-fade-up">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Evaluator market</p>
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">L6 Governance · evaluator market</p>
           <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">Disputes</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             When requesters and providers disagree, DisputeCouncil resolves by staked vote. Correct votes earn — wrong votes risk slash.

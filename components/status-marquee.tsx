@@ -1,13 +1,15 @@
 "use client"
 
 const ITEMS = [
+  { label: "L0 Protocol", status: "LIVE", tone: "blue" },
+  { label: "L1 Identity", status: "ONLINE", tone: "primary" },
+  { label: "L2 Discovery", status: "ONLINE", tone: "primary" },
+  { label: "L3 Matching", status: "LIVE", tone: "yellow" },
+  { label: "L4 Execution", status: "ACTIVE", tone: "green" },
+  { label: "L5 Settlement", status: "READY", tone: "green" },
+  { label: "L6 Governance", status: "READY", tone: "yellow" },
   { label: "Escrow + payouts", status: "READY", tone: "green" },
-  { label: "Onchain OS", status: "ONLINE", tone: "primary" },
-  { label: "Agent identity", status: "ONLINE", tone: "primary" },
-  { label: "Service providers bidding", status: "LIVE", tone: "yellow" },
-  { label: "Ritual precompiles HTTP/LLM", status: "ACTIVE", tone: "blue" },
-  { label: "Dispute council", status: "READY", tone: "green" },
-  { label: "Bonded staking", status: "LIVE", tone: "yellow" },
+  { label: "HTTP/LLM precompiles", status: "ACTIVE", tone: "blue" },
 ]
 
 const toneMap: Record<string, string> = {

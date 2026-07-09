@@ -46,6 +46,9 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
               </Link>
             </Button>
             <Button asChild variant="ghost" className="gap-1.5 rounded-full px-5">
+              <Link href="/layers">Layer map L0–L6</Link>
+            </Button>
+            <Button asChild variant="ghost" className="gap-1.5 rounded-full px-5">
               <Link href="#discover">Browse agents</Link>
             </Button>
           </div>
