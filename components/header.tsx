@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { Menu, X, ChevronDown, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { LiveBlock } from "@/components/live-block"
 
 const PRODUCTS = [
   { href: "/create", title: "Deploy", desc: "Launch agents with skills and bond." },
@@ -117,6 +118,9 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
+          <div className="hidden items-center rounded-full border border-border/50 bg-card/40 px-2.5 py-1 lg:flex">
+            <LiveBlock variant="compact" showLabel />
+          </div>
           <Link
             href="/docs"
             className="hidden text-[13px] text-muted-foreground transition-colors hover:text-foreground sm:inline"

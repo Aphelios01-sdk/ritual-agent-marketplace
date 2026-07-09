@@ -3,6 +3,7 @@ import Link from "next/link"
 import { ArrowLeft, Bot, Briefcase, Coins, Shield, Star, Activity, Gauge } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedNumber } from "@/components/ui/animated-number"
+import { LiveBlock } from "@/components/live-block"
 import { fetchAgents, fetchJobs, fetchChainInfo } from "@/lib/onchain"
 import { JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { cn } from "@/lib/utils"
@@ -66,8 +67,13 @@ export default async function AnalyticsPage() {
           <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">Network health</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Operational overview of the marketplace, read live from Ritual Chain.
-            {chainInfo && <span> Current block: <span className="font-mono text-foreground">{Number(chainInfo.block).toLocaleString()}</span>.</span>}
           </p>
+          <div className="mt-3">
+            <LiveBlock
+              initialBlock={chainInfo ? Number(chainInfo.block) : 0}
+              variant="inline"
+            />
+          </div>
         </div>
 
         <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

@@ -1,15 +1,18 @@
 "use client"
 
-import { useEffect, useMemo, useState } from "react"
+import { useMemo, useState } from "react"
 import Link from "next/link"
 import {
   LayoutDashboard, Bot, Briefcase, Layers, Activity, BookOpen,
-  ArrowUpRight, Zap, Clock, Box, Search,
+  ArrowUpRight, Zap, Clock, Search,
 } from "lucide-react"
 import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
 import { JOB_STATUS_LABELS } from "@/lib/constants"
 import { formatRating } from "@/lib/utils"
 import { cn } from "@/lib/utils"
+import { LiveBlock } from "@/components/live-block"
+import { useLiveBlock } from "@/hooks/use-live-block"
+import { AnimatedNumber } from "@/components/ui/animated-number"
 
 interface Props {
   agents: AgentInfo[]
@@ -29,20 +32,9 @@ const SIDE = [
 ]
 
 export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) {
-  const [block, setBlock] = useState(chainInfo ? Number(chainInfo.block) : 0)
   const [q, setQ] = useState("")
-
-  useEffect(() => {
-    const id = setInterval(async () => {
-      try {
-        const r = await fetch("/api/stats", { cache: "no-store" })
-        if (!r.ok) return
-        const d = await r.json()
-        if (d.block) setBlock(Number(d.block))
-      } catch { /* ignore */ }
-    }, 5000)
-    return () => clearInterval(id)
-  }, [])
+  const initialBlock = chainInfo ? Number(chainInfo.block) : 0
+  const live = useLiveBlock(initialBlock, 2000)
 
   const open = jobs.filter((j) => j.status === "OPEN").length
   const active = jobs.filter((j) => j.status === "ASSIGNED" || j.status === "IN_PROGRESS").length
@@ -60,10 +52,9 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
   const recentJobs = useMemo(() => [...jobs].slice(0, 7), [jobs])
 
   const kpis = [
-    { label: "Requests", value: jobs.length.toLocaleString(), sub: `${open} open`, icon: Briefcase },
-    { label: "Agents", value: String(agents.length), sub: onchain ? "on-chain" : "offline", icon: Bot },
-    { label: "Pipeline", value: String(active), sub: `${done} completed`, icon: Clock },
-    { label: "Block", value: block ? block.toLocaleString() : "—", sub: disputed ? `${disputed} disputed` : "healthy", icon: Box },
+    { label: "Requests", value: jobs.length, sub: `${open} open`, icon: Briefcase, live: false },
+    { label: "Agents", value: agents.length, sub: onchain ? "on-chain" : "offline", icon: Bot, live: false },
+    { label: "Pipeline", value: active, sub: `${done} completed`, icon: Clock, live: false },
   ]
 
   return (
@@ -106,10 +97,10 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Overview</h1>
-              <p className="text-xs text-muted-foreground sm:text-sm">
-                Console · {onchain ? "live" : "degraded"}
-                {block ? ` · block ${block.toLocaleString()}` : ""}
-              </p>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
+                <span>Console · {live.online || onchain ? "live" : "degraded"}</span>
+                <LiveBlock initialBlock={initialBlock} variant="compact" />
+              </div>
             </div>
             <div className="flex items-center gap-2">
               <Link href="/jobs" className="inf-btn inf-btn-ghost h-8 px-3 text-xs">
@@ -132,11 +123,14 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                     <p className="text-[11px] text-muted-foreground">{k.label}</p>
                     <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
                   </div>
-                  <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums">{k.value}</p>
+                  <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums">
+                    <AnimatedNumber value={k.value} decimals={0} />
+                  </p>
                   <p className="mt-1 text-[11px] text-muted-foreground">{k.sub}</p>
                 </div>
               )
             })}
+            <LiveBlock initialBlock={initialBlock} variant="card" />
           </div>
 
           <div className="grid gap-4 lg:grid-cols-5">

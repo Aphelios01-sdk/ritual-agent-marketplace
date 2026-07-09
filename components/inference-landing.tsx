@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
 import { formatRating } from "@/lib/utils"
+import { LiveBlock } from "@/components/live-block"
 
 interface Props {
   agents: AgentInfo[]
@@ -24,7 +25,7 @@ const PRODUCTS = [
 export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
   const openJobs = jobs.filter((j) => j.status === "OPEN").length
   const completed = jobs.filter((j) => j.status === "COMPLETED").length
-  const block = chainInfo ? Number(chainInfo.block) : 0
+  const initialBlock = chainInfo ? Number(chainInfo.block) : 0
 
   return (
     <div>
@@ -66,7 +67,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                 {onchain ? "Live on Ritual" : "RPC unreachable"}
               </span>
               {chainInfo && <span>chain {chainInfo.chainId}</span>}
-              {block > 0 && <span className="font-mono tabular-nums">block {block.toLocaleString()}</span>}
+              <LiveBlock initialBlock={initialBlock} variant="inline" />
               <span className="tabular-nums">{agents.length} agents</span>
               <span className="tabular-nums">{jobs.length} tasks</span>
             </div>

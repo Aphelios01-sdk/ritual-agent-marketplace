@@ -4,9 +4,10 @@ import { AGENT_REGISTRY_ABI } from "./contract-abi"
 import { JOB_MARKET_V2_ABI } from "./contract-abi-v2"
 
 // Public client to read on-chain state (without a wagmi provider)
+const RPC = process.env.RITUAL_RPC_URL || RITUAL_CHAIN.rpcUrls.default.http[0]
 export const publicClient = createPublicClient({
   chain: RITUAL_CHAIN,
-  transport: http(),
+  transport: http(RPC, { timeout: 12_000 }),
 })
 
 import { CONTRACT_ADDRESSES } from "./constants"

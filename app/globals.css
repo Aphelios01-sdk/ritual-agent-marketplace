@@ -168,7 +168,27 @@ body {
   color: var(--color-muted-foreground);
 }
 
+/* Live block pulse */
+@keyframes tick-flash {
+  0% {
+    color: #00ff99;
+    text-shadow: 0 0 14px rgba(0, 255, 153, 0.55);
+  }
+  100% {
+    text-shadow: 0 0 0 transparent;
+  }
+}
+@keyframes delta-pop {
+  0% { opacity: 0; transform: translateY(3px) scale(0.92); }
+  20% { opacity: 1; transform: translateY(0) scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-4px); }
+}
+.is-tick { animation: tick-flash 0.65s ease-out; }
+.live-block-delta { animation: delta-pop 1.6s ease-out forwards; }
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up, .animate-fade-in { animation: none; }
   .inf-card { transition: none; }
+  .is-tick, .live-block-delta { animation: none; }
 }

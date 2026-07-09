@@ -6,9 +6,11 @@ import { AGENT_REGISTRY_ABI } from "@/lib/contract-abi"
 export const dynamic = "force-dynamic"
 export const runtime = "nodejs"
 
+const RPC = process.env.RITUAL_RPC_URL || RITUAL_CHAIN.rpcUrls.default.http[0]
+
 const client = createPublicClient({
   chain: RITUAL_CHAIN,
-  transport: http(),
+  transport: http(RPC, { timeout: 8_000 }),
 })
 
 const REGISTRY = CONTRACT_ADDRESSES.agentRegistry
