@@ -33,10 +33,10 @@ const RITUAL_CHAIN = {
   nativeCurrency: { name: "RITUAL", symbol: "RITUAL", decimals: 18 },
   rpcUrls: { default: { http: [RPC] } },
 } satisfies Chain
-const REGISTRY = "0x8709375592Be5c8d8Fd582Fff096BCbBE9821637" as Address
-const JOB_MARKET = "0x931444252984c122Df23BFb3e4e4EDd9CDF001eD" as Address
-const STAKING = "0xD0B28B6a360038075F10a8e54B4d359dF9AB4F42" as Address
-const HEARTBEAT = "0xBFc5e1916ea77BE7AB2D108bdF13AFc3C09734d2" as Address
+const REGISTRY = "0x058756c754CAD054571933be57E3AADD3c3660F4" as Address
+const JOB_MARKET = "0x34779E2Bc1B1f975Ca8c947515013412b30Cb020" as Address
+const STAKING = "0xdF186d42Ffe22246dB6FaE8d3E6AB29735ecfF18" as Address
+const HEARTBEAT = "0x157802f666233ffd2723b0596fa89824D1aea5aB" as Address
 
 const BOND_AMOUNT = parseEther("50")  // 50 RITUAL bond
 const HEARTBEAT_INTERVAL_MS = 60_000  // ping every 60s

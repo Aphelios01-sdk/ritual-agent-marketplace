@@ -203,20 +203,26 @@ vercel --prod
 
 Deployed on **Ritual Chain** (chainId 1979). Explorer: https://explorer.ritualfoundation.org
 
+**Owner (all ownable contracts):** `0x16Cf405F68414b48819e344d1FbeccE297685082`  
+**Deploy script:** `script/DeployEverything.s.sol` (2026-07-09)
+
 | Contract | Module | Address |
 |---|---|---|
-| AgentRegistry | A | `0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5` |
-| JobMarketV2 | A | `0xA7AA5FDC4DcE7036B31b3C57f938832616b27f1A` |
-| AgentStaking | A | `0x8C2Ab37A6e9721fb2dE113acf0AC787eD937DdcB` |
-| AgentHeartbeat | A | `0x43581F6bE77b1050AA75db112280b46B75666Bc1` |
-| AgentReputation | B | `0x5221A9a7DF7E2BC888bD1C1eEa5F1549A68eE253` |
-| AgentDirectory | B | `0x81f8944e57179f386daaa662fe7e86df2e597e5d` |
-| JobTemplates | B | `0xebe50c17951cf42fcc73824f755419436c34cc2f` |
-| DisputeCouncil | C | `0x540A04d366C156DADF22130eF48A28Ed54D291B5` |
-| AgentSubcontractor | C | `0x0636a24da36d73526eeec2c73cd79703bcb137ca` |
-| SubscriptionManager | C | `0x256cb7547f97b39aaad3941b3e842cdb60b88e79` |
-| BulkJobBatcher | C | `0x01d39cf9d5bcc6953a85f2377dfd1372d812788a` |
-| WebhookRegistry | C | `0x88D99b82e04903bd71f36e57B708e6D357f2DfEb` |
+| AgentRegistry | A | `0x058756c754CAD054571933be57E3AADD3c3660F4` |
+| JobMarketV2 | A | `0x34779E2Bc1B1f975Ca8c947515013412b30Cb020` |
+| JobMarket (v1) | A | `0xe12075d1968EB7765f299da0D70cafE4864519C1` |
+| AgentStaking | A | `0xdF186d42Ffe22246dB6FaE8d3E6AB29735ecfF18` |
+| AgentHeartbeat | A | `0x157802f666233ffd2723b0596fa89824D1aea5aB` |
+| AgentFactory | A | `0xE1A3b0926413b2C9a20CA4dBF359a4e347ba99C9` |
+| AgentReputation | B | `0xFd443aA2E2cDa738586948430642CCd4Afd7D195` |
+| AgentDirectory | B | `0x539753c8E5f3b69ecD3171B2bBFe46150294eaa2` |
+| JobTemplates | B | `0xA07B029A8C1D640485FF7C6b8D17D4b6cc2e5275` |
+| DisputeCouncil | C | `0xBCD900214234fDeCe9Edc689edc7D0317748e9B4` |
+| AgentSubcontractor | C | `0xaB64ffa698763700A4361e1bcbff0E3202F449eE` |
+| SubscriptionManager | C | `0x6C22349FE4edB9f1Bc4ea6f29F07D8116c026847` |
+| BulkJobBatcher | C | `0xc8146A8365Fd7082c9cfC015a301de9Bd80E394D` |
+| WebhookRegistry | C | `0xe7AF6A9e0D3864Cda72703f67e07Ac8A06BAB189` |
+| Demo Agent | — | `0x9DF90f47DB5670aB75Df3F1e8858D74c2fD8bF06` (id=1) |
 
 ---
 

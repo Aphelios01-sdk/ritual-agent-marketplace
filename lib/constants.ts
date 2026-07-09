@@ -10,21 +10,23 @@ export const RITUAL_CHAIN = {
   },
 } as const
 
+// Deployed 2026-07-09 via script/DeployEverything.s.sol
+// Owner (all ownable): 0x16Cf405F68414b48819e344d1FbeccE297685082
 export const CONTRACT_ADDRESSES = {
-  agentRegistry: "0x8709375592Be5c8d8Fd582Fff096BCbBE9821637" as const,
-  jobMarket: "0x5d87fE0d14d5c72B915Cf4C1dddb6e6ac86d84Cd" as const,
-  jobMarketV2: "0x931444252984c122Df23BFb3e4e4EDd9CDF001eD" as const,
-  agentFactory: "0x4567a3EdAa03B52eb2f6d23c3a68FdfB4A67419b" as const,
-  agentStaking: "0xD0B28B6a360038075F10a8e54B4d359dF9AB4F42" as const,
-  agentHeartbeat: "0xBFc5e1916ea77BE7AB2D108bdF13AFc3C09734d2" as const,
-  agentReputation: "0x5221A9a7DF7E2BC888bD1C1eEa5F1549A68eE253" as const,
-  agentDirectory: "0x81f8944e57179f386daaa662fe7e86df2e597e5d" as const,
-  jobTemplates: "0xebe50c17951cf42fcc73824f755419436c34cc2f" as const,
-  disputeCouncil: "0x540A04d366C156DADF22130eF48A28Ed54D291B5" as const,
-  agentSubcontractor: "0x0636a24da36d73526eeec2c73cd79703bcb137ca" as const,
-  subscriptionManager: "0x256cb7547f97b39aaad3941b3e842cdb60b88e79" as const,
-  bulkJobBatcher: "0x01d39cf9d5bcc6953a85f2377dfd1372d812788a" as const,
-  webhookRegistry: "0x88D99b82e04903bd71f36e57B708e6D357f2DfEb" as const,
+  agentRegistry: "0x058756c754CAD054571933be57E3AADD3c3660F4" as const,
+  jobMarket: "0xe12075d1968EB7765f299da0D70cafE4864519C1" as const,
+  jobMarketV2: "0x34779E2Bc1B1f975Ca8c947515013412b30Cb020" as const,
+  agentFactory: "0xE1A3b0926413b2C9a20CA4dBF359a4e347ba99C9" as const,
+  agentStaking: "0xdF186d42Ffe22246dB6FaE8d3E6AB29735ecfF18" as const,
+  agentHeartbeat: "0x157802f666233ffd2723b0596fa89824D1aea5aB" as const,
+  agentReputation: "0xFd443aA2E2cDa738586948430642CCd4Afd7D195" as const,
+  agentDirectory: "0x539753c8E5f3b69ecD3171B2bBFe46150294eaa2" as const,
+  jobTemplates: "0xA07B029A8C1D640485FF7C6b8D17D4b6cc2e5275" as const,
+  disputeCouncil: "0xBCD900214234fDeCe9Edc689edc7D0317748e9B4" as const,
+  agentSubcontractor: "0xaB64ffa698763700A4361e1bcbff0E3202F449eE" as const,
+  subscriptionManager: "0x6C22349FE4edB9f1Bc4ea6f29F07D8116c026847" as const,
+  bulkJobBatcher: "0xc8146A8365Fd7082c9cfC015a301de9Bd80E394D" as const,
+  webhookRegistry: "0xe7AF6A9e0D3864Cda72703f67e07Ac8A06BAB189" as const,
 }
 
 export const PRECOMPILE_ADDRESSES = {

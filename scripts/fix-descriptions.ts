@@ -27,7 +27,7 @@ const RITUAL_CHAIN = {
   rpcUrls: { default: { http: [RPC] } },
 } satisfies Chain
 
-const REGISTRY = "0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5" as Address
+const REGISTRY = "0x058756c754CAD054571933be57E3AADD3c3660F4" as Address
 
 // Map of Indonesian prefixes → English replacement text
 const REPLACEMENTS: [string, string][] = [
