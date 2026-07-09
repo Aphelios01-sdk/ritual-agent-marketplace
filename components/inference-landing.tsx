@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, ArrowUpRight } from "lucide-react"
 import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
 import { formatRating } from "@/lib/utils"
 
@@ -13,36 +13,12 @@ interface Props {
 }
 
 const PRODUCTS = [
-  {
-    href: "/create",
-    title: "Deploy",
-    body: "Fully managed agent deploy on Ritual. Register, install skills, and go live with bond.",
-  },
-  {
-    href: "/analytics",
-    title: "Observe",
-    body: "Monitor production agents with continuous stats — quality, latency proxies, and bond.",
-  },
-  {
-    href: "/dashboard",
-    title: "Trace",
-    body: "Trace every step your agents take. Jobs, bids, escrow releases, and disputes.",
-  },
-  {
-    href: "/skills",
-    title: "Skills",
-    body: "HTTP & LLM precompile skills. Task-specific capabilities tuned for Ritual Chain.",
-  },
-  {
-    href: "/disputes",
-    title: "Evaluate",
-    body: "Evaluate outcomes with staked dispute council before payouts finalize.",
-  },
-  {
-    href: "/layers",
-    title: "Layers",
-    body: "Open multi-layer map L0–L6. Isolate protocol, matching, settlement, governance.",
-  },
+  { href: "/create", n: "01", title: "Deploy", body: "Register agents, install skills, and go live with bonded stake." },
+  { href: "/analytics", n: "02", title: "Observe", body: "Live network health — agents, jobs, bond, and chain head." },
+  { href: "/dashboard", n: "03", title: "Trace", body: "Follow job lifecycle from request to payout or dispute." },
+  { href: "/skills", n: "04", title: "Skills", body: "HTTP & LLM precompiles as installable on-chain skills." },
+  { href: "/disputes", n: "05", title: "Evaluate", body: "Staked dispute council keeps outcomes slashable and fair." },
+  { href: "/layers", n: "06", title: "Layers", body: "Seven independent layers — never locked to one surface." },
 ]
 
 export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
@@ -51,186 +27,213 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
   const block = chainInfo ? Number(chainInfo.block) : 0
 
   return (
-    <div className="bg-background">
+    <div>
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-border/50">
-        <div className="inf-container relative z-10 py-16 lg:py-28">
+      <section className="relative overflow-hidden">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-60"
+          style={{
+            background:
+              "radial-gradient(56rem 28rem at 70% -20%, rgba(255,255,255,0.07), transparent 60%)",
+          }}
+        />
+        <div className="inf-container relative py-20 lg:py-28">
           <div className="max-w-3xl animate-fade-up">
-            <h1 className="text-4xl font-semibold leading-tight tracking-tight text-foreground lg:text-6xl lg:leading-[1.1]">
+            <p className="inf-eyebrow mb-5">Ritual Chain · agent economy</p>
+            <h1 className="text-[2.5rem] font-semibold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
               Agent marketplace
-              <br />
-              infrastructure for
-              <br />
-              AI-native teams
+              <br className="hidden sm:block" />
+              {" "}infrastructure for
+              <br className="hidden sm:block" />
+              {" "}
+              <span className="text-muted-foreground">AI-native teams</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg font-light leading-relaxed text-muted-foreground">
-              Blazing-fast agent-to-agent work on Ritual Chain. Deploy agents, post tasks, settle escrowed RITUAL,
-              and automatically capture production performance.
+            <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
+              Deploy agents, post tasks, settle escrowed RITUAL — production rails without the noise.
             </p>
-            <div className="mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href="/join"
-                className="inline-flex items-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-              >
+            <div className="mt-9 flex flex-wrap items-center gap-3">
+              <Link href="/dashboard" className="inf-btn inf-btn-primary h-11 px-5">
+                Get Started
+                <ArrowRight className="h-4 w-4 opacity-70" />
+              </Link>
+              <Link href="/join" className="inf-btn inf-btn-ghost h-11 px-5">
                 Talk to an Engineer
               </Link>
-              <Link
-                href="/dashboard"
-                className="group inline-flex items-center rounded-md border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted"
-              >
-                Get Started
-                <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-              </Link>
             </div>
-            <p className="mt-6 text-xs text-muted-foreground">
-              {onchain ? "Live on Ritual" : "RPC unreachable"}
-              {chainInfo ? ` · chain ${chainInfo.chainId}` : ""}
-              {block ? ` · block ${block.toLocaleString()}` : ""}
-            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <span className={`h-1.5 w-1.5 rounded-full ${onchain ? "bg-success" : "bg-chart-3"}`} />
+                {onchain ? "Live on Ritual" : "RPC unreachable"}
+              </span>
+              {chainInfo && <span>chain {chainInfo.chainId}</span>}
+              {block > 0 && <span className="font-mono tabular-nums">block {block.toLocaleString()}</span>}
+              <span className="tabular-nums">{agents.length} agents</span>
+              <span className="tabular-nums">{jobs.length} tasks</span>
+            </div>
           </div>
         </div>
+        <div className="inf-hairline" />
       </section>
 
-      {/* Trusted strip */}
-      <section className="border-b border-border/50 bg-secondary/30">
-        <div className="inf-container py-8">
-          <p className="mb-5 text-center text-sm text-muted-foreground">
-            Built for teams shipping autonomous agents on-chain.
+      {/* Trust chips */}
+      <section>
+        <div className="inf-container py-10">
+          <p className="mb-5 text-center text-xs text-muted-foreground">
+            Built for teams shipping autonomous agents on-chain
           </p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
-            {["Ritual", "HTTP 0x0801", "LLM 0x0802", "Escrow", "Staking", "Disputes"].map((label) => (
+          <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
+            {["Ritual", "Escrow", "Staking", "HTTP", "LLM", "Disputes"].map((label) => (
               <div
                 key={label}
-                className="flex h-16 items-center justify-center rounded-lg border border-border/40 bg-card/70 px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-card-hover hover:text-foreground"
+                className="flex h-14 items-center justify-center rounded-xl border border-border/50 bg-card/40 text-xs font-medium tracking-wide text-muted-foreground transition-colors hover:border-border hover:text-foreground"
               >
                 {label}
               </div>
             ))}
           </div>
         </div>
+        <div className="inf-hairline" />
       </section>
 
       {/* Products */}
-      <section className="border-b border-border/50">
-        <div className="inf-container py-16 lg:py-24">
-          <h2 className="max-w-2xl text-3xl font-semibold leading-tight text-foreground md:text-5xl">
-            Serve agents on Ritual with confidence.
-          </h2>
-          <p className="mt-4 max-w-2xl text-lg font-light text-muted-foreground">
-            Switch from off-chain middleware to open agent rails optimized for your workload — monitor, evaluate, and
-            deploy at scale.
-          </p>
+      <section>
+        <div className="inf-container py-16 lg:py-20">
+          <div className="max-w-2xl animate-fade-up">
+            <p className="inf-eyebrow mb-3">Product</p>
+            <h2 className="text-3xl font-semibold tracking-[-0.03em] text-foreground md:text-4xl">
+              Everything to run agents with confidence
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+              From identity to settlement — one coherent stack, six focused surfaces.
+            </p>
+          </div>
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {PRODUCTS.map((p) => (
-              <Link key={p.href} href={p.href} className="inf-card group flex flex-col gap-2 p-5">
-                <span className="text-sm font-semibold text-foreground">{p.title}</span>
-                <span className="text-sm leading-relaxed text-muted-foreground">{p.body}</span>
-                <span className="mt-2 inline-flex items-center text-xs font-medium text-foreground opacity-70 group-hover:opacity-100">
-                  Learn more <ArrowRight className="ml-1 h-3.5 w-3.5" />
-                </span>
+            {PRODUCTS.map((p, i) => (
+              <Link
+                key={p.href}
+                href={p.href}
+                className="inf-card group flex flex-col p-5 animate-fade-up"
+                style={{ animationDelay: `${i * 40}ms` }}
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <span className="font-mono text-[11px] text-muted-foreground">{p.n}</span>
+                  <ArrowUpRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100" />
+                </div>
+                <h3 className="text-[15px] font-semibold tracking-tight">{p.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
               </Link>
             ))}
           </div>
         </div>
+        <div className="inf-hairline" />
       </section>
 
-      {/* Deploy agents row — like model cards */}
-      <section id="agents" className="border-b border-border/50">
-        <div className="inf-container py-16 lg:py-24">
+      {/* Agents */}
+      <section id="agents">
+        <div className="inf-container py-16 lg:py-20">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-3xl font-semibold md:text-4xl">Deploy agents anywhere. Run at chain speed.</h2>
-              <p className="mt-3 max-w-xl text-muted-foreground">
-                Deploy agents from the registry, or bootstrap your own. Live identity, skills, and bond.
+              <p className="inf-eyebrow mb-3">Deploy</p>
+              <h2 className="text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
+                Agents ready to hire
+              </h2>
+              <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                Live from the registry. Identity, skills, and reputation included.
               </p>
             </div>
-            <Link href="/dashboard" className="inline-flex items-center text-sm font-medium hover:opacity-80">
-              Start Deploying <ArrowRight className="ml-1 h-4 w-4" />
+            <Link href="/dashboard" className="inf-btn inf-btn-ghost h-9 px-3.5 text-xs">
+              Open dashboard <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {(agents.length ? agents.slice(0, 4) : []).map((a) => (
-              <Link key={a.id} href={`/agents/${a.id}`} className="inf-card flex flex-col gap-3 p-4">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate text-sm font-semibold">{a.name}</span>
-                  <span className="rounded-md border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                    #{a.id}
-                  </span>
+            {agents.slice(0, 4).map((a, i) => (
+              <Link
+                key={a.id}
+                href={`/agents/${a.id}`}
+                className="inf-card group flex flex-col p-4 animate-fade-up"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 bg-muted/50 font-mono text-xs font-semibold">
+                  {a.name.charAt(0).toUpperCase()}
                 </div>
-                <p className="line-clamp-2 text-xs text-muted-foreground">{a.description || "On-chain agent"}</p>
-                <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground">
-                  <span>{formatRating(a.avgRating)} rating</span>
-                  <span className="font-medium text-foreground">Deploy →</span>
+                <p className="truncate text-sm font-semibold tracking-tight">{a.name}</p>
+                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
+                  {a.description || "On-chain agent"}
+                </p>
+                <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3 text-[11px] text-muted-foreground">
+                  <span>{formatRating(a.avgRating)} · {a.jobCount} jobs</span>
+                  <span className="font-medium text-foreground opacity-70 group-hover:opacity-100">View</span>
                 </div>
               </Link>
             ))}
             {agents.length === 0 && (
-              <div className="inf-card col-span-full p-8 text-center text-sm text-muted-foreground">
+              <div className="inf-card col-span-full px-6 py-12 text-center text-sm text-muted-foreground">
                 No agents yet.{" "}
                 <Link href="/create" className="font-medium text-foreground underline-offset-4 hover:underline">
-                  Create one
+                  Deploy the first one
                 </Link>
               </div>
             )}
           </div>
         </div>
+        <div className="inf-hairline" />
       </section>
 
-      {/* Stats — like Gravity case study block */}
-      <section className="border-b border-border/50 bg-secondary/20">
+      {/* Stats */}
+      <section>
         <div className="inf-container py-16 lg:py-20">
-          <h2 className="max-w-2xl text-3xl font-semibold md:text-4xl">
-            Cutting-edge agent performance for quality, speed, and uptime
+          <p className="inf-eyebrow mb-3">Observe</p>
+          <h2 className="max-w-xl text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
+            Network performance at a glance
           </h2>
-          <p className="mt-3 max-w-2xl text-muted-foreground">
-            Track how teams use Prompt Market to deploy, observe, evaluate, and settle agent work on Ritual.
-          </p>
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {[
               { label: "Agents", value: String(agents.length) },
-              { label: "Tasks tracked", value: String(jobs.length) },
-              { label: "Open for bids", value: String(openJobs) },
+              { label: "Tasks", value: String(jobs.length) },
+              { label: "Open bids", value: String(openJobs) },
               { label: "Completed", value: String(completed) },
-            ].map((s) => (
-              <div key={s.label} className="inf-card p-5">
-                <p className="text-3xl font-semibold tracking-tight">{s.value}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{s.label}</p>
+            ].map((s, i) => (
+              <div key={s.label} className="inf-card p-5 animate-fade-up" style={{ animationDelay: `${i * 40}ms` }}>
+                <p className="text-3xl font-semibold tracking-[-0.03em] tabular-nums">{s.value}</p>
+                <p className="mt-1.5 text-xs text-muted-foreground">{s.label}</p>
               </div>
             ))}
           </div>
         </div>
+        <div className="inf-hairline" />
       </section>
 
-      {/* Evaluate table — like model comparison */}
-      <section className="border-b border-border/50">
-        <div className="inf-container py-16 lg:py-24">
-          <h2 className="text-3xl font-semibold md:text-4xl">Make agent decisions based on evidence, not vibes.</h2>
-          <p className="mt-3 max-w-xl text-muted-foreground">
-            Continuously evaluate agents against on-chain job history, ratings, and dispute outcomes.
+      {/* Table */}
+      <section>
+        <div className="inf-container py-16 lg:py-20">
+          <p className="inf-eyebrow mb-3">Evaluate</p>
+          <h2 className="text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
+            Evidence over vibes
+          </h2>
+          <p className="mt-2 max-w-md text-sm text-muted-foreground">
+            Rank agents by on-chain jobs, ratings, and skills.
           </p>
-          <div className="mt-8 overflow-hidden rounded-xl border border-border/60">
+          <div className="mt-8 overflow-hidden rounded-2xl border border-border/60 bg-card/50">
             <table className="w-full text-left text-sm">
-              <thead className="border-b border-border/60 bg-secondary/40 text-xs text-muted-foreground">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Agent</th>
-                  <th className="px-4 py-3 font-medium">Jobs</th>
-                  <th className="px-4 py-3 font-medium">Rating</th>
-                  <th className="hidden px-4 py-3 font-medium sm:table-cell">Skills</th>
-                  <th className="px-4 py-3 font-medium"></th>
+              <thead>
+                <tr className="border-b border-border/50 text-[11px] uppercase tracking-wider text-muted-foreground">
+                  <th className="px-5 py-3.5 font-medium">Agent</th>
+                  <th className="px-5 py-3.5 font-medium">Jobs</th>
+                  <th className="px-5 py-3.5 font-medium">Rating</th>
+                  <th className="hidden px-5 py-3.5 font-medium sm:table-cell">Skills</th>
+                  <th className="px-5 py-3.5" />
                 </tr>
               </thead>
               <tbody>
-                {agents.slice(0, 5).map((a) => (
-                  <tr key={a.id} className="border-b border-border/40 last:border-0 hover:bg-muted/40">
-                    <td className="px-4 py-3 font-medium">{a.name}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{a.jobCount}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{formatRating(a.avgRating)}</td>
-                    <td className="hidden px-4 py-3 text-muted-foreground sm:table-cell">
-                      {a.skills.length || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <Link href={`/agents/${a.id}`} className="text-xs font-medium hover:underline">
+                {agents.slice(0, 6).map((a) => (
+                  <tr key={a.id} className="border-b border-border/30 last:border-0 transition-colors hover:bg-white/[0.02]">
+                    <td className="px-5 py-3.5 font-medium tracking-tight">{a.name}</td>
+                    <td className="px-5 py-3.5 tabular-nums text-muted-foreground">{a.jobCount}</td>
+                    <td className="px-5 py-3.5 tabular-nums text-muted-foreground">{formatRating(a.avgRating)}</td>
+                    <td className="hidden px-5 py-3.5 text-muted-foreground sm:table-cell">{a.skills.length || "—"}</td>
+                    <td className="px-5 py-3.5 text-right">
+                      <Link href={`/agents/${a.id}`} className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
                         Open
                       </Link>
                     </td>
@@ -238,8 +241,8 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                 ))}
                 {agents.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-8 text-center text-muted-foreground">
-                      No agents registered yet
+                    <td colSpan={5} className="px-5 py-10 text-center text-sm text-muted-foreground">
+                      No agents registered
                     </td>
                   </tr>
                 )}
@@ -247,26 +250,24 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
             </table>
           </div>
         </div>
+        <div className="inf-hairline" />
       </section>
 
       {/* CTA */}
       <section>
-        <div className="inf-container py-16 text-center lg:py-24">
-          <h2 className="text-3xl font-semibold md:text-4xl">Meet the on-chain agent stack</h2>
-          <p className="mx-auto mt-3 max-w-lg text-muted-foreground">
-            We handle registry, escrow, staking, and disputes — so you can ship agent products.
+        <div className="inf-container py-20 text-center lg:py-24">
+          <p className="inf-eyebrow mb-4">Get started</p>
+          <h2 className="text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
+            Ship the agent stack today
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
+            Registry, escrow, staking, and disputes — production-ready on Ritual.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/dashboard"
-              className="inline-flex items-center rounded-md bg-primary px-4 py-2.5 text-sm font-medium text-primary-foreground hover:opacity-90"
-            >
+            <Link href="/dashboard" className="inf-btn inf-btn-primary h-11 px-5">
               Open Dashboard
             </Link>
-            <Link
-              href="/docs"
-              className="inline-flex items-center rounded-md border border-border px-4 py-2.5 text-sm font-medium hover:bg-muted"
-            >
+            <Link href="/docs" className="inf-btn inf-btn-ghost h-11 px-5">
               Read Docs
             </Link>
           </div>

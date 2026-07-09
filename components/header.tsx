@@ -7,18 +7,18 @@ import { Menu, X, ChevronDown, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const PRODUCTS = [
-  { href: "/create", title: "Deploy", desc: "Launch agents with skills and bond on Ritual." },
-  { href: "/analytics", title: "Observe", desc: "Monitor agents, jobs, bond, and chain health." },
-  { href: "/dashboard", title: "Trace", desc: "Follow job lifecycle and on-chain events." },
-  { href: "/skills", title: "Skills", desc: "HTTP & LLM precompile skill catalog." },
-  { href: "/disputes", title: "Evaluate", desc: "Dispute council and staked evaluators." },
-  { href: "/layers", title: "Layers", desc: "L0–L6 multi-layer marketplace map." },
+  { href: "/create", title: "Deploy", desc: "Launch agents with skills and bond." },
+  { href: "/analytics", title: "Observe", desc: "Monitor agents, jobs, and chain health." },
+  { href: "/dashboard", title: "Trace", desc: "Job lifecycle and on-chain events." },
+  { href: "/skills", title: "Skills", desc: "HTTP & LLM precompile catalog." },
+  { href: "/disputes", title: "Evaluate", desc: "Dispute council and evaluators." },
+  { href: "/layers", title: "Layers", desc: "L0–L6 multi-layer map." },
 ]
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/jobs", label: "Tasks" },
-  { href: "/agents", label: "Agents", isAgents: true },
+  { href: "/#agents", label: "Agents" },
   { href: "/docs", label: "Docs" },
 ]
 
@@ -29,32 +29,33 @@ export function Header() {
   const isDash = pathname.startsWith("/dashboard")
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-      {/* Announcement bar — inference style */}
+    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/75 backdrop-blur-xl">
       {!isDash && (
-        <div className="border-b border-border/40 bg-secondary/40">
-          <div className="inf-container flex min-h-10 items-center justify-center gap-2 px-4 py-2 text-center text-xs sm:text-sm">
-            <span className="rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">New</span>
-            <span className="text-muted-foreground">
-              Full stack live on Ritual testnet · JobMarketV2 + multi-layer map
+        <div className="border-b border-border/30 bg-card/30">
+          <div className="inf-container flex min-h-9 items-center justify-center gap-2 py-1.5 text-center text-xs">
+            <span className="rounded bg-primary/90 px-1.5 py-0.5 text-[10px] font-medium text-primary-foreground">
+              New
             </span>
-            <Link href="/layers" className="inline-flex items-center font-medium text-foreground hover:opacity-80">
-              Explore <ArrowRight className="ml-0.5 h-3.5 w-3.5" />
+            <span className="text-muted-foreground">
+              Full stack live on Ritual · multi-layer map
+            </span>
+            <Link href="/layers" className="inline-flex items-center font-medium text-foreground/90 hover:text-foreground">
+              Explore <ArrowRight className="ml-0.5 h-3 w-3 opacity-60" />
             </Link>
           </div>
         </div>
       )}
 
-      <div className="inf-container flex h-14 items-center justify-between gap-4">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight hover:opacity-80">
-            <span className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-[11px] font-bold text-primary-foreground">
+      <div className="inf-container flex h-13 items-center justify-between gap-4" style={{ height: "3.25rem" }}>
+        <div className="flex items-center gap-7">
+          <Link href="/" className="group flex items-center gap-2.5 tracking-tight">
+            <span className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-primary text-[11px] font-bold text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">
               P
             </span>
-            <span>Prompt Market</span>
+            <span className="text-sm font-semibold">Prompt Market</span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-0.5 lg:flex">
             <div
               className="relative"
               onMouseEnter={() => setProdOpen(true)}
@@ -62,34 +63,31 @@ export function Header() {
             >
               <button
                 type="button"
-                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
               >
-                Product <ChevronDown className="h-3.5 w-3.5" />
+                Product <ChevronDown className="h-3.5 w-3.5 opacity-60" />
               </button>
               {prodOpen && (
-                <div className="absolute left-0 top-full z-50 w-[420px] pt-2">
-                  <div className="rounded-xl border border-border/60 bg-card p-2 shadow-2xl">
-                    <div className="grid grid-cols-2 gap-1">
+                <div className="absolute left-0 top-full z-50 w-[400px] pt-2">
+                  <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/95 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                    <div className="grid grid-cols-2 gap-0.5">
                       {PRODUCTS.map((p) => (
                         <Link
                           key={p.href}
                           href={p.href}
-                          className="flex flex-col gap-0.5 rounded-lg px-3 py-3 transition-colors hover:bg-muted"
+                          className="flex flex-col gap-0.5 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted/60"
                         >
-                          <span className="text-sm font-semibold text-foreground">{p.title}</span>
-                          <span className="text-xs leading-relaxed text-muted-foreground">{p.desc}</span>
+                          <span className="text-[13px] font-semibold tracking-tight">{p.title}</span>
+                          <span className="text-[11px] leading-relaxed text-muted-foreground">{p.desc}</span>
                         </Link>
                       ))}
                     </div>
-                    <div className="mt-1 flex items-center justify-end gap-2 border-t border-border/50 px-3 py-2.5">
-                      <Link href="/join" className="text-xs font-medium text-muted-foreground hover:text-foreground">
+                    <div className="mt-1 flex items-center justify-between border-t border-border/40 px-3 py-2">
+                      <Link href="/join" className="text-[11px] text-muted-foreground hover:text-foreground">
                         Talk to us
                       </Link>
-                      <Link
-                        href="/dashboard"
-                        className="inline-flex items-center rounded-md bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground"
-                      >
-                        Open dashboard
+                      <Link href="/dashboard" className="inf-btn inf-btn-primary h-7 px-2.5 text-[11px]">
+                        Dashboard
                       </Link>
                     </div>
                   </div>
@@ -98,13 +96,16 @@ export function Header() {
             </div>
 
             {NAV.map((item) => {
-              const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
+              const active =
+                item.href === "/dashboard"
+                  ? pathname.startsWith("/dashboard")
+                  : item.href !== "/#agents" && pathname.startsWith(item.href)
               return (
                 <Link
                   key={item.href}
-                  href={item.href === "/agents" ? "/#agents" : item.href}
+                  href={item.href}
                   className={cn(
-                    "rounded-md px-2.5 py-1.5 text-sm transition-colors hover:text-foreground",
+                    "rounded-md px-2.5 py-1.5 text-[13px] transition-colors hover:text-foreground",
                     active ? "text-foreground" : "text-muted-foreground",
                   )}
                 >
@@ -118,20 +119,17 @@ export function Header() {
         <div className="flex items-center gap-2">
           <Link
             href="/docs"
-            className="hidden text-sm text-muted-foreground transition-colors hover:text-foreground sm:inline"
+            className="hidden text-[13px] text-muted-foreground transition-colors hover:text-foreground sm:inline"
           >
             Docs
           </Link>
           <Link
             href="/join"
-            className="hidden rounded-md px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground md:inline"
+            className="hidden text-[13px] text-muted-foreground transition-colors hover:text-foreground md:inline"
           >
             Talk to an Engineer
           </Link>
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
-          >
+          <Link href="/dashboard" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
             Get Started
           </Link>
           <button
@@ -146,22 +144,21 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-border/50 bg-background p-4 lg:hidden">
-          <div className="flex flex-col gap-1">
+        <div className="border-t border-border/40 bg-background/95 p-3 backdrop-blur-xl lg:hidden">
+          <div className="flex flex-col gap-0.5">
             {PRODUCTS.map((p) => (
-              <Link key={p.href} href={p.href} className="rounded-lg px-3 py-2 text-sm hover:bg-muted" onClick={() => setOpen(false)}>
-                <span className="font-semibold">{p.title}</span>
+              <Link
+                key={p.href}
+                href={p.href}
+                className="rounded-xl px-3 py-2.5 hover:bg-muted/50"
+                onClick={() => setOpen(false)}
+              >
+                <span className="text-sm font-semibold">{p.title}</span>
                 <span className="mt-0.5 block text-xs text-muted-foreground">{p.desc}</span>
               </Link>
             ))}
-            <Link href="/dashboard" className="rounded-lg px-3 py-2 text-sm font-medium" onClick={() => setOpen(false)}>
+            <Link href="/dashboard" className="rounded-xl px-3 py-2.5 text-sm font-medium" onClick={() => setOpen(false)}>
               Dashboard
-            </Link>
-            <Link href="/jobs" className="rounded-lg px-3 py-2 text-sm" onClick={() => setOpen(false)}>
-              Tasks
-            </Link>
-            <Link href="/docs" className="rounded-lg px-3 py-2 text-sm" onClick={() => setOpen(false)}>
-              Docs
             </Link>
           </div>
         </div>
