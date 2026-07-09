@@ -2,22 +2,21 @@
 
 import { useState, useMemo, useEffect, useRef } from "react"
 import { AgentGrid } from "@/components/agent-grid"
-import { SkillInstallGuide } from "@/components/skill-install-guide"
-import { LandingHero } from "@/components/landing-hero"
-import { PillarsSection } from "@/components/pillars-section"
-import { RolesSection } from "@/components/roles-section"
-import { WorkflowSection } from "@/components/workflow-section"
-import { MarketsSection } from "@/components/markets-section"
-import { LayersStack } from "@/components/layers-stack"
-import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
-import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, Search, Zap, BadgeCheck, ArrowRight } from "lucide-react"
+import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo } from "@/lib/constants"
+import { MARKET_LAYERS } from "@/lib/layers"
+import {
+  Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, Search,
+  BadgeCheck, ArrowRight, Layers, Users, Route, Sparkles, Briefcase, Scale,
+} from "lucide-react"
 import Link from "next/link"
 import { formatRating } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 import { AnimatedNumber } from "@/components/ui/animated-number"
+import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 type SortKey = "jobs" | "rating" | "bond" | "earnings"
+type Tab = "agents" | "layers" | "roles" | "flow"
 
 interface Props {
   agents: AgentInfo[]
@@ -27,16 +26,15 @@ interface Props {
 }
 
 export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
+  const [tab, setTab] = useState<Tab>("agents")
   const [skillFilter, setSkillFilter] = useState<string | null>(null)
   const [category, setCategory] = useState<"all" | "HTTP" | "LLM">("all")
   const [sort, setSort] = useState<SortKey>("jobs")
   const [query, setQuery] = useState("")
 
-  // Live-poll the latest block every 4s so "Chain Block" reflects the chain head.
   const [liveBlock, setLiveBlock] = useState<bigint | null>(chainInfo?.block ?? null)
   const prevBlockRef = useRef<bigint | null>(chainInfo?.block ?? null)
   const [blockDelta, setBlockDelta] = useState(0)
-  // Live events feed
   const [liveEvents, setLiveEvents] = useState<{ name: string; block: number; summary: string }[]>([])
 
   useEffect(() => {
@@ -49,23 +47,15 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
         if (!active || !data?.block) return
         const next = BigInt(data.block)
         const prev = prevBlockRef.current
-        if (prev !== null && next > prev) {
-          setBlockDelta(Number(next - prev))
-        }
+        if (prev !== null && next > prev) setBlockDelta(Number(next - prev))
         prevBlockRef.current = next
         setLiveBlock(next)
-      } catch {
-        /* keep last known value on transient RPC errors */
-      }
+      } catch { /* keep last */ }
     }
     const id = setInterval(poll, 4000)
-    return () => {
-      active = false
-      clearInterval(id)
-    }
+    return () => { active = false; clearInterval(id) }
   }, [])
 
-  // Poll live events every 6s
   useEffect(() => {
     let active = true
     const poll = async () => {
@@ -75,22 +65,16 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
         const data = await res.json()
         if (!active || !data?.events) return
         setLiveEvents(data.events)
-      } catch {
-        /* ignore */
-      }
+      } catch { /* ignore */ }
     }
-    poll() // immediate fetch
+    poll()
     const id = setInterval(poll, 6000)
-    return () => {
-      active = false
-      clearInterval(id)
-    }
+    return () => { active = false; clearInterval(id) }
   }, [])
 
   const totalBond = agents.reduce((sum, a) => sum + a.bondAmount, BigInt(0))
   const totalJobs = jobs.length
 
-  // Skill list: gabungkan BUILT_IN + skill unik dari agent on-chain
   const skillMap = new Map<string, string>()
   for (const s of BUILT_IN_SKILLS) skillMap.set(s.skillId, s.name)
   for (const a of agents) for (const s of a.skills) if (!skillMap.has(s.skillId)) skillMap.set(s.skillId, s.name)
@@ -116,20 +100,9 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
     })
   }, [agents, skillFilter, category, sort, query])
 
-  // Featured strip: top verified agents by rating.
-  const featured = useMemo(
-    () =>
-      [...agents]
-        .filter((a) => a.active && a.jobCount >= 10 && a.avgRating >= 4)
-        .sort((a, b) => b.avgRating - a.avgRating)
-        .slice(0, 3),
-    [agents],
-  )
-
-  // Activity feed: job terbaru, prioritaskan OPEN/IN_PROGRESS dulu
   const activity = useMemo(() => {
-    const order = { OPEN: 0, ASSIGNED: 1, IN_PROGRESS: 2, COMPLETED: 3, DISPUTED: 4, REFUNDED: 5, CANCELLED: 6 }
-    return [...jobs].sort((a, b) => order[a.status] - order[b.status]).slice(0, 8)
+    const order: Record<string, number> = { OPEN: 0, ASSIGNED: 1, IN_PROGRESS: 2, COMPLETED: 3, DISPUTED: 4, REFUNDED: 5, CANCELLED: 6 }
+    return [...jobs].sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9)).slice(0, 6)
   }, [jobs])
 
   const blockNum = liveBlock != null ? Number(liveBlock) : chainInfo ? Number(chainInfo.block) : 0
@@ -138,237 +111,328 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
 
   const stats = [
     { label: "Agents", value: agents.length, decimals: 0, suffix: "", icon: Bot, tone: "primary" as const },
-    { label: "Jobs Executed", value: totalJobs, decimals: 0, suffix: "", icon: Wifi, tone: "green" as const },
-    { label: "Total Bond", value: bondRitual, decimals: 1, suffix: " RITUAL", icon: Activity, tone: "yellow" as const },
-    { label: "Chain Block", value: blockNum, decimals: 0, suffix: "", icon: Boxes, tone: "blue" as const, live: hasBlock },
+    { label: "Tasks", value: totalJobs, decimals: 0, suffix: "", icon: Wifi, tone: "green" as const },
+    { label: "Bond", value: bondRitual, decimals: 1, suffix: "", icon: Activity, tone: "yellow" as const },
+    { label: "Block", value: blockNum, decimals: 0, suffix: "", icon: Boxes, tone: "blue" as const, live: hasBlock },
+  ]
+
+  const tabs: { id: Tab; label: string; icon: typeof Bot }[] = [
+    { id: "agents", label: "Agents", icon: Bot },
+    { id: "layers", label: "Layers", icon: Layers },
+    { id: "roles", label: "Roles", icon: Users },
+    { id: "flow", label: "Flow", icon: Route },
   ]
 
   return (
-    <div className="min-h-[100dvh]">
-      <LandingHero agentCount={agents.length} jobCount={totalJobs} onchain={onchain} />
-      <LayersStack compact />
-      <PillarsSection />
-      <RolesSection />
-      <WorkflowSection />
-      <MarketsSection />
+    <div className="min-h-[calc(100dvh-3.5rem)]">
+      {/* Compact command header — fits above fold */}
+      <div className="border-b border-border/50 bg-card/20">
+        <div className="container mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-4 md:flex-row md:items-center md:justify-between md:py-3.5">
+          <div className="min-w-0">
+            <div className="mb-1 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-primary">
+                <span className="live-dot inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
+                Live
+              </span>
+              <span className={cn("font-mono text-[10px] uppercase tracking-wider", onchain ? "text-primary" : "text-yellow-500")}>
+                {onchain ? "On-chain" : "RPC down"}
+              </span>
+              {chainInfo && (
+                <span className="font-mono text-[10px] text-muted-foreground">· chain {chainInfo.chainId}</span>
+              )}
+            </div>
+            <h1 className="text-xl font-bold tracking-tight md:text-2xl">
+              Prompt Market
+              <span className="ml-2 text-sm font-normal text-muted-foreground md:text-base">
+                agent economy on Ritual
+              </span>
+            </h1>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild size="sm" className="h-8 rounded-full px-3 text-xs">
+              <Link href="/join"><Sparkles className="h-3.5 w-3.5" /> Join</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline" className="h-8 rounded-full px-3 text-xs">
+              <Link href="/jobs"><Briefcase className="h-3.5 w-3.5" /> Tasks</Link>
+            </Button>
+            <Button asChild size="sm" variant="ghost" className="h-8 rounded-full px-3 text-xs">
+              <Link href="/layers">L0–L6</Link>
+            </Button>
+            <Button asChild size="sm" variant="ghost" className="h-8 rounded-full px-3 text-xs">
+              <Link href="/create">Create</Link>
+            </Button>
+          </div>
+        </div>
 
-      <section id="discover" className="container mx-auto max-w-[1400px] scroll-mt-20 px-4 py-10 md:py-14">
-        {/* Discover header */}
-        <div className="mb-8 max-w-[65ch] animate-fade-up">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Discover · live network</p>
-          <h2 className="text-3xl font-bold tracking-tight md:text-[2.4rem] md:leading-[1.05]">
-            Agent marketplace
-          </h2>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Browse, filter, and hire agents. Reputation and skills are the single source of truth on Ritual Chain.
+        {/* Inline stats strip */}
+        <div className="container mx-auto max-w-[1400px] px-4 pb-3">
+          <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
+            {stats.map((s) => {
+              const Icon = s.icon
+              const toneClass = {
+                primary: "text-primary",
+                green: "text-green-500",
+                yellow: "text-yellow-500",
+                blue: "text-blue-400",
+              }[s.tone]
+              const isBlock = s.label === "Block"
+              return (
+                <div
+                  key={s.label}
+                  className="relative flex items-center gap-2.5 rounded-xl border border-border/60 bg-card/50 px-3 py-2"
+                >
+                  <Icon className={cn("h-4 w-4 shrink-0", toneClass)} />
+                  <div className="min-w-0 leading-none">
+                    <p className="text-base font-bold tabular-nums">
+                      {isBlock && !hasBlock ? "—" : (
+                        <AnimatedNumber value={s.value} decimals={s.decimals} suffix={s.suffix} pulseOnIncrease={isBlock && hasBlock} />
+                      )}
+                    </p>
+                    <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">{s.label}</p>
+                  </div>
+                  {isBlock && blockDelta > 0 && (
+                    <span className="delta-pop absolute right-2 top-1.5 font-mono text-[10px] text-primary">+{blockDelta}</span>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Workspace: tabs + panels — no long scroll stack */}
+      <div className="container mx-auto max-w-[1400px] px-4 py-4 md:py-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="inline-flex rounded-full border border-border/70 bg-card/40 p-0.5">
+            {tabs.map((t) => {
+              const Icon = t.icon
+              const active = tab === t.id
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setTab(t.id)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                    active ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
+                  )}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {t.label}
+                </button>
+              )
+            })}
+          </div>
+          <p className="hidden text-[11px] text-muted-foreground sm:block">
+            Switch panels — no endless scroll
           </p>
         </div>
 
-        {/* Stat cards */}
-        <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((s, i) => {
-            const Icon = s.icon
-            const toneClass = {
-              primary: "border-primary/25 bg-primary/10 text-primary",
-              green: "border-green-500/25 bg-green-500/10 text-green-500",
-              yellow: "border-yellow-500/25 bg-yellow-500/10 text-yellow-500",
-              blue: "border-blue-500/25 bg-blue-500/10 text-blue-500",
-            }[s.tone]
-            const isBlock = s.label === "Chain Block"
-            return (
-              <Card
-                key={s.label}
-                className="surface-card sheen animate-fade-up border-border/60 transition-transform duration-300 hover:-translate-y-1"
-                style={{ animationDelay: `${120 + i * 70}ms` }}
-              >
-                <CardContent className="relative flex items-center gap-3.5 p-4">
-                  <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border", toneClass)}>
-                    <Icon className="h-[18px] w-[18px]" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="flex items-center gap-2 text-xl font-bold">
-                      {isBlock && hasBlock === false ? (
-                        "—"
-                      ) : (
-                        <AnimatedNumber
-                          value={s.value}
-                          decimals={s.decimals}
-                          suffix={s.suffix}
-                          pulseOnIncrease={isBlock && hasBlock}
-                        />
-                      )}
-                    </p>
-                    <p className="mt-0.5 flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-muted-foreground">
-                      {isBlock && s.live && (
-                        <span className="relative flex h-1.5 w-1.5">
-                          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-                        </span>
-                      )}
-                      {s.label}
-                    </p>
-                  </div>
-                  {isBlock && blockDelta > 0 && (
-                    <span
-                      key={`${liveBlock}-${blockDelta}`}
-                      className="delta-pop absolute right-3 top-3 inline-flex items-center gap-0.5 rounded-full border border-primary/30 bg-primary/10 px-1.5 py-0.5 font-mono text-[10px] font-medium text-primary"
-                    >
-                      <TrendingUp className="h-2.5 w-2.5" />+{blockDelta}
-                    </span>
-                  )}
-                </CardContent>
-              </Card>
-            )
-          })}
-        </div>
-
-        {/* Featured strip */}
-        {featured.length > 0 && (
-          <div className="mb-8 animate-fade-up" style={{ animationDelay: "440ms" }}>
-            <div className="mb-3 flex items-center gap-2">
-              <Zap className="h-3.5 w-3.5 text-primary" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Featured · verified</span>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {featured.map((a) => (
-                <Link key={a.id} href={`/agents/${a.id}`} className="surface-card sheen group flex items-center gap-3 rounded-[var(--radius)] border border-border/60 p-4 transition-transform duration-300 hover:-translate-y-1">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 font-mono text-sm font-bold text-primary">
-                    {a.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="flex items-center gap-1 truncate text-sm font-semibold">{a.name}<BadgeCheck className="h-3.5 w-3.5 shrink-0 text-primary" /></p>
-                    <p className="truncate text-xs text-muted-foreground">{formatRating(a.avgRating)} ★ · {a.jobCount} jobs</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Layout 2-kolom: grid agents + activity feed */}
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-          {/* Agents area */}
+        <div className="grid gap-4 lg:grid-cols-[1fr_280px]">
+          {/* Main panel */}
           <div className="min-w-0">
-            <div className="mb-4 animate-fade-up" style={{ animationDelay: "420ms" }}>
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <div className="flex min-w-[200px] flex-1 items-center gap-1.5 rounded-lg border border-border bg-transparent px-2.5 py-1.5 focus-within:border-primary/40">
-                  <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                  <input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Search agents, skills…"
-                    className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground"
-                  />
+            {tab === "agents" && (
+              <div className="space-y-3 animate-fade-in">
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className="flex min-w-[180px] flex-1 items-center gap-1.5 rounded-lg border border-border bg-card/40 px-2.5 py-1.5">
+                    <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                    <input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search agents, skills…"
+                      className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+                    />
+                  </div>
+                  <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <ArrowUpDown className="h-3.5 w-3.5" />
+                    <select
+                      value={sort}
+                      onChange={(e) => setSort(e.target.value as SortKey)}
+                      className="cursor-pointer rounded-md border border-border bg-transparent px-2 py-1 text-xs text-foreground outline-none"
+                    >
+                      <option value="jobs">Most jobs</option>
+                      <option value="rating">Top rated</option>
+                      <option value="bond">Highest bond</option>
+                      <option value="earnings">Top earners</option>
+                    </select>
+                  </label>
+                  {(["all", "HTTP", "LLM"] as const).map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setCategory(c)}
+                      className={cn(
+                        "rounded-full border px-2.5 py-0.5 text-[11px] transition-colors",
+                        category === c
+                          ? "border-primary/60 bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {c === "all" ? "All" : c}
+                    </button>
+                  ))}
                 </div>
-                <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <ArrowUpDown className="h-3.5 w-3.5" />
-                  Sort
-                  <select
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value as SortKey)}
-                    className="cursor-pointer rounded-md border border-border bg-transparent px-2 py-1 text-xs text-foreground outline-none ring-ring transition-colors hover:border-primary/40 focus-visible:ring-2"
-                  >
-                    <option value="jobs">Most jobs</option>
-                    <option value="rating">Top rated</option>
-                    <option value="bond">Highest bond</option>
-                    <option value="earnings">Top earners</option>
-                  </select>
-                </label>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={() => setSkillFilter(null)}
-                  className={cn(
-                    "rounded-full border px-3 py-1 text-xs transition-all duration-200",
-                    skillFilter === null
-                      ? "border-primary bg-primary text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklch,var(--color-primary)_18%,transparent)]"
-                      : "border-border bg-transparent text-muted-foreground hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground"
-                  )}
-                >
-                  All skills
-                </button>
-                {skills.map((skill) => (
+                <div className="flex flex-wrap gap-1.5">
                   <button
-                    key={skill.skillId}
-                    onClick={() => setSkillFilter(skill.skillId)}
+                    type="button"
+                    onClick={() => setSkillFilter(null)}
                     className={cn(
-                      "rounded-full border px-3 py-1 text-xs transition-all duration-200",
-                      skillFilter === skill.skillId
-                        ? "border-primary bg-primary text-primary-foreground shadow-[0_0_0_3px_color-mix(in_oklch,var(--color-primary)_18%,transparent)]"
-                        : "border-border bg-transparent text-muted-foreground hover:-translate-y-0.5 hover:border-primary/40 hover:text-foreground"
+                      "rounded-full border px-2.5 py-0.5 text-[11px]",
+                      skillFilter === null ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground",
                     )}
                   >
-                    {skill.name}
+                    All skills
                   </button>
-                ))}
+                  {skills.slice(0, 8).map((skill) => (
+                    <button
+                      key={skill.skillId}
+                      type="button"
+                      onClick={() => setSkillFilter(skill.skillId)}
+                      className={cn(
+                        "rounded-full border px-2.5 py-0.5 text-[11px]",
+                        skillFilter === skill.skillId
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border text-muted-foreground hover:border-primary/40",
+                      )}
+                    >
+                      {skill.name}
+                    </button>
+                  ))}
+                </div>
+                <AgentGrid agents={filtered} pageSize={6} />
               </div>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">Type</span>
-                {(["all", "HTTP", "LLM"] as const).map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setCategory(c)}
-                    className={cn(
-                      "rounded-full border px-2.5 py-0.5 text-[11px] transition-colors",
-                      category === c
-                        ? "border-primary/60 bg-primary/10 text-primary"
-                        : "border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                    )}
-                  >
-                    {c === "all" ? "All" : c}
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
 
-            <AgentGrid agents={filtered} />
+            {tab === "layers" && (
+              <div className="animate-fade-in">
+                <div className="mb-3 flex items-center justify-between gap-2">
+                  <p className="text-sm text-muted-foreground">Seven independent layers — open any without leaving the map.</p>
+                  <Link href="/layers" className="text-xs font-medium text-primary hover:underline">Full map</Link>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                  {MARKET_LAYERS.map((l) => (
+                    <Link
+                      key={l.id}
+                      href={`/layers/${l.id}`}
+                      className="group surface-card flex items-start gap-3 rounded-xl border border-border/60 p-3 transition-all hover:-translate-y-0.5 hover:border-primary/40"
+                    >
+                      <span className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded-lg border border-primary/25 bg-primary/10 font-mono text-[10px] font-bold text-primary">
+                        {l.short}
+                        <span className="text-[8px] font-normal text-muted-foreground">L{l.level}</span>
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <p className="truncate text-sm font-semibold">{l.name}</p>
+                          <span className="rounded-full border border-border px-1.5 py-px text-[9px] uppercase text-muted-foreground">{l.status}</span>
+                        </div>
+                        <p className="truncate text-xs text-muted-foreground">{l.tagline}</p>
+                      </div>
+                      <ArrowRight className="mt-1 h-3.5 w-3.5 shrink-0 text-muted-foreground opacity-0 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {tab === "roles" && (
+              <div className="grid gap-3 animate-fade-in sm:grid-cols-3">
+                {[
+                  { href: "/join/user", icon: Users, title: "User", body: "Post tasks, escrow RITUAL, hire agents.", cta: "Become User" },
+                  { href: "/join/asp", icon: Bot, title: "ASP", body: "List skills, bid jobs, earn on delivery.", cta: "Become ASP" },
+                  { href: "/join/evaluator", icon: Scale, title: "Evaluator", body: "Stake, vote disputes, keep market fair.", cta: "Become Evaluator" },
+                ].map((r) => {
+                  const Icon = r.icon
+                  return (
+                    <Card key={r.href} className="surface-card border-border/60 transition-transform hover:-translate-y-0.5">
+                      <CardContent className="flex h-full flex-col p-4">
+                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
+                          <Icon className="h-4 w-4" />
+                        </div>
+                        <h3 className="font-semibold">{r.title}</h3>
+                        <p className="mt-1 flex-1 text-xs text-muted-foreground">{r.body}</p>
+                        <Link href={r.href} className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+                          {r.cta} <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+            )}
+
+            {tab === "flow" && (
+              <div className="animate-fade-in">
+                <div className="grid gap-2 sm:grid-cols-5">
+                  {[
+                    "Post task",
+                    "Escrow lock",
+                    "Bid · assign",
+                    "Execute skill",
+                    "Payout / dispute",
+                  ].map((step, i) => (
+                    <div key={step} className="relative rounded-xl border border-border/60 bg-card/40 p-3 text-center">
+                      <p className="font-mono text-[10px] text-primary">0{i + 1}</p>
+                      <p className="mt-1 text-xs font-semibold">{step}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Button asChild size="sm" variant="outline" className="rounded-full text-xs">
+                    <Link href="/jobs">Open tasks board</Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline" className="rounded-full text-xs">
+                    <Link href="/disputes">Disputes</Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline" className="rounded-full text-xs">
+                    <Link href="/docs">Docs</Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline" className="rounded-full text-xs">
+                    <Link href="/skills">Skills</Link>
+                  </Button>
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Activity feed sidebar */}
-          <aside className="animate-fade-up space-y-4 lg:sticky lg:top-20 lg:self-start" style={{ animationDelay: "560ms" }}>
+          {/* Compact side rail */}
+          <aside className="space-y-3 lg:sticky lg:top-[4.5rem] lg:self-start">
             <Card className="surface-card border-border/60">
-              <CardContent className="p-4">
-                <div className="mb-3 flex items-center gap-2">
-                  <Radio className="h-4 w-4 text-primary" />
-                  <h3 className="font-semibold">Recent Activity</h3>
-                  <span className="ml-auto text-xs text-muted-foreground tabular-nums">{liveEvents.length || activity.length}</span>
+              <CardContent className="p-3.5">
+                <div className="mb-2.5 flex items-center gap-2">
+                  <Radio className="h-3.5 w-3.5 text-primary" />
+                  <h3 className="text-sm font-semibold">Activity</h3>
+                  <span className="ml-auto text-[10px] tabular-nums text-muted-foreground">
+                    {liveEvents.length || activity.length}
+                  </span>
                 </div>
-                {(liveEvents.length > 0 ? liveEvents.slice(0, 12) : activity).length === 0 ? (
-                  <p className="py-6 text-center text-xs text-muted-foreground">No recent activity</p>
+                {(liveEvents.length > 0 ? liveEvents.slice(0, 6) : activity).length === 0 ? (
+                  <p className="py-4 text-center text-[11px] text-muted-foreground">Quiet network</p>
                 ) : (
-                  <ol className="space-y-3">
-                    {(liveEvents.length > 0 ? liveEvents.slice(0, 12) : activity).map((ev, i) => {
+                  <ol className="max-h-[280px] space-y-2 overflow-y-auto pr-0.5">
+                    {(liveEvents.length > 0 ? liveEvents.slice(0, 6) : activity).map((ev, i) => {
                       const isEvent = "name" in ev
-                      const name = isEvent ? (ev as any).name : ""
-                      const summary = isEvent ? (ev as any).summary : (ev as any).taskData || ""
+                      const name = isEvent ? (ev as { name: string }).name : ""
+                      const summary = isEvent
+                        ? (ev as { summary: string }).summary
+                        : (ev as JobRequestInfo).taskData || ""
                       const label = isEvent
-                        ? name === "JobRequested" ? "Requested"
-                          : name === "JobAssigned" ? "Assigned"
+                        ? name === "JobRequested" ? "Req"
+                          : name === "JobAssigned" ? "Asgn"
                           : name === "JobCompleted" ? "Done"
-                          : name === "JobDisputed" ? "Disputed"
-                          : name === "BidSubmitted" ? "Bid" : ""
-                        : (ev as any).status
-                      const color = isEvent
-                        ? name === "JobCompleted" ? "bg-green-500"
-                          : name === "JobRequested" ? "bg-yellow-500"
-                          : (["JobAssigned", "JobStarted", "BidSubmitted"].includes(name)) ? "bg-blue-500"
-                          : "bg-muted-foreground"
-                        : (ev as any).status === "COMPLETED" ? "bg-green-500"
-                          : (ev as any).status === "OPEN" ? "bg-yellow-500"
-                          : (["IN_PROGRESS", "ASSIGNED"].includes((ev as any).status)) ? "bg-blue-500"
-                          : "bg-muted-foreground"
+                          : name === "JobDisputed" ? "Disp"
+                          : name === "BidSubmitted" ? "Bid" : "Evt"
+                        : (ev as JobRequestInfo).status.slice(0, 4)
                       return (
-                        <li key={i} className="flex items-start gap-3 text-sm">
-                          <span className={cn("mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full", color)} />
+                        <li key={i} className="flex items-start gap-2 text-xs">
+                          <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/70" />
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="font-mono text-xs text-muted-foreground">
-                                {isEvent ? `#${(ev as any).block}` : `Job #${(ev as any).id}`}
+                            <div className="flex justify-between gap-2">
+                              <span className="font-mono text-[10px] text-muted-foreground">
+                                {isEvent ? `#${(ev as { block: number }).block}` : `#${(ev as JobRequestInfo).id}`}
                               </span>
-                              <span className="text-xs font-medium">{label}</span>
+                              <span className="text-[10px] font-medium">{label}</span>
                             </div>
-                            <p className="truncate text-xs text-muted-foreground">{summary}</p>
+                            <p className="truncate text-[11px] text-muted-foreground">{summary}</p>
                           </div>
                         </li>
                       )
@@ -377,14 +441,41 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                 )}
               </CardContent>
             </Card>
+
+            <Card className="surface-card border-border/60">
+              <CardContent className="space-y-2 p-3.5">
+                <p className="text-xs font-semibold">Quick links</p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {[
+                    { href: "/skills", label: "Skills" },
+                    { href: "/analytics", label: "Analytics" },
+                    { href: "/disputes", label: "Disputes" },
+                    { href: "/docs", label: "Docs" },
+                  ].map((l) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      className="rounded-lg border border-border/60 px-2 py-1.5 text-center text-[11px] text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+                {agents[0] && (
+                  <Link
+                    href={`/agents/${agents[0].id}`}
+                    className="mt-1 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-2 py-1.5 text-[11px] transition-colors hover:border-primary/40"
+                  >
+                    <BadgeCheck className="h-3.5 w-3.5 text-primary" />
+                    <span className="min-w-0 flex-1 truncate font-medium">{agents[0].name}</span>
+                    <span className="text-muted-foreground">{formatRating(agents[0].avgRating)}★</span>
+                  </Link>
+                )}
+              </CardContent>
+            </Card>
           </aside>
         </div>
-
-        {/* Tutorial: install skill */}
-        <div className="mt-6 animate-fade-up" style={{ animationDelay: "680ms" }}>
-          <SkillInstallGuide />
-        </div>
-      </section>
+      </div>
     </div>
   )
 }

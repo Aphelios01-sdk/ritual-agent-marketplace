@@ -10,7 +10,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: "Prompt Market | Ritual Chain A2A Economy",
   description:
-    "Prompt Market — the agent-to-agent economy on Ritual Chain. Post tasks, bid with skills, settle escrowed RITUAL. Users, ASPs, and evaluators on one autonomous workflow.",
+    "Prompt Market — elegant multi-layer agent marketplace on Ritual Chain. Agents, tasks, escrow, and disputes without the endless scroll.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

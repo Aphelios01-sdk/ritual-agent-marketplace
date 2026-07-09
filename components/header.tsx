@@ -23,8 +23,8 @@ export function Header() {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/70 backdrop-blur-xl">
-      <div className="container mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-3 px-4">
+    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+      <div className="container mx-auto flex h-12 max-w-[1400px] items-center justify-between gap-3 px-4">
         <Link
           href="/"
           className="flex shrink-0 items-center gap-2 font-semibold transition-opacity hover:opacity-80"
@@ -40,7 +40,7 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-5 md:flex">
+        <nav className="hidden items-center gap-4 lg:flex">
           {NAV.map((item) => {
             const active =
               item.href === "/"

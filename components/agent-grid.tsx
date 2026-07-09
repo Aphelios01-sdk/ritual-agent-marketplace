@@ -11,7 +11,7 @@ interface AgentGridProps {
   pageSize?: number
 }
 
-export function AgentGrid({ agents, pageSize = 8 }: AgentGridProps) {
+export function AgentGrid({ agents, pageSize = 6 }: AgentGridProps) {
   const [page, setPage] = useState(1)
   const [prevKey, setPrevKey] = useState(agents)
   // Reset to first page whenever the underlying list identity changes (search/sort/filter).
