@@ -115,6 +115,9 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
         </div>
 
         <div className="space-y-5 p-4 sm:p-6">
+          {/* Branding story first — always visible on open */}
+          <BrandDeployAnimation />
+
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {kpis.map((k) => {
               const Icon = k.icon
@@ -209,10 +212,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
             </div>
           </div>
 
-          {/* Branding story — looping silent cartoon */}
-          <BrandDeployAnimation />
-
-          <div className="inf-card overflow-hidden">
+          <div id="agents" className="inf-card overflow-hidden">
             <div className="flex flex-col gap-3 border-b border-border/40 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold tracking-tight">Agents</p>

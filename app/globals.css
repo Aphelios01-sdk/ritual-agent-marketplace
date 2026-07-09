@@ -187,172 +187,119 @@ body {
 .is-tick { animation: tick-flash 0.65s ease-out; }
 .live-block-delta { animation: delta-pop 1.6s ease-out forwards; }
 
-/* ── Brand deploy animation (loop ~12s, silent) ── */
-.brand-anim-stage {
-  --dur: 12s;
-}
-
-.brand-caption {
-  position: absolute;
+/* ── Brand story animation: 4 clear scenes, 14s loop, always visible ── */
+.brand-scene {
   opacity: 0;
   pointer-events: none;
+  will-change: opacity, transform;
 }
-.brand-c1 { animation: brand-cap 12s linear infinite; }
-.brand-c2 { animation: brand-cap 12s linear infinite; animation-delay: -3s; }
-.brand-c3 { animation: brand-cap 12s linear infinite; animation-delay: -6s; }
-.brand-c4 { animation: brand-cap 12s linear infinite; animation-delay: -9s; }
-@keyframes brand-cap {
-  0%, 2% { opacity: 0; transform: translateY(4px); }
-  6%, 20% { opacity: 1; transform: translateY(0); }
-  24%, 100% { opacity: 0; transform: translateY(-4px); }
+.brand-scene-1 { animation: brand-s1 14s ease-in-out infinite; }
+.brand-scene-2 { animation: brand-s2 14s ease-in-out infinite; }
+.brand-scene-3 { animation: brand-s3 14s ease-in-out infinite; }
+.brand-scene-4 { animation: brand-s4 14s ease-in-out infinite; }
+
+/* Scene 1: 0–22% */
+@keyframes brand-s1 {
+  0%, 2% { opacity: 0; transform: scale(0.96); }
+  5%, 20% { opacity: 1; transform: scale(1); }
+  24%, 100% { opacity: 0; transform: scale(1.02); }
+}
+/* Scene 2: 22–47% */
+@keyframes brand-s2 {
+  0%, 22% { opacity: 0; transform: translateY(10px); }
+  26%, 44% { opacity: 1; transform: translateY(0); }
+  48%, 100% { opacity: 0; transform: translateY(-8px); }
+}
+/* Scene 3: 47–72% */
+@keyframes brand-s3 {
+  0%, 46% { opacity: 0; transform: scale(0.92); }
+  50%, 68% { opacity: 1; transform: scale(1); }
+  74%, 100% { opacity: 0; transform: scale(1.04); }
+}
+/* Scene 4: 72–100% */
+@keyframes brand-s4 {
+  0%, 72% { opacity: 0; transform: translateY(12px); }
+  76%, 96% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-6px); }
 }
 
-/* Laptop lid opens 0–2.5s */
-.brand-lid {
-  width: 7.5rem;
-  height: 5rem;
-  transform-origin: bottom center;
-  animation: brand-lid var(--dur) ease-in-out infinite;
+.brand-agent-pop {
+  animation: brand-pop 14s ease-in-out infinite;
 }
-@media (min-width: 640px) {
-  .brand-lid { width: 9rem; height: 5.75rem; }
-}
-@keyframes brand-lid {
-  0%, 4% {
-    transform: perspective(420px) rotateX(78deg) scaleY(0.35);
-    opacity: 0.9;
-  }
-  12%, 88% {
-    transform: perspective(420px) rotateX(0deg) scaleY(1);
-    opacity: 1;
-  }
-  96%, 100% {
-    transform: perspective(420px) rotateX(78deg) scaleY(0.35);
-    opacity: 0.9;
-  }
+@keyframes brand-pop {
+  0%, 48% { transform: scale(0.7); filter: brightness(0.8); }
+  54%, 68% { transform: scale(1.08); filter: brightness(1.1); }
+  72%, 100% { transform: scale(1); filter: brightness(1); }
 }
 
-.brand-screen {
+.brand-click-btn {
+  animation: brand-btn-flash 14s ease-in-out infinite;
+}
+@keyframes brand-btn-flash {
+  0%, 50% { transform: scale(1); opacity: 0.85; }
+  54% { transform: scale(0.94); opacity: 1; }
+  58%, 70% { transform: scale(1.04); opacity: 1; box-shadow: 0 0 28px rgba(0, 255, 153, 0.55); }
+  74%, 100% { transform: scale(1); opacity: 0.9; }
+}
+
+.brand-person-card {
   opacity: 0;
-  animation: brand-screen var(--dur) ease-in-out infinite;
+  animation: brand-card-in 14s ease-out infinite;
 }
-@keyframes brand-screen {
-  0%, 10% { opacity: 0; }
-  16%, 90% { opacity: 1; }
-  96%, 100% { opacity: 0; }
-}
-
-.brand-deploy-btn {
-  animation: brand-btn-pulse var(--dur) ease-in-out infinite;
-  transform-origin: center;
-}
-@keyframes brand-btn-pulse {
-  0%, 38% { transform: scale(1); box-shadow: none; }
-  42% { transform: scale(0.92); box-shadow: 0 0 12px rgba(0, 255, 153, 0.6); }
-  48%, 100% { transform: scale(1); box-shadow: 0 0 8px rgba(0, 255, 153, 0.25); }
+.brand-person-card-0 { animation-delay: 0s; }
+.brand-person-card-1 { animation-delay: 0.12s; }
+.brand-person-card-2 { animation-delay: 0.24s; }
+.brand-person-card-3 { animation-delay: 0.36s; }
+@keyframes brand-card-in {
+  0%, 74% { opacity: 0; transform: translateY(14px) scale(0.9); }
+  80%, 96% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-6px); }
 }
 
-.brand-screen-agent {
-  opacity: 0;
-  transform: scale(0.4);
-  animation: brand-screen-agent var(--dur) ease-out infinite;
-}
-@keyframes brand-screen-agent {
-  0%, 44% { opacity: 0; transform: scale(0.4); }
-  52%, 88% { opacity: 1; transform: scale(1); }
-  96%, 100% { opacity: 0; transform: scale(0.6); }
-}
-
-.brand-agent-float {
-  opacity: 0;
-  transform: translate(-50%, 12px) scale(0.6);
-  animation: brand-agent-float var(--dur) ease-out infinite;
-}
-@keyframes brand-agent-float {
-  0%, 48% { opacity: 0; transform: translate(-50%, 16px) scale(0.5); }
-  56%, 86% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-  94%, 100% { opacity: 0; transform: translate(-50%, -8px) scale(0.85); }
-}
-
-.brand-viewer {
-  opacity: 0;
-  transform: translateY(16px) scale(0.9);
-  position: relative;
-  animation: brand-viewer var(--dur) ease-out infinite;
-}
-.brand-viewer-0 { animation-delay: 0s; }
-.brand-viewer-1 { animation-delay: 0.12s; }
-.brand-viewer-2 { animation-delay: 0.24s; }
-.brand-viewer-3 { animation-delay: 0.36s; }
-@keyframes brand-viewer {
-  0%, 58% { opacity: 0; transform: translateY(16px) scale(0.9); }
-  68%, 90% { opacity: 1; transform: translateY(0) scale(1); }
-  97%, 100% { opacity: 0; transform: translateY(-6px) scale(0.95); }
-}
-
-.brand-notif {
-  opacity: 0;
-  transform: translateY(6px) scale(0.85);
-  animation: brand-notif var(--dur) ease-out infinite;
-}
-.brand-viewer-0 .brand-notif { animation-delay: 0.05s; }
-.brand-viewer-1 .brand-notif { animation-delay: 0.18s; }
-.brand-viewer-2 .brand-notif { animation-delay: 0.3s; }
-.brand-viewer-3 .brand-notif { animation-delay: 0.42s; }
-@keyframes brand-notif {
-  0%, 62% { opacity: 0; transform: translateY(8px) scale(0.8); }
-  70%, 88% { opacity: 1; transform: translateY(0) scale(1); }
-  96%, 100% { opacity: 0; transform: translateY(-4px) scale(0.9); }
-}
-
-.brand-progress {
+.brand-bar {
   width: 0%;
-  animation: brand-progress var(--dur) linear infinite;
+  animation: brand-bar 14s linear infinite;
 }
-@keyframes brand-progress {
-  0% { width: 0%; }
-  100% { width: 100%; }
+@keyframes brand-bar {
+  from { width: 0%; }
+  to { width: 100%; }
 }
 
-.brand-arm-l {
-  transform: rotate(25deg);
-  animation: brand-arm-l var(--dur) ease-in-out infinite;
+.brand-arrow {
+  animation: brand-arrow-pulse 14s ease-in-out infinite;
 }
-.brand-arm-r {
-  transform: rotate(-25deg);
-  animation: brand-arm-r var(--dur) ease-in-out infinite;
+@keyframes brand-arrow-pulse {
+  0%, 48% { opacity: 0.4; transform: translateX(-4px); }
+  54%, 68% { opacity: 1; transform: translateX(0); }
+  74%, 100% { opacity: 0.5; }
 }
-@keyframes brand-arm-l {
-  0%, 5% { transform: rotate(55deg); }
-  14%, 90% { transform: rotate(18deg); }
-  98%, 100% { transform: rotate(55deg); }
+
+.brand-lid-simple {
+  animation: brand-lid-bounce 14s ease-in-out infinite;
+  transform-origin: bottom center;
 }
-@keyframes brand-arm-r {
-  0%, 5% { transform: rotate(-55deg); }
-  14%, 90% { transform: rotate(-18deg); }
-  98%, 100% { transform: rotate(-55deg); }
+@keyframes brand-lid-bounce {
+  0%, 3% { transform: scaleY(0.2); opacity: 0.7; }
+  8%, 20% { transform: scaleY(1); opacity: 1; }
+  24%, 100% { transform: scaleY(1); opacity: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up, .animate-fade-in { animation: none; }
   .inf-card { transition: none; }
   .is-tick, .live-block-delta { animation: none; }
-  .brand-lid,
-  .brand-screen,
-  .brand-deploy-btn,
-  .brand-screen-agent,
-  .brand-agent-float,
-  .brand-viewer,
-  .brand-notif,
-  .brand-progress,
-  .brand-arm-l,
-  .brand-arm-r,
-  .brand-c1, .brand-c2, .brand-c3, .brand-c4 {
+  .brand-scene-1,
+  .brand-scene-2,
+  .brand-scene-3,
+  .brand-scene-4,
+  .brand-agent-pop,
+  .brand-click-btn,
+  .brand-person-card,
+  .brand-bar,
+  .brand-arrow,
+  .brand-lid-simple {
     animation: none !important;
   }
-  .brand-lid { height: 5rem; transform: none; opacity: 1; }
-  .brand-screen { opacity: 1; }
-  .brand-agent-float { opacity: 1; transform: translate(-50%, 0); }
-  .brand-viewer { opacity: 1; transform: none; }
-  .brand-notif { opacity: 1; transform: none; }
+  .brand-scene-4 { opacity: 1 !important; transform: none !important; }
+  .brand-person-card { opacity: 1 !important; transform: none !important; }
 }
