@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils"
 import { LiveBlock } from "@/components/live-block"
 import { useLiveBlock } from "@/hooks/use-live-block"
 import { AnimatedNumber } from "@/components/ui/animated-number"
-import { BrandDeployAnimation } from "@/components/brand-deploy-animation"
+
 
 interface Props {
   agents: AgentInfo[]
@@ -115,9 +115,6 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
         </div>
 
         <div className="space-y-5 p-4 sm:p-6">
-          {/* Branding story first — always visible on open */}
-          <BrandDeployAnimation />
-
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {kpis.map((k) => {
               const Icon = k.icon
