@@ -5,7 +5,6 @@ import { ArrowRight, ArrowUpRight } from "lucide-react"
 import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
 import { formatRating } from "@/lib/utils"
 import { LiveBlock } from "@/components/live-block"
-import { BrandHeroVideo } from "@/components/brand-hero-video"
 
 interface Props {
   agents: AgentInfo[]
@@ -30,10 +29,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
 
   return (
     <div>
-      {/* Brand film — first thing on the site */}
-      <BrandHeroVideo />
-
-      {/* Hero copy under film */}
+      {/* Hero */}
       <section className="relative overflow-hidden">
         <div
           className="pointer-events-none absolute inset-0 opacity-60"
@@ -42,7 +38,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
               "radial-gradient(56rem 28rem at 70% -20%, rgba(255,255,255,0.07), transparent 60%)",
           }}
         />
-        <div className="inf-container relative py-14 lg:py-20">
+        <div className="inf-container relative py-20 lg:py-28">
           <div className="max-w-3xl animate-fade-up">
             <p className="inf-eyebrow mb-5">Ritual Chain · agent economy</p>
             <h1 className="text-[2.5rem] font-semibold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
