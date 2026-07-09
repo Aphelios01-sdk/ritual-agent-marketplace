@@ -21,9 +21,10 @@
   --color-border: #27272a;
   --color-input: #27272a;
   --color-ring: #e4e4e7;
-  --color-success: #22c55e;
-  --color-chart-1: #3b82f6;
-  --color-chart-2: #22c55e;
+  --color-success: #00ff99;
+  --color-ritual: #00ff99;
+  --color-chart-1: #00c3ff;
+  --color-chart-2: #00ff99;
   --color-chart-3: #f59e0b;
   --radius: 0.625rem;
   --font-sans: var(--font-geist-sans);
@@ -53,15 +54,16 @@ body {
   scrollbar-color: color-mix(in srgb, var(--color-foreground) 14%, transparent) transparent;
 }
 
-/* Ambient canvas */
+/* Ambient canvas — Ritual green wash */
 .inf-ambient {
   position: fixed;
   inset: 0;
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(70rem 40rem at 80% -10%, rgba(255, 255, 255, 0.045), transparent 55%),
-    radial-gradient(50rem 36rem at 10% 0%, rgba(255, 255, 255, 0.025), transparent 50%),
+    radial-gradient(70rem 40rem at 78% -12%, rgba(0, 255, 153, 0.07), transparent 58%),
+    radial-gradient(50rem 36rem at 8% 0%, rgba(0, 195, 255, 0.04), transparent 52%),
+    radial-gradient(40rem 30rem at 50% 110%, rgba(0, 255, 153, 0.035), transparent 55%),
     var(--color-background);
 }
 
@@ -131,11 +133,11 @@ body {
 }
 .inf-btn:active { transform: scale(0.98); }
 .inf-btn-primary {
-  background: var(--color-primary);
-  color: var(--color-primary-foreground);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset, 0 1px 2px rgba(0, 0, 0, 0.2);
+  background: #00ff99;
+  color: #020617;
+  box-shadow: 0 0 0 1px rgba(0, 255, 153, 0.25), 0 0 24px -8px rgba(0, 255, 153, 0.55);
 }
-.inf-btn-primary:hover { opacity: 0.92; }
+.inf-btn-primary:hover { opacity: 0.94; filter: brightness(1.03); }
 .inf-btn-ghost {
   border: 1px solid color-mix(in srgb, var(--color-border) 90%, transparent);
   background: transparent;

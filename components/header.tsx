@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { useState } from "react"
 import { Menu, X, ChevronDown, ArrowRight } from "lucide-react"
@@ -19,6 +20,7 @@ const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/jobs", label: "Tasks" },
   { href: "/#agents", label: "Agents" },
+  { href: "/brand", label: "Brand" },
   { href: "/docs", label: "Docs" },
 ]
 
@@ -37,10 +39,10 @@ export function Header() {
               New
             </span>
             <span className="text-muted-foreground">
-              Full stack live on Ritual · multi-layer map
+              Ritual Tools for builders · brand kit + docs hub
             </span>
-            <Link href="/layers" className="inline-flex items-center font-medium text-foreground/90 hover:text-foreground">
-              Explore <ArrowRight className="ml-0.5 h-3 w-3 opacity-60" />
+            <Link href="/brand" className="inline-flex items-center font-medium text-[#00ff99] hover:opacity-90">
+              Brand kit <ArrowRight className="ml-0.5 h-3 w-3 opacity-70" />
             </Link>
           </div>
         </div>
@@ -49,9 +51,16 @@ export function Header() {
       <div className="inf-container flex h-13 items-center justify-between gap-4" style={{ height: "3.25rem" }}>
         <div className="flex items-center gap-7">
           <Link href="/" className="group flex items-center gap-2.5 tracking-tight">
-            <span className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-primary text-[11px] font-bold text-primary-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]">
-              P
-            </span>
+            <Image
+              src="/brand/logo-white.png"
+              alt="Ritual"
+              width={88}
+              height={28}
+              className="h-6 w-auto object-contain opacity-95"
+              unoptimized
+              priority
+            />
+            <span className="hidden h-4 w-px bg-border/70 sm:block" />
             <span className="text-sm font-semibold">Prompt Market</span>
           </Link>
 

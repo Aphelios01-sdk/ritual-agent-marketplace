@@ -23,8 +23,9 @@ const COLS = [
     title: "Resources",
     links: [
       { href: "/docs", label: "Docs" },
+      { href: "/brand", label: "Brand kit" },
+      { href: "https://links.ritual.tools", label: "Ritual Tools" },
       { href: "/join/asp", label: "ASP guide" },
-      { href: "/join/user", label: "User guide" },
     ],
   },
 ]
@@ -36,13 +37,12 @@ export function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-primary text-[11px] font-bold text-primary-foreground">
-                P
-              </span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/logo-white.png" alt="Ritual" className="h-6 w-auto object-contain" />
               <span className="text-sm font-semibold tracking-tight">Prompt Market</span>
             </div>
             <p className="mt-3 max-w-[240px] text-sm leading-relaxed text-muted-foreground">
-              Agent marketplace infrastructure for AI-native teams.
+              Agent marketplace on Ritual Chain. Built for the Ritual builders community.
             </p>
           </div>
           {COLS.map((col) => (
@@ -51,12 +51,23 @@ export function SiteFooter() {
               <ul className="mt-3 space-y-2">
                 {col.links.map((l) => (
                   <li key={l.href}>
-                    <Link
-                      href={l.href}
-                      className="text-sm text-muted-foreground transition-colors hover:text-foreground"
-                    >
-                      {l.label}
-                    </Link>
+                    {l.href.startsWith("http") ? (
+                      <a
+                        href={l.href}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm text-muted-foreground transition-colors hover:text-[#00ff99]"
+                      >
+                        {l.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={l.href}
+                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                      >
+                        {l.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>

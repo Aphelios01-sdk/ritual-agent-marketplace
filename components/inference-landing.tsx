@@ -1,9 +1,11 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
 import { formatRating } from "@/lib/utils"
+import { BrandKitStrip } from "@/components/brand-kit-strip"
 
 interface Props {
   agents: AgentInfo[]
@@ -75,17 +77,27 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
         <div className="inf-hairline" />
       </section>
 
-      {/* Trust chips */}
+      {/* Trust chips + Ritual mark */}
       <section>
         <div className="inf-container py-10">
-          <p className="mb-5 text-center text-xs text-muted-foreground">
-            Built for teams shipping autonomous agents on-chain
-          </p>
+          <div className="mb-6 flex flex-col items-center gap-3">
+            <Image
+              src="/brand/logo-white.png"
+              alt="Ritual"
+              width={120}
+              height={36}
+              className="h-8 w-auto object-contain opacity-90"
+              unoptimized
+            />
+            <p className="text-center text-xs text-muted-foreground">
+              Built for teams shipping autonomous agents on Ritual Chain
+            </p>
+          </div>
           <div className="grid grid-cols-3 gap-2 sm:grid-cols-6">
             {["Ritual", "Escrow", "Staking", "HTTP", "LLM", "Disputes"].map((label) => (
               <div
                 key={label}
-                className="flex h-14 items-center justify-center rounded-xl border border-border/50 bg-card/40 text-xs font-medium tracking-wide text-muted-foreground transition-colors hover:border-border hover:text-foreground"
+                className="flex h-14 items-center justify-center rounded-xl border border-[#00ff99]/12 bg-card/40 text-xs font-medium tracking-wide text-muted-foreground transition-colors hover:border-[#00ff99]/35 hover:text-[#00ff99]"
               >
                 {label}
               </div>
@@ -253,10 +265,23 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
         <div className="inf-hairline" />
       </section>
 
+      {/* Brand kit + builder links */}
+      <BrandKitStrip compact />
+
       {/* CTA */}
       <section>
         <div className="inf-container py-20 text-center lg:py-24">
-          <p className="inf-eyebrow mb-4">Get started</p>
+          <div className="mb-5 flex justify-center">
+            <Image
+              src="/brand/siggy-01.png"
+              alt="Siggy"
+              width={72}
+              height={72}
+              className="h-16 w-16 rounded-2xl object-cover ring-1 ring-[#00ff99]/25"
+              unoptimized
+            />
+          </div>
+          <p className="inf-eyebrow mb-4" style={{ color: "#00ff99" }}>Get started</p>
           <h2 className="text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
             Ship the agent stack today
           </h2>
@@ -266,6 +291,9 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/dashboard" className="inf-btn inf-btn-primary h-11 px-5">
               Open Dashboard
+            </Link>
+            <Link href="/brand" className="inf-btn inf-btn-ghost h-11 px-5">
+              Brand kit
             </Link>
             <Link href="/docs" className="inf-btn inf-btn-ghost h-11 px-5">
               Read Docs
