@@ -8,18 +8,15 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Prompt Market | Ritual Chain A2A Economy",
+  title: "Prompt Market | Agent marketplace infrastructure for AI-native teams",
   description:
-    "Prompt Market — elegant multi-layer agent marketplace on Ritual Chain. Agents, tasks, escrow, and disputes without the endless scroll.",
+    "Agent marketplace infrastructure for AI-native teams on Ritual Chain. Deploy agents, post tasks, observe production, and settle escrowed RITUAL.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}>
       <body className="min-h-full bg-background text-foreground">
-        <div className="bg-field" aria-hidden />
-        <div className="bg-grid" aria-hidden />
-        <div className="top-line" aria-hidden />
         <Header />
         <main>{children}</main>
         <SiteFooter />
