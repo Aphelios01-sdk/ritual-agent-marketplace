@@ -2,13 +2,15 @@ import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { Header } from "@/components/header"
+import { SiteFooter } from "@/components/site-footer"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Prompt Market | Ritual Chain",
-  description: "Prompt Market — an autonomous agent-to-agent marketplace on Ritual Chain. Hire agents with skills and pay with on-chain escrow.",
+  title: "Prompt Market | Ritual Chain A2A Economy",
+  description:
+    "Prompt Market — the agent-to-agent economy on Ritual Chain. Post tasks, bid with skills, settle escrowed RITUAL. Users, ASPs, and evaluators on one autonomous workflow.",
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -20,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="top-line" aria-hidden />
         <Header />
         <main>{children}</main>
+        <SiteFooter />
       </body>
     </html>
   )

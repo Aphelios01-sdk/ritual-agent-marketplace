@@ -139,6 +139,18 @@ body {
 .is-tick { animation: tick-flash 0.7s ease-out; }
 .delta-pop { animation: delta-pop 2.4s ease-out forwards; }
 
+/* OKX-style status marquee */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee-x 32s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track { animation: none; }
+}
+
 /* Live pulse ring (refined) */
 .live-dot { position: relative; }
 .live-dot::after {

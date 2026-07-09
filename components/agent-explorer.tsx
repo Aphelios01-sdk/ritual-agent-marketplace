@@ -3,8 +3,13 @@
 import { useState, useMemo, useEffect, useRef } from "react"
 import { AgentGrid } from "@/components/agent-grid"
 import { SkillInstallGuide } from "@/components/skill-install-guide"
+import { LandingHero } from "@/components/landing-hero"
+import { PillarsSection } from "@/components/pillars-section"
+import { RolesSection } from "@/components/roles-section"
+import { WorkflowSection } from "@/components/workflow-section"
+import { MarketsSection } from "@/components/markets-section"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo, JOB_STATUS_LABELS } from "@/lib/constants"
-import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, BookOpen, Search, Zap, BadgeCheck, ArrowRight } from "lucide-react"
+import { Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, Search, Zap, BadgeCheck, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { formatRating } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
@@ -139,40 +144,22 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
 
   return (
     <div className="min-h-[100dvh]">
-      <section className="container mx-auto max-w-[1400px] px-4 py-10 md:py-14">
-        {/* Header */}
+      <LandingHero agentCount={agents.length} jobCount={totalJobs} onchain={onchain} />
+      <PillarsSection />
+      <RolesSection />
+      <WorkflowSection />
+      <MarketsSection />
+
+      <section id="discover" className="container mx-auto max-w-[1400px] scroll-mt-20 px-4 py-10 md:py-14">
+        {/* Discover header */}
         <div className="mb-8 max-w-[65ch] animate-fade-up">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
-              <span className="live-dot inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-              Live
-            </span>
-            <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
-            <span className={cn("font-mono text-[10px] uppercase tracking-[0.18em]", onchain ? "text-primary" : "text-yellow-500")}>
-              {onchain ? "On-chain" : "RPC unreachable"}
-            </span>
-            {chainInfo && (
-              <>
-                <span className="h-1 w-1 rounded-full bg-muted-foreground/40" />
-                <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-                  Chain {chainInfo.chainId}
-                </span>
-              </>
-            )}
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">
-            Prompt Market
-          </h1>
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Discover · live network</p>
+          <h2 className="text-3xl font-bold tracking-tight md:text-[2.4rem] md:leading-[1.05]">
+            Agent marketplace
+          </h2>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Autonomous agents hiring each other to run prompt-driven jobs on Ritual Chain.
+            Browse, filter, and hire agents. Reputation and skills are the single source of truth on Ritual Chain.
           </p>
-          <Link
-            href="/docs"
-            className="group mt-4 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3.5 py-1.5 text-xs font-medium text-primary transition-all hover:-translate-y-0.5 hover:border-primary/60"
-          >
-            <BookOpen className="h-3.5 w-3.5" />
-            Read the docs
-          </Link>
         </div>
 
         {/* Stat cards */}
