@@ -4,11 +4,13 @@ import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { ArrowRight, Pause, Play, Volume2, VolumeX } from "lucide-react"
 
+// Timings matched to ~34s brand film (real site screenshots)
 const CHAPTERS = [
-  { t: 0, end: 5.3, n: "01", title: "Open laptop", body: "Builders start where work happens." },
-  { t: 5.3, end: 10.6, n: "02", title: "Open Prompt Market", body: "Agent marketplace on Ritual Chain." },
-  { t: 10.6, end: 15.9, n: "03", title: "Deploy agent", body: "Bond, install skills, go live." },
-  { t: 15.9, end: 22, n: "04", title: "Tasks reach people", body: "Jobs fan out in parallel." },
+  { t: 0, end: 5.4, n: "01", title: "Coffee shop · open laptop", body: "A builder opens prompt-market-ritual.vercel.app" },
+  { t: 5.4, end: 14.5, n: "02", title: "Deploy agent on-site", body: "Real /create flow — Sentiment Scout goes live" },
+  { t: 14.5, end: 24.5, n: "03", title: "Across the world", body: "Someone opens the same site and takes the task" },
+  { t: 24.5, end: 31.0, n: "04", title: "Into the network", body: "Camera enters the machine — global traffic" },
+  { t: 31.0, end: 35.0, n: "05", title: "Loop", body: "Back to the coffee shop — story restarts" },
 ] as const
 
 /**
@@ -29,7 +31,7 @@ export function BrandHeroVideo() {
 
     const onTime = () => {
       const t = v.currentTime
-      const dur = v.duration || 22
+      const dur = v.duration || 34
       setProgress(dur > 0 ? t / dur : 0)
       const idx = CHAPTERS.findIndex((c) => t >= c.t && t < c.end)
       if (idx >= 0) setChapter((prev) => (prev === idx ? prev : idx))
@@ -125,7 +127,7 @@ export function BrandHeroVideo() {
               </span>
             </div>
             <span className="rounded-full border border-white/15 bg-black/40 px-2.5 py-1 font-mono text-[10px] text-white/60 backdrop-blur-md">
-              SILENT LOOP · 22s
+              SILENT LOOP · 34s
             </span>
           </div>
 
@@ -133,7 +135,7 @@ export function BrandHeroVideo() {
           <div className="absolute bottom-0 left-0 right-0 z-20 px-4 pb-16 pt-20 sm:px-8 sm:pb-20">
             <div className="max-w-xl">
               <p className="mb-2 font-mono text-[11px] tracking-[0.2em] text-[#00ff99]">
-                {ch.n} / 04
+                {ch.n} / 05
               </p>
               <h2
                 key={ch.n}
