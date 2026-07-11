@@ -98,22 +98,29 @@ function mapSkills(raw: RawSkill[]): SkillDefinition[] {
   }))
 }
 
-function mapAgent(id: bigint, raw: RawAgent, skills: SkillDefinition[]): AgentInfo | null {
-  const name = raw[1]?.trim()
+function mapAgent(id: bigint, raw: RawAgent | Record<string, unknown>, skills: SkillDefinition[]): AgentInfo | null {
+  // viem may return tuple array or named object depending on ABI fragment
+  const name = (Array.isArray(raw) ? raw[1] : (raw as { name?: string }).name)?.toString()?.trim()
   if (!name) return null
-  const rawDesc = raw[2]?.trim() || ""
+  const rawDesc = (Array.isArray(raw) ? raw[2] : (raw as { description?: string }).description)?.toString()?.trim() || ""
   const description = FIX_DESC_PREFIX.find(([p]) => rawDesc.startsWith(p))?.[1] ?? rawDesc
+  const contractAddress = (Array.isArray(raw) ? raw[3] : (raw as { agentContract?: Address }).agentContract) as Address
+  const bondAmount = (Array.isArray(raw) ? raw[4] : (raw as { bondAmount?: bigint }).bondAmount) as bigint
+  const totalEarnings = (Array.isArray(raw) ? raw[5] : (raw as { totalEarnings?: bigint }).totalEarnings) as bigint
+  const avgRatingRaw = Number(Array.isArray(raw) ? raw[6] : (raw as { avgRating?: bigint }).avgRating ?? 0)
+  const jobCount = Number(Array.isArray(raw) ? raw[7] : (raw as { jobCount?: bigint }).jobCount ?? 0)
+  const active = Boolean(Array.isArray(raw) ? raw[8] : (raw as { active?: boolean }).active)
   return {
     id: id.toString(),
     name,
     description,
-    contractAddress: raw[3],
+    contractAddress,
     skills,
-    bondAmount: raw[4],
-    totalEarnings: raw[5],
-    avgRating: Number(raw[6]) / 100,
-    jobCount: Number(raw[7]),
-    active: raw[8],
+    bondAmount: bondAmount ?? BigInt(0),
+    totalEarnings: totalEarnings ?? BigInt(0),
+    avgRating: avgRatingRaw / 100,
+    jobCount,
+    active,
   }
 }
 
@@ -142,7 +149,7 @@ function mapJob(
   }
 }
 
-/** Read all agents (parallel RPC). Cached ~5s. */
+/** Read all agents in parallel (no multicall — Ritual chain has no multicall3). Cached ~5s. */
 export async function fetchAgents(): Promise<AgentInfo[]> {
   const hit = fromCache(agentsCache)
   if (hit) return hit
@@ -161,35 +168,44 @@ export async function fetchAgents(): Promise<AgentInfo[]> {
 
     const ids = Array.from({ length: Number(count) }, (_, i) => BigInt(i + 1))
 
-    const agentResults = await publicClient.multicall({
-      allowFailure: true,
-      contracts: ids.map((id) => ({
-        address: CONTRACT_ADDR,
-        abi: AGENT_REGISTRY_ABI,
-        functionName: "agents" as const,
-        args: [id] as const,
-      })),
-    })
+    // Parallel individual eth_calls — reliable on Ritual (multicall3 not deployed)
+    const agentResults = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const raw = (await publicClient.readContract({
+            address: CONTRACT_ADDR,
+            abi: AGENT_REGISTRY_ABI,
+            functionName: "agents",
+            args: [id],
+          })) as RawAgent
+          return { id, raw }
+        } catch {
+          return null
+        }
+      }),
+    )
 
-    const skillResults = await publicClient.multicall({
-      allowFailure: true,
-      contracts: ids.map((id) => ({
-        address: CONTRACT_ADDR,
-        abi: AGENT_REGISTRY_ABI,
-        functionName: "getAgentSkills" as const,
-        args: [id] as const,
-      })),
-    })
+    const skillResults = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const raw = (await publicClient.readContract({
+            address: CONTRACT_ADDR,
+            abi: AGENT_REGISTRY_ABI,
+            functionName: "getAgentSkills",
+            args: [id],
+          })) as RawSkill[]
+          return raw
+        } catch {
+          return [] as RawSkill[]
+        }
+      }),
+    )
 
     const agents: AgentInfo[] = []
     for (let i = 0; i < ids.length; i++) {
       const ar = agentResults[i]
-      if (ar.status !== "success" || !ar.result) continue
-      const skills =
-        skillResults[i].status === "success" && skillResults[i].result
-          ? mapSkills(skillResults[i].result as RawSkill[])
-          : []
-      const mapped = mapAgent(ids[i], ar.result as RawAgent, skills)
+      if (!ar) continue
+      const mapped = mapAgent(ar.id, ar.raw, mapSkills(skillResults[i] ?? []))
       if (mapped) agents.push(mapped)
     }
 
@@ -263,7 +279,7 @@ export async function fetchJob(id: string): Promise<OnchainJob | null> {
   }
 }
 
-/** Read all jobs (parallel RPC). Cached ~5s. */
+/** Read all jobs in parallel. Cached ~5s. */
 export async function fetchJobs(): Promise<OnchainJob[]> {
   const hit = fromCache(jobsCache)
   if (hit) return hit
@@ -281,26 +297,28 @@ export async function fetchJobs(): Promise<OnchainJob[]> {
     }
 
     const ids = Array.from({ length: Number(count) }, (_, i) => BigInt(i + 1))
-    const results = await publicClient.multicall({
-      allowFailure: true,
-      contracts: ids.map((id) => ({
-        address: JOB_MARKET_V2,
-        abi: JOB_MARKET_V2_ABI,
-        functionName: "jobs" as const,
-        args: [id] as const,
-      })),
-    })
+    const results = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          return (await publicClient.readContract({
+            address: JOB_MARKET_V2,
+            abi: JOB_MARKET_V2_ABI,
+            functionName: "jobs",
+            args: [id],
+          })) as readonly [
+            bigint, Address, `0x${string}`, bigint, bigint, number, Address, `0x${string}`, bigint, bigint, bigint
+          ]
+        } catch {
+          return null
+        }
+      }),
+    )
 
     const jobs: OnchainJob[] = []
     for (let i = 0; i < ids.length; i++) {
       const r = results[i]
-      if (r.status !== "success" || !r.result) continue
-      const mapped = mapJob(
-        ids[i],
-        r.result as readonly [
-          bigint, Address, `0x${string}`, bigint, bigint, number, Address, `0x${string}`, bigint, bigint, bigint
-        ],
-      )
+      if (!r) continue
+      const mapped = mapJob(ids[i], r)
       if (mapped) jobs.push(mapped)
     }
 
