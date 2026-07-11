@@ -26,19 +26,12 @@ const DEFAULT: LiveBlockState = {
  * Interval default 2s so the block counter feels live.
  */
 export function useLiveBlock(initialBlock = 0, intervalMs = 2000): LiveBlockState {
-  const [state, setState] = useState<LiveBlockState>({
+  const [state, setState] = useState<LiveBlockState>(() => ({
     ...DEFAULT,
     block: initialBlock,
     online: initialBlock > 0,
-  })
+  }))
   const prevRef = useRef(initialBlock)
-
-  useEffect(() => {
-    prevRef.current = initialBlock
-    if (initialBlock > 0) {
-      setState((s) => ({ ...s, block: initialBlock, online: true }))
-    }
-  }, [initialBlock])
 
   useEffect(() => {
     let active = true

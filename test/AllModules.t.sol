@@ -2,6 +2,7 @@
 pragma solidity ^0.8.28;
 
 import "forge-std/Test.sol";
+import "../contracts/interfaces.sol";
 import "../contracts/AgentStaking.sol";
 import "../contracts/AgentHeartbeat.sol";
 import "../contracts/JobMarketV2.sol";
@@ -14,16 +15,44 @@ import "../contracts/SubscriptionManager.sol";
 import "../contracts/BulkJobBatcher.sol";
 import "../contracts/WebhookRegistry.sol";
 
-/// @notice Mock registry: records agentByContract + skills to verify the onlyAgent guard.
+/// @notice Mock registry: matches IAgentRegistry.getAgentSkills (Skill[]) for JobMarketV2 skill matching.
 contract MockRegistry {
     mapping(address => uint256) public agentByContract;
-    mapping(uint256 => bytes32[]) public skillsOf;
+    mapping(uint256 => IAgentRegistry.Skill[]) private skillsOf;
     uint256 public nextId = 1;
-    function register(address agent) external returns (uint256 id) { id = nextId++; agentByContract[agent] = id; }
-    function setSkills(uint256 id, bytes32[] calldata s) external { skillsOf[id] = s; }
-    function getAgentSkills(uint256 id) external view returns (bytes32[] memory) { return skillsOf[id]; }
-    function getAgentSkillIds(uint256 id) external view returns (bytes32[] memory) { return skillsOf[id]; }
-    function addEarnings(uint256, uint256, uint256) external { }
+
+    function register(address agent) external returns (uint256 id) {
+        id = nextId++;
+        agentByContract[agent] = id;
+    }
+
+    function setSkills(uint256 id, bytes32[] calldata skillIds) external {
+        delete skillsOf[id];
+        for (uint256 i = 0; i < skillIds.length; i++) {
+            skillsOf[id].push(
+                IAgentRegistry.Skill({
+                    skillId: skillIds[i],
+                    name: "skill",
+                    description: "mock",
+                    precompileAddr: address(0x0801),
+                    configData: "",
+                    active: true
+                })
+            );
+        }
+    }
+
+    function getAgentSkills(uint256 id) external view returns (IAgentRegistry.Skill[] memory) {
+        return skillsOf[id];
+    }
+
+    function getAgentSkillIds(uint256 id) external view returns (bytes32[] memory ids) {
+        IAgentRegistry.Skill[] storage sk = skillsOf[id];
+        ids = new bytes32[](sk.length);
+        for (uint256 i = 0; i < sk.length; i++) ids[i] = sk[i].skillId;
+    }
+
+    function addEarnings(uint256, uint256, uint256) external {}
 }
 
 /// @title Harness test for the logic of 18 features across Module A/B/C — local, no on-chain gas.
