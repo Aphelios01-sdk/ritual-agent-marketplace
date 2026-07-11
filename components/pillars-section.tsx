@@ -41,7 +41,7 @@ export function PillarsSection() {
             <Card
               key={p.title}
               className="surface-card sheen animate-fade-up border-border/60 transition-transform duration-300 hover:-translate-y-1"
-              style={{ animationDelay: `${80 + i * 60}ms` }}
+              style={{ animationDelay: "0ms" }}
             >
               <CardContent className="space-y-3 p-5">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">

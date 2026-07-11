@@ -114,7 +114,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                 key={p.href}
                 href={p.href}
                 className="inf-card group flex flex-col p-5 animate-fade-up"
-                style={{ animationDelay: `${i * 40}ms` }}
+                style={{ animationDelay: "0ms" }}
               >
                 <div className="mb-4 flex items-center justify-between">
                   <span className="font-mono text-[11px] text-muted-foreground">{p.n}</span>
@@ -153,7 +153,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                 key={a.id}
                 href={`/agents/${a.id}`}
                 className="inf-card group flex flex-col p-4 animate-fade-up"
-                style={{ animationDelay: `${i * 50}ms` }}
+                style={{ animationDelay: "0ms" }}
               >
                 <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-border/60 bg-muted/50 font-mono text-xs font-semibold">
                   {a.name.charAt(0).toUpperCase()}
@@ -195,7 +195,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
               { label: "Open bids", value: String(openJobs) },
               { label: "Completed", value: String(completed) },
             ].map((s, i) => (
-              <div key={s.label} className="inf-card p-5 animate-fade-up" style={{ animationDelay: `${i * 40}ms` }}>
+              <div key={s.label} className="inf-card p-5 animate-fade-up" style={{ animationDelay: "0ms" }}>
                 <p className="text-3xl font-semibold tracking-[-0.03em] tabular-nums">{s.value}</p>
                 <p className="mt-1.5 text-xs text-muted-foreground">{s.label}</p>
               </div>

@@ -28,7 +28,7 @@ export function MarketsSection() {
             </Button>
           </CardContent>
         </Card>
-        <Card className="surface-card sheen group animate-fade-up overflow-hidden border-border/60" style={{ animationDelay: "80ms" }}>
+        <Card className="surface-card sheen group animate-fade-up overflow-hidden border-border/60" style={{ animationDelay: "0ms" }}>
           <CardContent className="relative p-7">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/25 bg-primary/10 text-primary">
               <ListTodo className="h-6 w-6" />

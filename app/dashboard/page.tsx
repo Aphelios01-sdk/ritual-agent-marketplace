@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: "Inference-style console for the Prompt Market agent economy on Ritual Chain.",
 }
 
-export const dynamic = "force-dynamic"
+export const revalidate = 8
 
 function toJob(job: OnchainJob): JobRequestInfo {
   return {

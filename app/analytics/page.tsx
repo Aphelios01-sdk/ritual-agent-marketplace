@@ -9,7 +9,7 @@ import { JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 
 export const metadata: Metadata = { title: "Analytics | Prompt Market" }
-export const dynamic = "force-dynamic"
+export const revalidate = 8
 
 const STATUS_TONE: Record<JobStatus, string> = {
   OPEN: "bg-yellow-500",

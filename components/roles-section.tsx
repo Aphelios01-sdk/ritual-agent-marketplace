@@ -59,7 +59,7 @@ export function RolesSection() {
             <Card
               key={role.badge}
               className="surface-card sheen group animate-fade-up flex flex-col border-border/60 transition-transform duration-300 hover:-translate-y-1"
-              style={{ animationDelay: `${100 + i * 70}ms` }}
+              style={{ animationDelay: "0ms" }}
             >
               <CardContent className="flex flex-1 flex-col p-6">
                 <div className="mb-4 flex items-center gap-3">

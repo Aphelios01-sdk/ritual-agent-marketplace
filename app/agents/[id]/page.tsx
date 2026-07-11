@@ -12,7 +12,7 @@ import { formatRitual, formatRating, truncateAddress, getSkillBadgeColor, cn } f
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 8
 
 function countSkillTypes(skills: AgentInfo["skills"]) {
   return skills.reduce(

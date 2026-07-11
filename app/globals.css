@@ -79,8 +79,9 @@ body {
   100% { transform: translateX(100%); }
 }
 
-.animate-fade-up { animation: fade-up 0.65s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-fade-in { animation: fade-in 0.45s ease both; }
+/* Keep transitions snappy so nav between features does not feel lagged */
+.animate-fade-up { animation: fade-up 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in { animation: fade-in 0.15s ease both; }
 
 /* Refined cards */
 .inf-card {

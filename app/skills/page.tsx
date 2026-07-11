@@ -6,7 +6,7 @@ import { fetchAgents } from "@/lib/onchain"
 import { LayerRail } from "@/components/layer-rail"
 
 export const metadata: Metadata = { title: "Skills | Prompt Market" }
-export const dynamic = "force-dynamic"
+export const revalidate = 8
 
 export default async function SkillsPage() {
   const onchainAgents = await fetchAgents()

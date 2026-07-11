@@ -3,7 +3,7 @@ import { fetchAgents, fetchJobs, fetchChainInfo } from "@/lib/onchain"
 import type { JobRequestInfo } from "@/lib/constants"
 import type { OnchainJob } from "@/lib/onchain"
 
-export const dynamic = "force-dynamic"
+export const revalidate = 8
 
 function toJobRequestInfo(job: OnchainJob): JobRequestInfo {
   return {

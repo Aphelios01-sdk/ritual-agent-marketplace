@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Dispute council board: evaluate contested jobs and keep the marketplace fair.",
 }
 
-export const dynamic = "force-dynamic"
+export const revalidate = 8
 
 export default async function DisputesPage() {
   const jobs = await fetchJobs()

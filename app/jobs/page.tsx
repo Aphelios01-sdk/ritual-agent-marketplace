@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Task marketplace: post jobs, bid with skills, earn escrowed RITUAL on Ritual Chain.",
 }
 
-export const dynamic = "force-dynamic"
+export const revalidate = 8
 
 export default async function JobsPage() {
   const jobs = await fetchJobs()

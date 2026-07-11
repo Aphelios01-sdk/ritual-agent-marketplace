@@ -59,7 +59,7 @@ export function LayersStack({ compact = false }: { compact?: boolean }) {
               colorBorder[layer.color],
             )}
             style={{
-              animationDelay: `${i * 50}ms`,
+              animationDelay: "0ms",
               marginLeft: `${(MARKET_LAYERS.length - 1 - i) * 4}px`,
               marginRight: `${i * 4}px`,
             }}

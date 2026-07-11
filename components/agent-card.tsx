@@ -27,7 +27,7 @@ export function AgentCard({ agent, featured, index = 0, className }: AgentCardPr
     <Link
       href={`/agents/${agent.id}`}
       className="group block rounded-[var(--radius)] outline-none ring-ring transition-[box-shadow] focus-visible:ring-2 animate-fade-up"
-      style={{ animationDelay: `${Math.min(index, 8) * 60}ms` }}
+      style={{ animationDelay: "0ms" }}
     >
       <Card
         className={cn(
