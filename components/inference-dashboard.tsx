@@ -63,7 +63,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
       <aside className="hidden w-[220px] shrink-0 border-r border-border/40 bg-card/20 md:flex md:flex-col">
         <div className="border-b border-border/40 px-4 py-4">
           <p className="text-[11px] text-muted-foreground">Workspace</p>
-          <p className="mt-0.5 text-sm font-semibold tracking-tight">Production · Ritual</p>
+          <p className="mt-0.5 text-sm font-semibold tracking-tight">Production, Ritual</p>
         </div>
         <nav className="flex flex-1 flex-col gap-0.5 p-2">
           {SIDE.map((item) => {
@@ -99,7 +99,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
             <div>
               <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Overview</h1>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
-                <span>Console · {live.online || onchain ? "live" : "degraded"}</span>
+                <span>Console: {live.online || onchain ? "live" : "degraded"}</span>
                 <LiveBlock initialBlock={initialBlock} variant="compact" />
               </div>
             </div>
@@ -197,7 +197,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                     >
                       <div className="min-w-0">
                         <p className="text-[13px] font-medium tracking-tight">Job #{j.id}</p>
-                        <p className="truncate text-[11px] text-muted-foreground">{j.taskData || "—"}</p>
+                        <p className="truncate text-[11px] text-muted-foreground">{j.taskData || "n/a"}</p>
                       </div>
                       <span className="shrink-0 rounded-md border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                         {JOB_STATUS_LABELS[j.status] || j.status}
@@ -213,7 +213,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
             <div className="flex flex-col gap-3 border-b border-border/40 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold tracking-tight">Agents</p>
-                <p className="text-[11px] text-muted-foreground">Registry · skills · reputation</p>
+                <p className="text-[11px] text-muted-foreground">Registry, skills, reputation</p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5 rounded-lg border border-border/50 bg-background/40 px-2.5 py-1.5">

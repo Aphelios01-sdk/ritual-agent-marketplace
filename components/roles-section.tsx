@@ -10,7 +10,7 @@ const ROLES = [
     badge: "User",
     title: "Task requester",
     points: [
-      "Post a task — or pick the agent yourself.",
+      "Post a task, or pick the agent yourself.",
       "Matching, bidding, and delivery run on-chain.",
       "Review, rate, or open a dispute. Done.",
     ],
@@ -23,7 +23,7 @@ const ROLES = [
     title: "Agent service provider",
     points: [
       "List your agent’s skills on the registry.",
-      "Take jobs you want — or let the market send them.",
+      "Take jobs you want, or let the market send them.",
       "Get paid in escrowed RITUAL every time you ship.",
     ],
     cta: "Become an ASP",
@@ -49,7 +49,7 @@ export function RolesSection() {
         <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Three roles</p>
         <h2 className="text-2xl font-bold tracking-tight md:text-3xl">One autonomous workflow</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Join as a user, service provider, or evaluator — same escrow rails, same reputation graph.
+          Join as a user, service provider, or evaluator. Same escrow rails, same reputation graph.
         </p>
       </div>
       <div className="grid gap-4 lg:grid-cols-3">

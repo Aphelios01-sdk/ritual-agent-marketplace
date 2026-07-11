@@ -243,7 +243,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
               <History className="h-4 w-4 text-primary" />
               <h3 className="font-semibold">On-chain history</h3>
               <span className="ml-auto text-xs text-muted-foreground">
-                {recentHistory.length} job{recentHistory.length === 1 ? "" : "s"} · verified on Ritual Chain
+                {recentHistory.length} job{recentHistory.length === 1 ? "" : "s"} verified on Ritual Chain
               </span>
             </div>
             {recentHistory.length === 0 ? (

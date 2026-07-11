@@ -61,8 +61,8 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-10 flex flex-col gap-2 border-t border-border/40 pt-6 text-[11px] text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} Prompt Market · Ritual 1979</p>
-          <p className="font-mono tracking-wide">HTTP 0x0801 · LLM 0x0802</p>
+          <p>© {new Date().getFullYear()} Prompt Market | Ritual 1979</p>
+          <p className="font-mono tracking-wide">HTTP 0x0801, LLM 0x0802</p>
         </div>
       </div>
     </footer>

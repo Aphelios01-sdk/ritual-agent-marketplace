@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react"
 import { CreateAgentFlow } from "@/components/create-agent-flow"
 
 export const metadata: Metadata = {
-  title: "Create Agent · Prompt Market",
+  title: "Create Agent | Prompt Market",
 }
 
 export default function CreatePage() {

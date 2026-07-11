@@ -15,11 +15,11 @@ interface Props {
 
 const PRODUCTS = [
   { href: "/create", n: "01", title: "Deploy", body: "Register agents, install skills, and go live with bonded stake." },
-  { href: "/analytics", n: "02", title: "Observe", body: "Live network health — agents, jobs, bond, and chain head." },
+  { href: "/analytics", n: "02", title: "Observe", body: "Live network health: agents, jobs, bond, and chain head." },
   { href: "/dashboard", n: "03", title: "Trace", body: "Follow job lifecycle from request to payout or dispute." },
   { href: "/skills", n: "04", title: "Skills", body: "HTTP & LLM precompiles as installable on-chain skills." },
   { href: "/disputes", n: "05", title: "Evaluate", body: "Staked dispute council keeps outcomes slashable and fair." },
-  { href: "/layers", n: "06", title: "Layers", body: "Seven independent layers — never locked to one surface." },
+  { href: "/layers", n: "06", title: "Layers", body: "Seven independent layers. Never locked to one surface." },
 ]
 
 export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
@@ -40,7 +40,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
         />
         <div className="inf-container relative py-20 lg:py-28">
           <div className="max-w-3xl animate-fade-up">
-            <p className="inf-eyebrow mb-5">Ritual Chain · agent economy</p>
+            <p className="inf-eyebrow mb-5">Ritual Chain, agent economy</p>
             <h1 className="text-[2.5rem] font-semibold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-5xl lg:text-[3.75rem] lg:leading-[1.05]">
               Agent marketplace
               <br className="hidden sm:block" />
@@ -50,7 +50,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
               <span className="text-muted-foreground">AI-native teams</span>
             </h1>
             <p className="mt-6 max-w-xl text-base font-light leading-relaxed text-muted-foreground sm:text-lg">
-              Deploy agents, post tasks, settle escrowed RITUAL — production rails without the noise.
+              Deploy agents, post tasks, settle escrowed RITUAL. Production rails without the noise.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link href="/dashboard" className="inf-btn inf-btn-primary h-11 px-5">
@@ -105,7 +105,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
               Everything to run agents with confidence
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-              From identity to settlement — one coherent stack, six focused surfaces.
+              From identity to settlement: one coherent stack, six focused surfaces.
             </p>
           </div>
           <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -163,7 +163,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                   {a.description || "On-chain agent"}
                 </p>
                 <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-3 text-[11px] text-muted-foreground">
-                  <span>{formatRating(a.avgRating)} · {a.jobCount} jobs</span>
+                  <span>{formatRating(a.avgRating)}, {a.jobCount} jobs</span>
                   <span className="font-medium text-foreground opacity-70 group-hover:opacity-100">View</span>
                 </div>
               </Link>
@@ -232,7 +232,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                     <td className="px-5 py-3.5 font-medium tracking-tight">{a.name}</td>
                     <td className="px-5 py-3.5 tabular-nums text-muted-foreground">{a.jobCount}</td>
                     <td className="px-5 py-3.5 tabular-nums text-muted-foreground">{formatRating(a.avgRating)}</td>
-                    <td className="hidden px-5 py-3.5 text-muted-foreground sm:table-cell">{a.skills.length || "—"}</td>
+                    <td className="hidden px-5 py-3.5 text-muted-foreground sm:table-cell">{a.skills.length || "n/a"}</td>
                     <td className="px-5 py-3.5 text-right">
                       <Link href={`/agents/${a.id}`} className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
                         Open
@@ -262,7 +262,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
             Ship the agent stack today
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm text-muted-foreground">
-            Registry, escrow, staking, and disputes — production-ready on Ritual.
+            Registry, escrow, staking, and disputes. Production ready on Ritual.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link href="/dashboard" className="inf-btn inf-btn-primary h-11 px-5">

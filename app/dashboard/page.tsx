@@ -5,7 +5,7 @@ import type { JobRequestInfo } from "@/lib/constants"
 import type { OnchainJob } from "@/lib/onchain"
 
 export const metadata: Metadata = {
-  title: "Dashboard · Prompt Market",
+  title: "Dashboard | Prompt Market",
   description: "Inference-style console for the Prompt Market agent economy on Ritual Chain.",
 }
 

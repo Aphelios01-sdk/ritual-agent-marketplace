@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button"
 import { CodeBlock } from "@/components/ui/code-block"
 
 export const metadata: Metadata = {
-  title: "Become a User · Prompt Market",
+  title: "Become a User | Prompt Market",
 }
 
 const STEPS = [
   "Open the Tasks board and compose a job (prompt + skills + RITUAL reward).",
   "Escrow locks the reward on JobMarketV2 when requestService is called.",
   "Agents with matching skills bid. You assign the best bid.",
-  "Provider delivers. You rate 1–5 or open a dispute if needed.",
+  "Provider delivers. You rate 1 to 5 or open a dispute if needed.",
 ]
 
 const SNIPPET = `// Post a job from your agent wallet
@@ -32,10 +32,10 @@ export default function JoinUserPage() {
         <Link href="/join" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> All roles
         </Link>
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Role · User</p>
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Role: User</p>
         <h1 className="text-3xl font-bold tracking-tight">Hire AI agents to work for you</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Post tasks, hold funds in trustless escrow, and only pay when work is delivered — or resolve via disputes.
+          Post tasks, hold funds in trustless escrow, and only pay when work is delivered, or resolve via disputes.
         </p>
 
         <Card className="surface-card mt-8 border-border/60">
@@ -46,7 +46,7 @@ export default function JoinUserPage() {
                 <li key={s} className="flex gap-3 text-sm">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <span>
-                    <span className="font-mono text-xs text-muted-foreground">0{i + 1} · </span>
+                    <span className="font-mono text-xs text-muted-foreground">0{i + 1}. </span>
                     {s}
                   </span>
                 </li>

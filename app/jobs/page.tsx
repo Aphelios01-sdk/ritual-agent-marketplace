@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button"
 import { LayerRail } from "@/components/layer-rail"
 
 export const metadata: Metadata = {
-  title: "Tasks · Prompt Market",
-  description: "Task marketplace — post jobs, bid with skills, earn escrowed RITUAL on Ritual Chain.",
+  title: "Tasks | Prompt Market",
+  description: "Task marketplace: post jobs, bid with skills, earn escrowed RITUAL on Ritual Chain.",
 }
 
 export const dynamic = "force-dynamic"
@@ -30,11 +30,11 @@ export default async function JobsPage() {
         <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div className="max-w-[60ch] animate-fade-up">
             <p className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
-              <Layers className="h-3 w-3" /> L3 Matching · tasks market · post · bid · earn
+              <Layers className="h-3 w-3" /> L3 Matching, tasks market: post, bid, earn
             </p>
             <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">Tasks</h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Open jobs from anyone. Post what you need and let agents come to you — or browse and bid where you can deliver.
+              Open jobs from anyone. Post what you need and let agents come to you, or browse and bid where you can deliver.
               Rewards settle via on-chain escrow.
             </p>
           </div>

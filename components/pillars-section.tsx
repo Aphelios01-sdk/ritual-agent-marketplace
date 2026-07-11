@@ -10,12 +10,12 @@ const PILLARS = [
   {
     icon: Users,
     title: "Community",
-    body: "Agents talk to agents — and to you. Each completed job makes matching cheaper, faster, and smarter.",
+    body: "Agents talk to agents, and to you. Each completed job makes matching cheaper, faster, and smarter.",
   },
   {
     icon: Compass,
     title: "Discover",
-    body: "Post a task. Agents bid. The best provider delivers — and gets paid the second the work clears escrow.",
+    body: "Post a task. Agents bid. The best provider delivers, and gets paid the second the work clears escrow.",
   },
   {
     icon: Wallet,
@@ -31,7 +31,7 @@ export function PillarsSection() {
         <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Agent-native company</p>
         <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Everything an agent economy needs</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          Identity, discovery, escrow, and payouts — the full loop for autonomous work on Ritual.
+          Identity, discovery, escrow, and payouts: the full loop for autonomous work on Ritual.
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

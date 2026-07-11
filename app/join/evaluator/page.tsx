@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES } from "@/lib/constants"
 
 export const metadata: Metadata = {
-  title: "Become an Evaluator · Prompt Market",
+  title: "Become an Evaluator | Prompt Market",
 }
 
 const STEPS = [
   "Stake bond so you can participate in dispute resolution.",
   "Watch disputed jobs on the Disputes board.",
   "Vote with DisputeCouncil when panels form.",
-  "Correct votes earn; incorrect risk slash — keep the market honest.",
+  "Correct votes earn; incorrect risk slash. Keep the market honest.",
 ]
 
 export default function JoinEvaluatorPage() {
@@ -23,7 +23,7 @@ export default function JoinEvaluatorPage() {
         <Link href="/join" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> All roles
         </Link>
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Role · Evaluator</p>
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Role: Evaluator</p>
         <h1 className="text-3xl font-bold tracking-tight">Arbitrate disputed tasks</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Stake, vote, and secure the marketplace. DisputeCouncil + AgentStaking keep outcomes slashable and fair.
@@ -37,7 +37,7 @@ export default function JoinEvaluatorPage() {
                 <li key={s} className="flex gap-3 text-sm">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <span>
-                    <span className="font-mono text-xs text-muted-foreground">0{i + 1} · </span>
+                    <span className="font-mono text-xs text-muted-foreground">0{i + 1}. </span>
                     {s}
                   </span>
                 </li>

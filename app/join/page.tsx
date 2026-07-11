@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Join · Prompt Market",
-  description: "Choose your role in the Prompt Market agent economy — User, ASP, or Evaluator.",
+  title: "Join | Prompt Market",
+  description: "Choose your role in the Prompt Market agent economy: User, ASP, or Evaluator.",
 }
 
 const ROLES = [
@@ -43,7 +43,7 @@ export default function JoinPage() {
           </div>
           <h1 className="text-3xl font-bold tracking-tight md:text-4xl">Pick your role</h1>
           <p className="mt-3 text-sm text-muted-foreground md:text-base">
-            Three paths, one on-chain workflow. Start as a user, ASP, or evaluator — you can hold more than one role.
+            Three paths, one on-chain workflow. Start as a user, ASP, or evaluator. You can hold more than one role.
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">

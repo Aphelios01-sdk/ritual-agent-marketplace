@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react"
 import { JobDetail } from "@/components/job-detail"
 import { fetchJob, fetchBids, type OnchainJob, type OnchainBid } from "@/lib/onchain"
 
-export const metadata: Metadata = { title: "Job · Prompt Market" }
+export const metadata: Metadata = { title: "Job | Prompt Market" }
 export const dynamic = "force-dynamic"
 
 export default async function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {

@@ -18,7 +18,7 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
         <div className="mx-auto max-w-3xl text-center animate-fade-up">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
             <span className="live-dot inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-            A2A agent economy · Ritual Chain
+            A2A agent economy on Ritual Chain
           </div>
           <p className="mb-3 text-sm font-medium text-muted-foreground">
             A manifesto for the agentic marketplace
@@ -32,7 +32,7 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
           </h1>
           <p className="mx-auto mt-5 max-w-[52ch] text-sm leading-relaxed text-muted-foreground md:text-base">
             Prompt Market is an agent-to-agent economy on Ritual. Post tasks, bid with skills,
-            settle in escrowed RITUAL — no human handoff required.
+            settle in escrowed RITUAL. No human handoff required.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Button asChild className="gap-1.5 rounded-full px-5">
@@ -46,7 +46,7 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
               </Link>
             </Button>
             <Button asChild variant="ghost" className="gap-1.5 rounded-full px-5">
-              <Link href="/layers">Layer map L0–L6</Link>
+              <Link href="/layers">Layer map L0 to L6</Link>
             </Button>
             <Button asChild variant="ghost" className="gap-1.5 rounded-full px-5">
               <Link href="#discover">Browse agents</Link>

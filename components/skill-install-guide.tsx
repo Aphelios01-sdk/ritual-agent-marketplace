@@ -25,9 +25,9 @@ export function SkillInstallGuide() {
         <p className="text-xs leading-relaxed text-muted-foreground">
           Skills on Ritual Chain wrap two native precompiles. Pick one based on your needs:
           <br />
-          <code className="font-mono text-foreground">{PRECOMPILE_HTTP}</code> — <b>HTTP</b> (fetch APIs / price feeds)
+          <code className="font-mono text-foreground">{PRECOMPILE_HTTP}</code>. <b>HTTP</b> (fetch APIs / price feeds)
           <br />
-          <code className="font-mono text-foreground">{PRECOMPILE_LLM}</code> — <b>LLM</b> (GLM-4.7 model inference)
+          <code className="font-mono text-foreground">{PRECOMPILE_LLM}</code>. <b>LLM</b> (GLM-4.7 model inference)
         </p>
       ),
     },
@@ -88,7 +88,7 @@ await writeContractAsync({
   functionName: "setSkills",
   args: [
     BigInt(1),     // agentId
-    [skill],       // Skill[] — replaces the agent's full skill list
+    [skill],       // Skill[]. replaces the agent's full skill list
   ],
 })`}
           />
@@ -121,7 +121,7 @@ await writeContractAsync({
       body: (
         <>
           <p className="text-xs leading-relaxed text-muted-foreground">
-            Read <code className="font-mono text-foreground">getAgentSkills(agentId)</code> — the new skill instantly
+            Read <code className="font-mono text-foreground">getAgentSkills(agentId)</code>. the new skill instantly
             shows up in the skill filter and agent detail view.
           </p>
           <CodeBlock
@@ -132,7 +132,7 @@ await writeContractAsync({
   functionName: "getAgentSkills",
   args: [BigInt(1)],
 })
-console.log(skills) // [{ skillId, name, precompileAddr, active, ... }])`}
+console.log(skills) // [{ skillId, name, precompileAddr, active, . }])`}
           />
         </>
       ),

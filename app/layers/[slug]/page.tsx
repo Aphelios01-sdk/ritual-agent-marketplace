@@ -14,9 +14,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const layer = getLayer(slug)
-  if (!layer) return { title: "Layer · Prompt Market" }
+  if (!layer) return { title: "Layer | Prompt Market" }
   return {
-    title: `${layer.short} ${layer.name} · Prompt Market`,
+    title: `${layer.short} ${layer.name} | Prompt Market`,
     description: layer.description,
   }
 }
@@ -40,7 +40,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
         <div className="mb-8 animate-fade-up">
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary">
-              {layer.short} · Level {layer.level}
+              {layer.short}, Level {layer.level}
             </span>
             <span className="rounded-full border border-border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
               {layer.status}
@@ -127,7 +127,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
           </Card>
         </div>
 
-        {/* Adjacent layers — never stuck on one */}
+        {/* Adjacent layers. never stuck on one */}
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-between">
           {prev ? (
             <Link
@@ -136,7 +136,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
             >
               <ArrowLeft className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
               <div>
-                <p className="font-mono text-[10px] text-muted-foreground">Previous · {prev.short}</p>
+                <p className="font-mono text-[10px] text-muted-foreground">Previous: {prev.short}</p>
                 <p className="font-medium">{prev.name}</p>
               </div>
             </Link>
@@ -149,7 +149,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
               className="group flex items-center justify-end gap-2 rounded-xl border border-border/60 px-4 py-3 text-sm transition-colors hover:border-primary/40 sm:text-right"
             >
               <div>
-                <p className="font-mono text-[10px] text-muted-foreground">Next · {next.short}</p>
+                <p className="font-mono text-[10px] text-muted-foreground">Next: {next.short}</p>
                 <p className="font-medium">{next.name}</p>
               </div>
               <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary" />

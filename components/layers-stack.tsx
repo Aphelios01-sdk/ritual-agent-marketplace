@@ -32,7 +32,7 @@ export function LayersStack({ compact = false }: { compact?: boolean }) {
             <Layers className="h-3.5 w-3.5" /> Multi-layer architecture
           </p>
           <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-            Not one flat market — seven independent layers
+            Not one flat market: seven independent layers
           </h2>
           <p className="mt-2 text-sm text-muted-foreground">
             Protocol → Identity → Discovery → Matching → Execution → Settlement → Governance.
@@ -47,7 +47,7 @@ export function LayersStack({ compact = false }: { compact?: boolean }) {
         </Link>
       </div>
 
-      {/* Vertical stack — bottom protocol to top governance */}
+      {/* Vertical stack. bottom protocol to top governance */}
       <div className="relative mx-auto max-w-3xl space-y-2">
         <div className="pointer-events-none absolute bottom-4 left-1/2 top-4 hidden w-px -translate-x-1/2 bg-gradient-to-b from-red-500/40 via-primary/30 to-blue-500/40 md:block" />
         {[...MARKET_LAYERS].reverse().map((layer, i) => (
@@ -84,7 +84,7 @@ export function LayersStack({ compact = false }: { compact?: boolean }) {
 
       {!compact && (
         <p className="mt-6 text-center text-xs text-muted-foreground">
-          Click any layer to open contracts, flows, and deep links — you are never locked into a single surface.
+          Click any layer to open contracts, flows, and deep links. You are never locked into a single surface.
         </p>
       )}
     </section>

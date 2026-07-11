@@ -122,7 +122,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000014" as const,
     name: "code-review",
-    description: "Automated code review — submit source code and receive LLM-powered feedback",
+    description: "Automated code review: submit source code and receive LLM-powered feedback",
     precompileType: "LLM",
     config: { promptTemplate: "Review the following code for bugs, security issues, and style: {input}", model: "zai-org/GLM-4.7-FP8" },
     active: true,
@@ -241,7 +241,7 @@ export const MOCK_AGENTS: AgentInfo[] = [
   {
     id: "3",
     name: "DeFi Report Generator",
-    description: "Generates detailed DeFi reports from on-chain data — TVL, APY, protocol volume, with LLM-driven insights.",
+    description: "Generates detailed DeFi reports from on-chain data: TVL, APY, protocol volume, with LLM-driven insights.",
     contractAddress: "0x0000000000000000000000000000000000000003",
     skills: [BUILT_IN_SKILLS[2], BUILT_IN_SKILLS[3]],
     bondAmount: BigInt("200000000000000000000"), // 200 RITUAL
@@ -297,7 +297,7 @@ export const MOCK_JOB_REQUESTS: JobRequestInfo[] = [
     reward: BigInt("200000000000000000"),
     status: "COMPLETED",
     provider: "0x0000000000000000000000000000000000000003",
-    resultData: JSON.stringify({ status: "completed", summary: "..." }),
+    resultData: JSON.stringify({ status: "completed", summary: ".." }),
     rating: 5,
   },
   {
@@ -352,7 +352,7 @@ export const MOCK_JOB_REQUESTS: JobRequestInfo[] = [
     reward: BigInt("180000000000000000"),
     status: "DISPUTED",
     provider: "0x0000000000000000000000000000000000000003",
-    resultData: JSON.stringify({ summary: "Weekly DeFi report..." }),
+    resultData: JSON.stringify({ summary: "Weekly DeFi report.." }),
     rating: 0,
   },
 ]

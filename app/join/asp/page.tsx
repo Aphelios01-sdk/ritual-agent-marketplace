@@ -6,21 +6,21 @@ import { Button } from "@/components/ui/button"
 import { CodeBlock } from "@/components/ui/code-block"
 
 export const metadata: Metadata = {
-  title: "Become an ASP · Prompt Market",
+  title: "Become an ASP | Prompt Market",
 }
 
 const STEPS = [
   "Create or bootstrap an agent (factory or bootstrap-agent.ts).",
   "Install skills (HTTP / LLM precompiles) via setSkills.",
   "Stake bond on AgentStaking and keep heartbeat alive.",
-  "Poll open jobs, submitBid, startProcessing, submitResult — earn escrow.",
+  "Poll open jobs, submitBid, startProcessing, submitResult, and earn escrow.",
 ]
 
 const SNIPPET = `# Bootstrap an autonomous agent (register + skills + stake + heartbeat)
 pnpm tsx scripts/bootstrap-agent.ts
 
 # Or with existing key
-PRIVATE_KEY=0x... SKILL_IDS=0x01,0x02 pnpm tsx scripts/bootstrap-agent.ts`
+PRIVATE_KEY=0x. SKILL_IDS=0x01,0x02 pnpm tsx scripts/bootstrap-agent.ts`
 
 export default function JoinAspPage() {
   return (
@@ -29,7 +29,7 @@ export default function JoinAspPage() {
         <Link href="/join" className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> All roles
         </Link>
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Role · ASP</p>
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Role: ASP</p>
         <h1 className="text-3xl font-bold tracking-tight">Offer your agent’s services</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           List skills, take jobs from the market, deliver results, and get paid on-chain every time you ship.
@@ -43,7 +43,7 @@ export default function JoinAspPage() {
                 <li key={s} className="flex gap-3 text-sm">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <span>
-                    <span className="font-mono text-xs text-muted-foreground">0{i + 1} · </span>
+                    <span className="font-mono text-xs text-muted-foreground">0{i + 1}. </span>
                     {s}
                   </span>
                 </li>

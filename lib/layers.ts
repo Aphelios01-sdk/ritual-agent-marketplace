@@ -30,7 +30,7 @@ export const MARKET_LAYERS: MarketLayer[] = [
     status: "live",
     color: "blue",
     contracts: [
-      { label: "Chain", address: "Ritual · 1979" },
+      { label: "Chain", address: "Ritual 1979" },
       { label: "HTTP precompile", address: PRECOMPILE_ADDRESSES.http },
       { label: "LLM precompile", address: PRECOMPILE_ADDRESSES.llm },
       { label: "Scheduler", address: PRECOMPILE_ADDRESSES.scheduler },
@@ -65,8 +65,8 @@ export const MARKET_LAYERS: MarketLayer[] = [
       { href: "/join/asp", label: "Become ASP" },
     ],
     flows: ["registerAgent", "setSkills", "createAgent", "recordReview"],
-    inputs: ["Name · skills · wallet"],
-    outputs: ["Agent ID · rep score"],
+    inputs: ["Name, skills, wallet"],
+    outputs: ["Agent ID, rep score"],
   },
   {
     id: "discovery",
@@ -88,7 +88,7 @@ export const MARKET_LAYERS: MarketLayer[] = [
       { href: "/analytics", label: "Top agents" },
     ],
     flows: ["Search", "Filter", "Featured strip", "Templates"],
-    inputs: ["Query · skill tags"],
+    inputs: ["Query, skill tags"],
     outputs: ["Agent shortlist"],
   },
   {
@@ -113,15 +113,15 @@ export const MARKET_LAYERS: MarketLayer[] = [
       { href: "/join/asp", label: "Bid as ASP" },
     ],
     flows: ["requestService", "submitBid", "assignJob", "getAvailableJobs"],
-    inputs: ["Skill IDs · reward · task data"],
-    outputs: ["Job ID · bid set · assignment"],
+    inputs: ["Skill IDs, reward, task data"],
+    outputs: ["Job ID, bid set, assignment"],
   },
   {
     id: "execution",
     level: 4,
     name: "Execution",
     short: "L4",
-    tagline: "Run skills · heartbeat · hooks",
+    tagline: "Run skills, heartbeat, hooks",
     description:
       "Do the work. Providers start processing with bond, call HTTP/LLM skills, submit results. Heartbeat proves liveness; webhooks and subcontractors extend pipelines.",
     status: "live",
@@ -138,8 +138,8 @@ export const MARKET_LAYERS: MarketLayer[] = [
       { href: "/docs", label: "Bootstrap SDK" },
     ],
     flows: ["startProcessing", "submitResult", "ping", "subcontract"],
-    inputs: ["Assigned job · skill config"],
-    outputs: ["Result bytes · liveness"],
+    inputs: ["Assigned job, skill config"],
+    outputs: ["Result bytes, liveness"],
   },
   {
     id: "settlement",
@@ -161,8 +161,8 @@ export const MARKET_LAYERS: MarketLayer[] = [
       { href: "/docs", label: "Fee model" },
     ],
     flows: ["escrow lock", "stake / slash", "payout", "rateProvider"],
-    inputs: ["Reward · bond"],
-    outputs: ["RITUAL transfer · ratings"],
+    inputs: ["Reward, bond"],
+    outputs: ["RITUAL transfer, ratings"],
   },
   {
     id: "governance",
@@ -183,8 +183,8 @@ export const MARKET_LAYERS: MarketLayer[] = [
       { href: "/join/evaluator", label: "Become evaluator" },
     ],
     flows: ["dispute", "panel vote", "slash / release"],
-    inputs: ["Disputed job · votes"],
-    outputs: ["Final status · slash events"],
+    inputs: ["Disputed job, votes"],
+    outputs: ["Final status, slash events"],
   },
 ]
 

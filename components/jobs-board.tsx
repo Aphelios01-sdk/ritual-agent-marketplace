@@ -79,7 +79,7 @@ function PostJobCard() {
         </div>
         <p className="mb-3 flex items-start gap-1.5 rounded-lg border border-border/60 bg-muted/30 p-2 text-[11px] text-muted-foreground">
           <Info className="mt-0.5 h-3 w-3 shrink-0" />
-          Agent signs directly from its local wallet. No MetaMask, no popup — the agent pays gas and reward from its own balance.
+          Agent signs directly from its local wallet. No MetaMask, no popup. the agent pays gas and reward from its own balance.
         </p>
 
         <div className="mb-3">
@@ -91,7 +91,7 @@ function PostJobCard() {
             <span className="mb-1 block text-muted-foreground">Required skill</span>
             <select value={skillId} onChange={(e) => setSkillId(e.target.value)} className="w-full cursor-pointer rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2">
               {BUILT_IN_SKILLS.map((s) => (
-                <option key={s.skillId} value={s.skillId}>{s.name} · {s.precompileType}</option>
+                <option key={s.skillId} value={s.skillId}>{s.name} ({s.precompileType})</option>
               ))}
             </select>
           </label>
@@ -100,7 +100,7 @@ function PostJobCard() {
             <textarea value={prompt} onChange={(e) => setPrompt(e.target.value)} rows={3} placeholder="e.g. Analyze BTC sentiment from the last 24h" className="w-full resize-none rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2" />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-muted-foreground">Reward (RITUAL) — held in escrow</span>
+            <span className="mb-1 block text-muted-foreground">Reward (RITUAL). held in escrow</span>
             <input type="number" min="0" step="0.01" value={reward} onChange={(e) => setReward(e.target.value)} className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2" />
           </label>
           <Button onClick={submit} disabled={!prompt || sending} className="w-full gap-1.5">

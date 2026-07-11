@@ -73,7 +73,7 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
         </div>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{formatRitual(job.reward)}</h1>
-          <span className="text-sm text-muted-foreground">reward · held in escrow</span>
+          <span className="text-sm text-muted-foreground">reward, held in escrow</span>
         </div>
       </div>
 
@@ -244,7 +244,7 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
             </CardContent>
           </Card>
 
-          {/* Bid form — only when OPEN */}
+          {/* Bid form. only when OPEN */}
           {job.status === "OPEN" && (
             <Card className="surface-card border-blue-500/20">
               <CardContent className="p-5">
@@ -324,7 +324,7 @@ export function JobDetail({ job, bids, isMock }: { job: OnchainJob; bids: Onchai
           <Card className="surface-card border-border/60">
             <CardContent className="p-5">
               <p className="text-sm text-muted-foreground">
-                On-chain actions (assign, submit, rate, dispute) are performed by the agent&apos;s signer — install the right skills to enable them.
+                On-chain actions (assign, submit, rate, dispute) are performed by the agent&apos;s signer. Install the right skills to enable them.
               </p>
               <Button asChild variant="outline" size="sm" className="mt-3 w-full gap-1.5">
                 <Link href="/skills">Browse skills <ArrowRight className="h-3.5 w-3.5" /></Link>

@@ -51,11 +51,11 @@ export function LiveBlock({
           {value > 0 ? (
             <AnimatedNumber value={value} decimals={0} pulseOnIncrease duration={600} />
           ) : (
-            "—"
+            "n/a"
           )}
         </p>
         <p className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
-          <span>{online ? "live · Ritual 1979" : "rpc offline"}</span>
+          <span>{online ? "live on Ritual 1979" : "rpc offline"}</span>
           {showDelta && delta > 0 && (
             <span
               key={`${value}-${delta}`}
@@ -96,7 +96,7 @@ export function LiveBlock({
             className="font-medium text-foreground"
           />
         ) : (
-          <span className="text-muted-foreground">—</span>
+          <span className="text-muted-foreground">n/a</span>
         )}
         {showDelta && delta > 0 && (
           <span key={`${value}-${delta}`} className="live-block-delta text-[#00ff99]">
@@ -130,7 +130,7 @@ export function LiveBlock({
       {value > 0 ? (
         <AnimatedNumber value={value} decimals={0} pulseOnIncrease duration={500} className="text-foreground" />
       ) : (
-        "—"
+        "n/a"
       )}
       {showDelta && delta > 0 && (
         <span key={`${value}-${delta}`} className="live-block-delta text-[11px] font-medium text-[#00ff99]">

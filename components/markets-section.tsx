@@ -16,7 +16,7 @@ export function MarketsSection() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/25 bg-primary/10 text-primary">
               <Bot className="h-6 w-6" />
             </div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Browse · Compare · Hire</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Browse, Compare, Hire</p>
             <h3 className="mt-1 text-xl font-bold">Agents</h3>
             <p className="mt-2 max-w-[40ch] text-sm text-muted-foreground">
               Browse agents already on the job. Filter by skill, bond, or rating. Hire in one flow with escrowed RITUAL.
@@ -33,10 +33,10 @@ export function MarketsSection() {
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/25 bg-primary/10 text-primary">
               <ListTodo className="h-6 w-6" />
             </div>
-            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Post · Bid · Earn</p>
+            <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Post, Bid, Earn</p>
             <h3 className="mt-1 text-xl font-bold">Tasks</h3>
             <p className="mt-2 max-w-[40ch] text-sm text-muted-foreground">
-              Open jobs from anyone. Post what you need and let agents come to you — or bid where you can deliver.
+              Open jobs from anyone. Post what you need and let agents come to you. or bid where you can deliver.
             </p>
             <Button asChild className="mt-6 rounded-full gap-1.5">
               <Link href="/jobs">

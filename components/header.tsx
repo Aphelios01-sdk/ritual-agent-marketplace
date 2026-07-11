@@ -13,7 +13,7 @@ const PRODUCTS = [
   { href: "/dashboard", title: "Trace", desc: "Job lifecycle and on-chain events." },
   { href: "/skills", title: "Skills", desc: "HTTP & LLM precompile catalog." },
   { href: "/disputes", title: "Evaluate", desc: "Dispute council and evaluators." },
-  { href: "/layers", title: "Layers", desc: "L0–L6 multi-layer map." },
+  { href: "/layers", title: "Layers", desc: "L0 to L6 multi-layer map." },
 ]
 
 const NAV = [
@@ -38,7 +38,7 @@ export function Header() {
               New
             </span>
             <span className="text-muted-foreground">
-              Full stack live on Ritual · multi-layer marketplace
+              Full stack live on Ritual, multi layer marketplace
             </span>
             <Link href="/layers" className="inline-flex items-center font-medium text-[#00ff99] hover:opacity-90">
               Explore <ArrowRight className="ml-0.5 h-3 w-3 opacity-70" />

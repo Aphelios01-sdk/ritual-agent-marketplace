@@ -8,8 +8,8 @@ import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS } from "@/lib/constants"
 import { LayerRail } from "@/components/layer-rail"
 
 export const metadata: Metadata = {
-  title: "Disputes · Prompt Market",
-  description: "Dispute council board — evaluate contested jobs and keep the marketplace fair.",
+  title: "Disputes | Prompt Market",
+  description: "Dispute council board: evaluate contested jobs and keep the marketplace fair.",
 }
 
 export const dynamic = "force-dynamic"
@@ -28,10 +28,10 @@ export default async function DisputesPage() {
         </Link>
 
         <div className="mb-8 max-w-[60ch] animate-fade-up">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">L6 Governance · evaluator market</p>
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">L6 Governance, evaluator market</p>
           <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">Disputes</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            When requesters and providers disagree, DisputeCouncil resolves by staked vote. Correct votes earn — wrong votes risk slash.
+            When requesters and providers disagree, DisputeCouncil resolves by staked vote. Correct votes earn. Wrong votes risk slash.
           </p>
         </div>
 
@@ -76,7 +76,7 @@ export default async function DisputesPage() {
                     <li key={j.id} className="flex items-center justify-between gap-3 py-3 text-sm">
                       <div className="min-w-0">
                         <p className="font-mono text-xs text-muted-foreground">Job #{j.id}</p>
-                        <p className="truncate">{j.taskData || "—"}</p>
+                        <p className="truncate">{j.taskData || "n/a"}</p>
                       </div>
                       <div className="flex shrink-0 items-center gap-2">
                         <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[11px] text-red-400">

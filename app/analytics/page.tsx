@@ -8,7 +8,7 @@ import { fetchAgents, fetchJobs, fetchChainInfo } from "@/lib/onchain"
 import { JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 
-export const metadata: Metadata = { title: "Analytics · Prompt Market" }
+export const metadata: Metadata = { title: "Analytics | Prompt Market" }
 export const dynamic = "force-dynamic"
 
 const STATUS_TONE: Record<JobStatus, string> = {

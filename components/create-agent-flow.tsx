@@ -54,7 +54,7 @@ export function CreateAgentFlow() {
               <div>
                 <h3 className="text-lg font-semibold">Configure your agent</h3>
                 <p className="text-sm text-muted-foreground">
-                  Define the agent identity. No wallet or gas needed — this builds the agent configuration locally.
+                  Define the agent identity. No wallet or gas needed. This builds the agent configuration locally.
                 </p>
               </div>
               <div className="grid gap-3">

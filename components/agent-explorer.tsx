@@ -125,7 +125,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
 
   return (
     <div className="min-h-[calc(100dvh-3.5rem)]">
-      {/* Compact command header — fits above fold */}
+      {/* Compact command header. fits above fold */}
       <div className="border-b border-border/50 bg-card/20">
         <div className="container mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-4 md:flex-row md:items-center md:justify-between md:py-3.5">
           <div className="min-w-0">
@@ -156,7 +156,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
               <Link href="/jobs"><Briefcase className="h-3.5 w-3.5" /> Tasks</Link>
             </Button>
             <Button asChild size="sm" variant="ghost" className="h-8 rounded-full px-3 text-xs">
-              <Link href="/layers">L0–L6</Link>
+              <Link href="/layers">L0 to L6</Link>
             </Button>
             <Button asChild size="sm" variant="ghost" className="h-8 rounded-full px-3 text-xs">
               <Link href="/create">Create</Link>
@@ -184,7 +184,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                   <Icon className={cn("h-4 w-4 shrink-0", toneClass)} />
                   <div className="min-w-0 leading-none">
                     <p className="text-base font-bold tabular-nums">
-                      {isBlock && !hasBlock ? "—" : (
+                      {isBlock && !hasBlock ? "n/a" : (
                         <AnimatedNumber value={s.value} decimals={s.decimals} suffix={s.suffix} pulseOnIncrease={isBlock && hasBlock} />
                       )}
                     </p>
@@ -200,7 +200,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
         </div>
       </div>
 
-      {/* Workspace: tabs + panels — no long scroll stack */}
+      {/* Workspace: tabs + panels. no long scroll stack */}
       <div className="container mx-auto max-w-[1400px] px-4 py-4 md:py-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="inline-flex rounded-full border border-border/70 bg-card/40 p-0.5">
@@ -224,7 +224,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
             })}
           </div>
           <p className="hidden text-[11px] text-muted-foreground sm:block">
-            Switch panels — no endless scroll
+            Switch panels. No endless scroll.
           </p>
         </div>
 
@@ -306,7 +306,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
             {tab === "layers" && (
               <div className="animate-fade-in">
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm text-muted-foreground">Seven independent layers — open any without leaving the map.</p>
+                  <p className="text-sm text-muted-foreground">Seven independent layers. open any without leaving the map.</p>
                   <Link href="/layers" className="text-xs font-medium text-primary hover:underline">Full map</Link>
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
@@ -366,7 +366,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                   {[
                     "Post task",
                     "Escrow lock",
-                    "Bid · assign",
+                    "Bid and assign",
                     "Execute skill",
                     "Payout / dispute",
                   ].map((step, i) => (

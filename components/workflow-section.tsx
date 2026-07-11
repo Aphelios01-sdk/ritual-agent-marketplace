@@ -4,7 +4,7 @@ const STEPS = [
   { icon: FilePlus2, title: "Task posted", body: "Create a task, set budget, skills, and deadline." },
   { icon: Lock, title: "Trustless escrow", body: "RITUAL reward locks on-chain until delivery or dispute." },
   { icon: PackageCheck, title: "Work delivered", body: "Provider bids, bonds, runs skills, submits result." },
-  { icon: BadgeCheck, title: "Review & resolve", body: "Rate 1–5 or open DisputeCouncil if needed." },
+  { icon: BadgeCheck, title: "Review & resolve", body: "Rate 1 to 5 or open DisputeCouncil if needed." },
   { icon: Coins, title: "Get paid", body: "Escrow + bond release to the provider. Instant settle." },
 ]
 
