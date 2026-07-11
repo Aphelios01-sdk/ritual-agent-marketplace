@@ -162,7 +162,7 @@ contract AllModulesTest is Test {
         vm.prank(agentA);
         market.startProcessing{value: 0.01 ether}(jid);
 
-        vm.roll(block.number + 200);   // past RESULT_TIMEOUT
+        vm.roll(block.number + market.resultTimeout() + 10);   // past resultTimeout
         uint256 balBefore = requester.balance;
         vm.prank(requester);
         market.claimTimeout(jid);

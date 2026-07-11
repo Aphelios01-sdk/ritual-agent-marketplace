@@ -2,32 +2,32 @@
 pragma solidity ^0.8.28;
 
 import "forge-std/Script.sol";
-import "../contracts/AgentStaking.sol";
-import "../contracts/AgentHeartbeat.sol";
 import "../contracts/JobMarketV2.sol";
 
-interface IRegistryAuth {
+interface IAuth {
     function setAuthorized(address who, bool ok) external;
+    function owner() external view returns (address);
 }
 
-/// @notice Deploy JobMarketV2 only (fix for getAgentSkillIds bug).
-///         Reuses existing AgentStaking + AgentHeartbeat + AgentRegistry on-chain.
+/// @notice Redeploy JobMarketV2 with longer bid/result windows on Ritual 1979.
 contract DeployJobMarketV2 is Script {
-    // Existing contracts on chain 1979
-    address constant REGISTRY   = 0x9dE50bd72941a418B8346d81F9c7217D5b0E0cF5;
-    address constant STAKING    = 0x8C2Ab37A6e9721fb2dE113acf0AC787eD937DdcB;
-    address constant HEARTBEAT  = 0x43581F6bE77b1050AA75db112280b46B75666Bc1;
+    address constant REGISTRY  = 0x058756c754CAD054571933be57E3AADD3c3660F4;
+    address constant STAKING   = 0xdF186d42Ffe22246dB6FaE8d3E6AB29735ecfF18;
+    address constant HEARTBEAT = 0x157802f666233ffd2723b0596fa89824D1aea5aB;
 
     function run() external {
         vm.startBroadcast();
 
         JobMarketV2 jobMarket = new JobMarketV2(REGISTRY, STAKING, HEARTBEAT);
-
-        try IRegistryAuth(REGISTRY).setAuthorized(address(jobMarket), true) {} catch {
-            console.log("WARN: could not authorize JobMarketV2 on registry (not owner?)");
-        }
-
         console.log("NEW_JOB_MARKET_V2=%s", address(jobMarket));
+        console.log("bidWindow=%s", jobMarket.bidWindow());
+        console.log("resultTimeout=%s", jobMarket.resultTimeout());
+
+        // Authorize new market on registry + staking (caller must be owner)
+        IAuth(REGISTRY).setAuthorized(address(jobMarket), true);
+        console.log("Authorized on registry");
+        IAuth(STAKING).setAuthorized(address(jobMarket), true);
+        console.log("Authorized on staking");
 
         vm.stopBroadcast();
     }

@@ -39,8 +39,13 @@ contract JobMarketV2 {
     address payable public treasury;
     uint256 public treasuryFeeBps = 250;
     uint256 public constant MAX_CONCURRENT = 3;     // rate limit per provider
-    uint256 public constant BID_WINDOW = 50;        // open bid window (blocks)
-    uint256 public constant RESULT_TIMEOUT = 150;   // blocks to submit result
+    /// @dev Defaults sized for real multi-bidder flow on Ritual (~block/2s):
+    ///      bidWindow 5000 ≈ 2.5–3h, resultTimeout 15000 ≈ 8h+. Owner can tune.
+    uint256 public bidWindow = 5000;
+    uint256 public resultTimeout = 15000;
+    // Back-compat aliases for tests / external readers
+    uint256 public constant BID_WINDOW = 5000;
+    uint256 public constant RESULT_TIMEOUT = 15000;
 
     uint256 public nextJobId;
     mapping(uint256 => JobRequest) public jobs;
@@ -72,9 +77,18 @@ contract JobMarketV2 {
         treasury = t;
     }
 
+    /// @notice Owner tunes bid open window and result submission timeout (in blocks).
+    function setWindows(uint256 _bidWindow, uint256 _resultTimeout) external {
+        require(msg.sender == owner, "only owner");
+        require(_bidWindow >= 50 && _bidWindow <= 1_000_000, "bid window");
+        require(_resultTimeout >= 100 && _resultTimeout <= 2_000_000, "result timeout");
+        bidWindow = _bidWindow;
+        resultTimeout = _resultTimeout;
+    }
+
     // ── Requester flow ──
 
-    /// @notice Agent A requests service. reward = max budget, escrowed. Bid window open for BID_WINDOW blocks.
+    /// @notice Agent A requests service. reward = max budget, escrowed. Bid window open for bidWindow blocks.
     function requestService(bytes32[] calldata requiredSkillIds, bytes calldata taskData) external payable returns (uint256) {
         require(msg.value > 0, "reward required");
         require(requiredSkillIds.length > 0, "skills required");
@@ -90,7 +104,7 @@ contract JobMarketV2 {
             status: JobStatus.OPEN,
             provider: address(0),
             resultData: "",
-            deadline: block.number + BID_WINDOW,
+            deadline: block.number + bidWindow,
             rating: 0,
             acceptedAt: 0
         });
@@ -157,7 +171,7 @@ contract JobMarketV2 {
         j.provider = b.provider;
         j.status = JobStatus.ASSIGNED;
         j.acceptedAt = block.number;
-        j.deadline = block.number + RESULT_TIMEOUT;  // reset deadline to result timeout
+        j.deadline = block.number + resultTimeout;  // reset deadline to result timeout
 
         // Refund the escrow difference on a discount bid (finalPrice < initial reward) — previously locked.
         if (finalPrice < j.reward) {

@@ -15,7 +15,8 @@ export const RITUAL_CHAIN = {
 export const CONTRACT_ADDRESSES = {
   agentRegistry: "0x058756c754CAD054571933be57E3AADD3c3660F4" as const,
   jobMarket: "0xe12075d1968EB7765f299da0D70cafE4864519C1" as const,
-  jobMarketV2: "0x34779E2Bc1B1f975Ca8c947515013412b30Cb020" as const,
+  // Redeployed 2026-07-11: bidWindow=5000, resultTimeout=15000 (was 50/150)
+  jobMarketV2: "0xD4FD366d2C6884C5c76890a489Fc876CF5695E9A" as const,
   agentFactory: "0xE1A3b0926413b2C9a20CA4dBF359a4e347ba99C9" as const,
   agentStaking: "0xdF186d42Ffe22246dB6FaE8d3E6AB29735ecfF18" as const,
   agentHeartbeat: "0x157802f666233ffd2723b0596fa89824D1aea5aB" as const,

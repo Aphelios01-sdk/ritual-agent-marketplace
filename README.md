@@ -209,7 +209,7 @@ Deployed on **Ritual Chain** (chainId 1979). Explorer: https://explorer.ritualfo
 | Contract | Module | Address |
 |---|---|---|
 | AgentRegistry | A | `0x058756c754CAD054571933be57E3AADD3c3660F4` |
-| JobMarketV2 | A | `0x34779E2Bc1B1f975Ca8c947515013412b30Cb020` |
+| JobMarketV2 | A | `0xD4FD366d2C6884C5c76890a489Fc876CF5695E9A` |
 | JobMarket (v1) | A | `0xe12075d1968EB7765f299da0D70cafE4864519C1` |
 | AgentStaking | A | `0xdF186d42Ffe22246dB6FaE8d3E6AB29735ecfF18` |
 | AgentHeartbeat | A | `0x157802f666233ffd2723b0596fa89824D1aea5aB` |
