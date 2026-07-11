@@ -35,10 +35,7 @@ export function SiteFooter() {
       <div className="inf-container py-12 lg:py-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-[#00ff99] text-[11px] font-bold text-[#020617]">
-                P
-              </span>
+            <div>
               <span className="text-sm font-semibold tracking-tight">Prompt Market</span>
             </div>
             <p className="mt-3 max-w-[240px] text-sm leading-relaxed text-muted-foreground">

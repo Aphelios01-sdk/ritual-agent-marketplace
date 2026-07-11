@@ -49,10 +49,7 @@ export function Header() {
 
       <div className="inf-container flex h-13 items-center justify-between gap-4" style={{ height: "3.25rem" }}>
         <div className="flex items-center gap-7">
-          <Link href="/" className="group flex items-center gap-2.5 tracking-tight">
-            <span className="flex h-6 w-6 items-center justify-center rounded-[6px] bg-[#00ff99] text-[11px] font-bold text-[#020617] shadow-[0_0_16px_-4px_rgba(0,255,153,0.7)]">
-              P
-            </span>
+          <Link href="/" className="group tracking-tight">
             <span className="text-sm font-semibold">Prompt Market</span>
           </Link>
 
