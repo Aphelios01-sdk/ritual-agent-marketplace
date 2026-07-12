@@ -29,6 +29,11 @@ import {
   getAgentWallet,
   submitBid as submitBidOnChain,
   assignJob as assignJobOnChain,
+  startProcessing,
+  submitResult,
+  rateProvider,
+  disputeJob,
+  claimTimeout,
 } from "@/lib/agent-wallet"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
@@ -109,9 +114,18 @@ export function JobDetail({
     error?: string
   } | null>(null)
 
+  const [actionBusy, setActionBusy] = useState(false)
+  const [actionMsg, setActionMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const [resultDraft, setResultDraft] = useState("")
+  const [rateVal, setRateVal] = useState(5)
+
   const resultHash = job.resultData ? computeResultHash(job.resultData) : ""
   const isRequester =
     walletAddr != null && walletAddr.toLowerCase() === job.requester.toLowerCase()
+  const isProvider =
+    walletAddr != null &&
+    job.provider !== "0x0000000000000000000000000000000000000000" &&
+    walletAddr.toLowerCase() === job.provider.toLowerCase()
   const maxRewardEth = Number(job.reward) / 1e18
 
   useEffect(() => {
@@ -203,6 +217,23 @@ export function JobDetail({
     }
   }
 
+  const runAction = async (label: string, fn: () => Promise<`0x${string}`>) => {
+    setActionBusy(true)
+    setActionMsg(null)
+    try {
+      const hash = await fn()
+      setActionMsg({ ok: true, text: `${label}: ${hash}` })
+      setTimeout(refresh, 1500)
+      setTimeout(refresh, 4000)
+      router.refresh()
+    } catch (e: unknown) {
+      const err = e as { shortMessage?: string; message?: string }
+      setActionMsg({ ok: false, text: err?.shortMessage || err?.message || String(e) })
+    } finally {
+      setActionBusy(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="animate-fade-up">
@@ -258,6 +289,118 @@ export function JobDetail({
               </div>
             </CardContent>
           </Card>
+
+          {/* Provider / requester actions */}
+          {(isProvider || isRequester) && (
+            <Card className="surface-card border-[#00ff99]/20">
+              <CardContent className="space-y-3 p-5">
+                <h3 className="font-semibold">On-chain actions</h3>
+                {isProvider && (job.status === "ASSIGNED" || job.status === "IN_PROGRESS") && (
+                  <div className="flex flex-wrap gap-2">
+                    {job.status === "ASSIGNED" && (
+                      <Button
+                        size="sm"
+                        className="rounded-full"
+                        disabled={actionBusy}
+                        onClick={() =>
+                          runAction("startProcessing", () =>
+                            startProcessing(
+                              getAgentWallet(),
+                              BigInt(job.id),
+                              job.bondRequired || BigInt(0),
+                            ),
+                          )
+                        }
+                      >
+                        Start processing
+                      </Button>
+                    )}
+                    <input
+                      value={resultDraft}
+                      onChange={(e) => setResultDraft(e.target.value)}
+                      placeholder="Result payload…"
+                      className="h-8 min-w-[160px] flex-1 rounded-full border border-border/60 bg-background px-3 text-xs"
+                    />
+                    <Button
+                      size="sm"
+                      className="rounded-full bg-[#00ff99] text-black hover:bg-[#00ff99]/90"
+                      disabled={actionBusy || !resultDraft.trim()}
+                      onClick={() =>
+                        runAction("submitResult", () =>
+                          submitResult(getAgentWallet(), BigInt(job.id), resultDraft),
+                        )
+                      }
+                    >
+                      Submit result
+                    </Button>
+                  </div>
+                )}
+                {isRequester && job.status === "COMPLETED" && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <select
+                      value={rateVal}
+                      onChange={(e) => setRateVal(Number(e.target.value))}
+                      className="h-8 rounded-full border border-border/60 bg-background px-2 text-xs"
+                    >
+                      {[5, 4, 3, 2, 1].map((r) => (
+                        <option key={r} value={r}>
+                          Rate {r}
+                        </option>
+                      ))}
+                    </select>
+                    <Button
+                      size="sm"
+                      className="rounded-full"
+                      disabled={actionBusy}
+                      onClick={() =>
+                        runAction("rateProvider", () =>
+                          rateProvider(getAgentWallet(), BigInt(job.id), BigInt(rateVal)),
+                        )
+                      }
+                    >
+                      Rate provider
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-full text-red-400"
+                      disabled={actionBusy}
+                      onClick={() =>
+                        runAction("dispute", () => disputeJob(getAgentWallet(), BigInt(job.id)))
+                      }
+                    >
+                      Dispute
+                    </Button>
+                  </div>
+                )}
+                {isRequester && (job.status === "ASSIGNED" || job.status === "IN_PROGRESS") && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="rounded-full"
+                    disabled={actionBusy}
+                    onClick={() =>
+                      runAction("claimTimeout", () =>
+                        claimTimeout(getAgentWallet(), BigInt(job.id)),
+                      )
+                    }
+                  >
+                    Claim timeout
+                  </Button>
+                )}
+                {actionMsg && (
+                  <p
+                    className={cn(
+                      "break-all font-mono text-[11px]",
+                      actionMsg.ok ? "text-[#00ff99]" : "text-red-400",
+                    )}
+                  >
+                    {actionMsg.text}
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           {job.resultData && (
             <Card className="surface-card border-green-500/30">

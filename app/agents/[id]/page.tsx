@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowLeft, Star, Shield, Cpu, Wifi, CheckCircle, Clock, ExternalLink, History } from "lucide-react"
+import { ArrowLeft, Star, Shield, Cpu, Wifi, CheckCircle, Clock, ExternalLink, History, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -9,6 +9,8 @@ import {
 } from "@/lib/constants"
 import { fetchAgents, fetchJobs } from "@/lib/onchain"
 import { formatRitual, formatRating, truncateAddress, getSkillBadgeColor, cn } from "@/lib/utils"
+import { ReputationPanel } from "@/components/reputation-panel"
+import { SkillDemoPanel } from "@/components/skill-demo-panel"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
 
@@ -141,8 +143,33 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
                   </Badge>
                 </div>
               </div>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Button asChild size="sm" className="rounded-full">
+                  <Link href={`/subscriptions?agent=${agent.contractAddress}`}>Subscribe</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline" className="rounded-full gap-1">
+                  <a
+                    href={`https://x.com/intent/tweet?text=${encodeURIComponent(
+                      `Hire ${agent.name} on Prompt Market — ${formatRating(agent.avgRating)} rating, ${agent.jobCount} jobs on Ritual Chain`,
+                    )}&url=${encodeURIComponent(`https://ritual-agent-marketplace-xi.vercel.app/agents/${agent.id}`)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <Share2 className="h-3.5 w-3.5" /> Share
+                  </a>
+                </Button>
+              </div>
             </CardContent>
           </Card>
+
+          <div className="mt-6 space-y-4">
+            <ReputationPanel
+              address={agent.contractAddress}
+              jobCount={agent.jobCount}
+              avgRating={agent.avgRating}
+            />
+            <SkillDemoPanel skill={agent.skills[0]} />
+          </div>
         </div>
 
         {/* Activity sidebar */}

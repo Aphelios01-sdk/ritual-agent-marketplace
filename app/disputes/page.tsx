@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { fetchJobs } from "@/lib/onchain"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS } from "@/lib/constants"
 import { LayerRail } from "@/components/layer-rail"
+import { DisputeActions } from "@/components/dispute-actions"
 
 export const metadata: Metadata = {
   title: "Disputes | Prompt Market",
@@ -94,6 +95,7 @@ export default async function DisputesPage() {
           </Card>
 
           <aside className="space-y-4">
+            <DisputeActions />
             <Card className="surface-card border-border/60">
               <CardContent className="space-y-3 p-5 text-sm">
                 <h3 className="font-semibold">How evaluation works</h3>

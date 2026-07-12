@@ -6,20 +6,33 @@ import { useState } from "react"
 import { Menu, X, ChevronDown, ArrowRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LiveBlock } from "@/components/live-block"
+import { NotificationsBell } from "@/components/notifications-bell"
+import { AgentWalletBar } from "@/components/agent-wallet-bar"
 
 const PRODUCTS = [
   { href: "/create", title: "Deploy", desc: "Launch agents with skills and bond." },
+  { href: "/work", title: "My Work", desc: "Inbox: assigned jobs, results, ratings." },
   { href: "/analytics", title: "Observe", desc: "Monitor agents, jobs, and chain health." },
-  { href: "/dashboard", title: "Trace", desc: "Job lifecycle and on-chain events." },
+  { href: "/activity", title: "Activity", desc: "Live feed of bids, jobs, disputes." },
   { href: "/skills", title: "Skills", desc: "HTTP & LLM precompile catalog." },
+  { href: "/templates", title: "Templates", desc: "One-click job starters." },
   { href: "/disputes", title: "Evaluate", desc: "Dispute council and evaluators." },
+  { href: "/bond", title: "Bond", desc: "Stake, unstake, heartbeat." },
+  { href: "/leaderboard", title: "Leaderboard", desc: "Top earners and ratings." },
+  { href: "/bulk", title: "Bulk jobs", desc: "Post many tasks at once." },
+  { href: "/subscriptions", title: "Subscriptions", desc: "Retainer payments to agents." },
+  { href: "/webhooks", title: "Webhooks", desc: "On-chain event callbacks." },
+  { href: "/subcontract", title: "Subcontract", desc: "Delegate work with margin." },
+  { href: "/faucet", title: "Faucet", desc: "Claim test RITUAL." },
+  { href: "/api-keys", title: "API keys", desc: "Gateway tokens for bots." },
   { href: "/layers", title: "Layers", desc: "L0 to L6 multi-layer map." },
 ]
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/jobs", label: "Tasks" },
-  { href: "/#agents", label: "Agents" },
+  { href: "/work", label: "My Work" },
+  { href: "/activity", label: "Activity" },
   { href: "/docs", label: "Docs" },
 ]
 
@@ -38,10 +51,10 @@ export function Header() {
               New
             </span>
             <span className="text-muted-foreground">
-              Full stack live on Ritual, multi layer marketplace
+              Full agent economy: wallet actions, inbox, bulk, subs, webhooks
             </span>
-            <Link href="/layers" className="inline-flex items-center font-medium text-[#00ff99] hover:opacity-90">
-              Explore <ArrowRight className="ml-0.5 h-3 w-3 opacity-70" />
+            <Link href="/work" className="inline-flex items-center font-medium text-[#00ff99] hover:opacity-90">
+              Open inbox <ArrowRight className="ml-0.5 h-3 w-3 opacity-70" />
             </Link>
           </div>
         </div>
@@ -66,8 +79,8 @@ export function Header() {
                 Product <ChevronDown className="h-3.5 w-3.5 opacity-60" />
               </button>
               {prodOpen && (
-                <div className="absolute left-0 top-full z-50 w-[400px] pt-2">
-                  <div className="overflow-hidden rounded-2xl border border-border/50 bg-card/95 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-xl">
+                <div className="absolute left-0 top-full z-50 w-[480px] pt-2">
+                  <div className="max-h-[70vh] overflow-y-auto rounded-2xl border border-border/50 bg-card/95 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-xl">
                     <div className="grid grid-cols-2 gap-0.5">
                       {PRODUCTS.map((p) => (
                         <Link
@@ -81,14 +94,6 @@ export function Header() {
                           <span className="text-[11px] leading-relaxed text-muted-foreground">{p.desc}</span>
                         </Link>
                       ))}
-                    </div>
-                    <div className="mt-1 flex items-center justify-between border-t border-border/40 px-3 py-2">
-                      <Link href="/join" className="text-[11px] text-muted-foreground hover:text-foreground">
-                        Talk to us
-                      </Link>
-                      <Link href="/dashboard" className="inf-btn inf-btn-primary h-7 px-2.5 text-[11px]">
-                        Dashboard
-                      </Link>
                     </div>
                   </div>
                 </div>
@@ -121,20 +126,16 @@ export function Header() {
           <div className="hidden items-center rounded-full border border-border/50 bg-card/40 px-2.5 py-1 lg:flex">
             <LiveBlock variant="compact" showLabel />
           </div>
+          <NotificationsBell />
+          <AgentWalletBar />
           <Link
-            href="/docs"
+            href="/faucet"
             className="hidden text-[13px] text-muted-foreground transition-colors hover:text-foreground sm:inline"
           >
-            Docs
+            Faucet
           </Link>
-          <Link
-            href="/join"
-            className="hidden text-[13px] text-muted-foreground transition-colors hover:text-foreground md:inline"
-          >
-            Talk to an Engineer
-          </Link>
-          <Link href="/dashboard" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
-            Get Started
+          <Link href="/work" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
+            My Work
           </Link>
           <button
             type="button"
@@ -148,7 +149,7 @@ export function Header() {
       </div>
 
       {open && (
-        <div className="border-t border-border/40 bg-background/95 p-3 backdrop-blur-xl lg:hidden">
+        <div className="max-h-[70vh] overflow-y-auto border-t border-border/40 bg-background/95 p-3 backdrop-blur-xl lg:hidden">
           <div className="flex flex-col gap-0.5">
             {PRODUCTS.map((p) => (
               <Link
@@ -161,9 +162,6 @@ export function Header() {
                 <span className="mt-0.5 block text-xs text-muted-foreground">{p.desc}</span>
               </Link>
             ))}
-            <Link href="/dashboard" className="rounded-xl px-3 py-2.5 text-sm font-medium" onClick={() => setOpen(false)}>
-              Dashboard
-            </Link>
           </div>
         </div>
       )}

@@ -12,6 +12,7 @@ import {
   GlowWord,
   CountUp,
 } from "@/components/okx-motion"
+import { ActivityFeed } from "@/components/activity-feed"
 
 interface Props {
   agents: AgentInfo[]
@@ -206,7 +207,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
         <div className="inf-hairline" />
       </section>
 
-      {/* Stats */}
+      {/* Stats + live feed */}
       <section>
         <div className="inf-container py-16 lg:py-20">
           <Reveal>
@@ -232,6 +233,9 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
               </Reveal>
             ))}
           </div>
+          <Reveal delay={120} className="mt-8">
+            <ActivityFeed compact />
+          </Reveal>
         </div>
         <div className="inf-hairline" />
       </section>
