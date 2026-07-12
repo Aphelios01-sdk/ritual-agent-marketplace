@@ -6,33 +6,86 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const
+
+export function isZeroAddress(address?: string | null): boolean {
+  if (!address) return true
+  return address.toLowerCase() === ZERO_ADDRESS
+}
+
+/**
+ * Short human address: 0xA29D…Ff5 (never full wei-style dumps).
+ * Zero address → "unassigned".
+ */
+export function shortAddress(address?: string | null, left = 4, right = 3): string {
+  if (!address) return "—"
+  if (isZeroAddress(address)) return "unassigned"
+  const a = address.trim()
+  if (a.length < left + right + 2) return a
+  return `${a.slice(0, 2 + left)}…${a.slice(-right)}`
+}
+
+/** @deprecated use shortAddress — kept for call sites */
 export function truncateAddress(address: string, chars = 4): string {
-  return `${address.slice(0, chars + 2)}...${address.slice(-chars)}`
+  return shortAddress(address, chars, chars)
 }
 
-export function formatRitual(wei: bigint | string): string {
-  if (typeof wei === "string") wei = BigInt(wei)
-  const amount = Number(wei) / 1e18
-  // Always express in RITUAL with a precision appropriate to the magnitude — no Gwei,
-  // which is confusing in a marketplace UI.
-  if (amount >= 1000) return `${amount.toLocaleString("en-US", { maximumFractionDigits: 0 })} RITUAL`
-  if (amount >= 1) return `${amount.toLocaleString("en-US", { maximumFractionDigits: 2 })} RITUAL`
-  if (amount >= 0.001) return `${amount.toFixed(4)} RITUAL`
-  if (amount > 0) return `${amount.toFixed(8)} RITUAL`
-  return "0 RITUAL"
+/**
+ * Human-readable RIT amount from wei. Never shows raw wei.
+ * Unit label: "RIT" (user-facing ticker).
+ */
+export function formatRitual(wei: bigint | string | number): string {
+  const amount = toEthNumber(wei)
+  if (!Number.isFinite(amount) || amount === 0) return "0 RIT"
+  if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(2)}M RIT`
+  if (amount >= 1000) return `${amount.toLocaleString("en-US", { maximumFractionDigits: 1 })} RIT`
+  if (amount >= 1) return `${amount.toLocaleString("en-US", { maximumFractionDigits: 4 })} RIT`
+  if (amount >= 0.0001) return `${amount.toFixed(4)} RIT`
+  // dust but non-zero — avoid looking like wei
+  return `<0.0001 RIT`
 }
 
-// Compact variant for tight UI (stat cards, badges) — drops the unit when very small.
-export function formatRitualCompact(wei: bigint | string): string {
-  if (typeof wei === "string") wei = BigInt(wei)
-  const amount = Number(wei) / 1e18
-  if (amount >= 1000) return `${(amount / 1000).toFixed(1)}K`
-  if (amount >= 1) return amount.toFixed(1)
-  if (amount >= 0.001) return amount.toFixed(3)
-  return amount.toFixed(5)
+/** Amount only (no unit), for composing custom labels. */
+export function formatRitualAmount(wei: bigint | string | number): string {
+  const amount = toEthNumber(wei)
+  if (!Number.isFinite(amount) || amount === 0) return "0"
+  if (amount >= 1_000_000) return `${(amount / 1_000_000).toFixed(2)}M`
+  if (amount >= 1000) return amount.toLocaleString("en-US", { maximumFractionDigits: 1 })
+  if (amount >= 1) return amount.toLocaleString("en-US", { maximumFractionDigits: 4 })
+  if (amount >= 0.0001) return amount.toFixed(4)
+  return "<0.0001"
+}
+
+/** Alias preferred in new UI copy */
+export const formatRit = formatRitual
+
+export function formatRitualCompact(wei: bigint | string | number): string {
+  return formatRitualAmount(wei)
+}
+
+function toEthNumber(wei: bigint | string | number): number {
+  if (typeof wei === "number") {
+    // if someone already passed eth units by mistake (< 1e12 treat as eth)
+    if (Math.abs(wei) < 1e12) return wei
+    return wei / 1e18
+  }
+  try {
+    const b = typeof wei === "bigint" ? wei : BigInt(wei || "0")
+    // use string divide for precision on large values
+    const neg = b < BigInt(0)
+    const abs = neg ? -b : b
+    const whole = abs / BigInt(1e18)
+    const frac = abs % BigInt(1e18)
+    const fracStr = frac.toString().padStart(18, "0").slice(0, 8)
+    const n = Number(`${whole}.${fracStr}`)
+    return neg ? -n : n
+  } catch {
+    return 0
+  }
 }
 
 export function formatRating(rating: number): string {
+  if (!Number.isFinite(rating)) return "—"
   return rating.toFixed(1)
 }
 
@@ -40,7 +93,6 @@ export function formatBond(wei: bigint | string): string {
   return formatRitual(wei)
 }
 
-// HTTP/LLM colored separately — LLM uses the primary accent (teal), HTTP blue. Not AI-purple.
 export function getSkillBadgeColor(type: "HTTP" | "LLM"): string {
   return type === "HTTP"
     ? "bg-blue-500/10 text-blue-500 dark:text-blue-400"

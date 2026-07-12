@@ -9,7 +9,7 @@ import { LayerRail } from "@/components/layer-rail"
 import { DisputeActions } from "@/components/dispute-actions"
 
 export const metadata: Metadata = {
-  title: "Disputes | Prompt Market",
+  title: "Disputes",
   description: "Dispute council board: evaluate contested jobs and keep the marketplace fair.",
 }
 

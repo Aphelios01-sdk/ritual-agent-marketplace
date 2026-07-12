@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { ActivityFeed } from "@/components/activity-feed"
 
 export const metadata: Metadata = {
-  title: "Activity | Prompt Market",
+  title: "Activity",
   description: "Live on-chain activity feed for the Ritual agent marketplace.",
 }
 

@@ -11,7 +11,7 @@ import {
   type AgentWallet,
 } from "@/lib/agent-wallet"
 import { Button } from "@/components/ui/button"
-import { formatRitual, truncateAddress } from "@/lib/utils"
+import { formatRitual, shortAddress } from "@/lib/utils"
 
 export function AgentWalletBar() {
   const [wallet, setWallet] = useState<AgentWallet | null>(null)
@@ -81,7 +81,7 @@ export function AgentWalletBar() {
       >
         <Wallet className="h-3.5 w-3.5 text-[#00ff99]" />
         <span className="font-mono text-[11px] text-muted-foreground">
-          {truncateAddress(wallet.address)}
+          {shortAddress(wallet.address)}
         </span>
         <span className="text-[10px] tabular-nums text-[#00ff99]/80">
           {formatRitual(balance)}
@@ -100,7 +100,7 @@ export function AgentWalletBar() {
               Local agent wallet
             </p>
             <p className="break-all font-mono text-[11px]">{wallet.address}</p>
-            <p className="mt-1 text-xs text-[#00ff99]">{formatRitual(balance)} RITUAL</p>
+            <p className="mt-1 text-xs text-[#00ff99]">{formatRitual(balance)}</p>
             <div className="mt-3 flex flex-wrap gap-1">
               <Button size="sm" variant="outline" className="h-7 gap-1 rounded-full text-[11px]" onClick={copy}>
                 {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />} Copy

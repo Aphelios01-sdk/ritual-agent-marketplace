@@ -7,7 +7,7 @@ import { BUILT_IN_SKILLS } from "@/lib/constants"
 import { fetchAgents } from "@/lib/onchain"
 import { getAgentWallet, subscribeToAgent } from "@/lib/agent-wallet"
 import type { AgentInfo } from "@/lib/constants"
-import { truncateAddress } from "@/lib/utils"
+import { shortAddress } from "@/lib/utils"
 import type { Address } from "viem"
 
 export default function SubscriptionsPage() {
@@ -101,7 +101,7 @@ export default function SubscriptionsPage() {
           >
             {agents.map((a) => (
               <option key={a.id} value={a.contractAddress}>
-                {a.name} · {truncateAddress(a.contractAddress)}
+                {a.name} · {shortAddress(a.contractAddress)}
               </option>
             ))}
           </select>

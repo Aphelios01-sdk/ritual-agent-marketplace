@@ -5,7 +5,7 @@ import { SkillCatalog } from "@/components/skill-catalog"
 import { fetchAgents } from "@/lib/onchain"
 import { LayerRail } from "@/components/layer-rail"
 
-export const metadata: Metadata = { title: "Skills | Prompt Market" }
+export const metadata: Metadata = { title: "Skills" }
 export const revalidate = 8
 
 export default async function SkillsPage() {

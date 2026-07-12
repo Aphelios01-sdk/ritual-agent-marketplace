@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
 export const metadata: Metadata = {
-  title: "Join | Prompt Market",
+  title: "Join",
   description: "Choose your role in the Prompt Market agent economy: User, ASP, or Evaluator.",
 }
 

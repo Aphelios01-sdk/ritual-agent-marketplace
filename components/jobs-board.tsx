@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { BUILT_IN_SKILLS, CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob, type SerializedJob, deserializeJob } from "@/lib/onchain"
-import { cn, formatRitual, truncateAddress } from "@/lib/utils"
+import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
 import { getAgentWallet, postJob, type AgentWallet } from "@/lib/agent-wallet"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
@@ -53,7 +53,7 @@ function AgentWalletBadge() {
       className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-2.5 py-1 font-mono text-[11px] text-primary transition-colors hover:border-primary/50"
     >
       <Key className="h-3 w-3" />
-      {truncateAddress(wallet.address)}
+      {shortAddress(wallet.address)}
       {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
     </button>
   )
@@ -128,7 +128,7 @@ function PostJobCard({ onPosted }: { onPosted?: () => void }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-muted-foreground">Reward (RITUAL), held in escrow</span>
+            <span className="mb-1 block text-muted-foreground">Reward (RIT), held in escrow</span>
             <input
               type="number"
               min="0"
@@ -145,7 +145,7 @@ function PostJobCard({ onPosted }: { onPosted?: () => void }) {
               </>
             ) : (
               <>
-                <Plus className="h-4 w-4" /> Post job ({reward || "0"} RITUAL)
+                <Plus className="h-4 w-4" /> Post job ({reward || "0"} RIT)
               </>
             )}
           </Button>
@@ -307,26 +307,69 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
           </div>
         </div>
 
-        {tab === "available" && (
+        {tab === "available" && counts.open > 0 && (
           <p className="mb-3 text-[11px] text-muted-foreground">
             Only open jobs are listed here. Finished and in-progress jobs are hidden from this tab.
           </p>
         )}
 
-        {visible.length === 0 ? (
+        {counts.total === 0 ? (
+          <Card className="surface-card border-border/60 border-dashed">
+            <CardContent className="flex flex-col items-center gap-3 p-12 text-center">
+              <Inbox className="h-8 w-8 text-muted-foreground/50" />
+              <div>
+                <p className="text-sm font-medium text-foreground">No jobs on-chain yet</p>
+                <p className="mt-1 max-w-sm text-xs text-muted-foreground">
+                  Open, active, and done are all empty. Post the first task with a RIT reward — agents
+                  will bid from the Available tab.
+                </p>
+              </div>
+              <div className="mt-1 flex flex-wrap justify-center gap-2 text-[11px] text-muted-foreground">
+                <span className="rounded-full border border-border/50 px-2.5 py-1">Open 0</span>
+                <span className="rounded-full border border-border/50 px-2.5 py-1">Active 0</span>
+                <span className="rounded-full border border-border/50 px-2.5 py-1">Done 0</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground">
+                Use the form on the left to post a job from your agent wallet.
+              </p>
+            </CardContent>
+          </Card>
+        ) : visible.length === 0 ? (
           <Card className="surface-card border-border/60">
             <CardContent className="flex flex-col items-center gap-2 p-12 text-center text-muted-foreground">
               <Inbox className="h-6 w-6" />
-              <p className="text-sm">
+              <p className="text-sm font-medium text-foreground">
                 {tab === "available"
-                  ? "No open jobs right now. Post one or check Active / Done."
-                  : "Nothing in this filter yet."}
+                  ? "No open jobs right now"
+                  : tab === "active"
+                    ? "No jobs in progress"
+                    : tab === "done"
+                      ? "No completed jobs yet"
+                      : "Nothing in this filter"}
               </p>
+              <p className="max-w-sm text-xs">
+                {tab === "available"
+                  ? "Post a task or switch to In progress / Done to see other pipeline stages."
+                  : "Try another tab, or post a new job to seed the market."}
+              </p>
+              <div className="mt-2 flex flex-wrap justify-center gap-2 text-[11px]">
+                <span className="rounded-full border border-border/50 px-2.5 py-1">
+                  Open {counts.open}
+                </span>
+                <span className="rounded-full border border-border/50 px-2.5 py-1">
+                  Active {counts.active}
+                </span>
+                <span className="rounded-full border border-border/50 px-2.5 py-1">
+                  Done {counts.done}
+                </span>
+              </div>
             </CardContent>
           </Card>
         ) : (
           <div className="space-y-3">
-            {visible.map((job) => (
+            {visible.map((job) => {
+              const hasProvider = !isZeroAddress(job.provider)
+              return (
               <Card
                 key={job.id}
                 className="surface-card border-border/60 transition-colors hover:border-primary/30"
@@ -344,6 +387,11 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
                         >
                           {JOB_STATUS_LABELS[job.status]}
                         </span>
+                        {job.status === "OPEN" && !hasProvider && (
+                          <span className="rounded-full border border-border/50 px-2 py-0.5 text-[10px] text-muted-foreground">
+                            awaiting provider
+                          </span>
+                        )}
                       </div>
                       <p className="truncate text-sm">
                         {job.taskData || (
@@ -353,14 +401,22 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
                       <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                         <span>
                           Requester{" "}
-                          <span className="font-mono">{truncateAddress(job.requester)}</span>
-                        </span>
-                        {job.provider !== "0x0000000000000000000000000000000000000000" && (
-                          <span>
-                            Provider{" "}
-                            <span className="font-mono">{truncateAddress(job.provider)}</span>
+                          <span className="font-mono text-foreground/80" title={job.requester}>
+                            {shortAddress(job.requester)}
                           </span>
-                        )}
+                        </span>
+                        <span>
+                          Provider{" "}
+                          <span
+                            className={cn(
+                              "font-mono",
+                              hasProvider ? "text-foreground/80" : "text-muted-foreground/70",
+                            )}
+                            title={hasProvider ? job.provider : "No provider until a bid is accepted"}
+                          >
+                            {hasProvider ? shortAddress(job.provider) : "unassigned"}
+                          </span>
+                        </span>
                         <Link href={`/jobs/${job.id}`} className="text-primary hover:underline">
                           {job.status === "OPEN" ? "bid / review →" : "details →"}
                         </Link>
@@ -374,13 +430,16 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
                         </a>
                       </div>
                     </div>
-                    <span className="shrink-0 font-mono text-sm font-medium text-primary">
-                      {formatRitual(job.reward)}
-                    </span>
+                    <div className="shrink-0 text-right">
+                      <p className="font-mono text-sm font-semibold tabular-nums text-primary">
+                        {formatRitual(job.reward)}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">escrow</p>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         )}
       </div>

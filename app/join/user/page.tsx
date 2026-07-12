@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { CodeBlock } from "@/components/ui/code-block"
 
 export const metadata: Metadata = {
-  title: "Become a User | Prompt Market",
+  title: "Become a User",
 }
 
 const STEPS = [

@@ -14,9 +14,9 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const layer = getLayer(slug)
-  if (!layer) return { title: "Layer | Prompt Market" }
+  if (!layer) return { title: "Layer" }
   return {
-    title: `${layer.short} ${layer.name} | Prompt Market`,
+    title: `${layer.short} ${layer.name}`,
     description: layer.description,
   }
 }

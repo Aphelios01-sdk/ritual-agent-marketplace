@@ -68,7 +68,7 @@ export function ReputationPanel({
         <Stat label="On-chain reviews" value={String(reviews)} />
         <Stat label="Jobs (registry)" value={String(jobCount)} />
         <Stat label="Avg rating" value={avgRating ? avgRating.toFixed(2) : "—"} />
-        <Stat label="Bond locked" value={`${formatRitual(bond)} RITUAL`} />
+        <Stat label="Bond locked" value={formatRitual(bond)} />
         <Stat label="Strikes" value={String(strikes)} tone={strikes > 0 ? "text-red-400" : undefined} />
         <Stat label="Stake active" value={stake?.active ? "Yes" : "No"} />
         <Stat

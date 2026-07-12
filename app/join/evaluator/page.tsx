@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES } from "@/lib/constants"
 
 export const metadata: Metadata = {
-  title: "Become an Evaluator | Prompt Market",
+  title: "Become an Evaluator",
 }
 
 const STEPS = [

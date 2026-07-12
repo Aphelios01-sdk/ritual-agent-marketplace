@@ -12,7 +12,7 @@ import {
   pingHeartbeat,
   type AgentWallet,
 } from "@/lib/agent-wallet"
-import { formatRitual, truncateAddress } from "@/lib/utils"
+import { formatRitual, shortAddress } from "@/lib/utils"
 
 export default function BondPage() {
   const [wallet, setWallet] = useState<AgentWallet | null>(null)
@@ -67,7 +67,7 @@ export default function BondPage() {
       </p>
 
       {wallet && (
-        <p className="mt-4 font-mono text-xs text-[#00ff99]">{truncateAddress(wallet.address, 6)}</p>
+        <p className="mt-4 font-mono text-xs text-[#00ff99]">{shortAddress(wallet.address, 6)}</p>
       )}
 
       <div className="mt-8 grid gap-3 sm:grid-cols-2">

@@ -6,7 +6,7 @@ import { LayerRail } from "@/components/layer-rail"
 import { Card, CardContent } from "@/components/ui/card"
 
 export const metadata: Metadata = {
-  title: "Layers | Prompt Market",
+  title: "Layers",
   description:
     "Seven independent marketplace layers: protocol, identity, discovery, matching, execution, settlement, governance.",
 }

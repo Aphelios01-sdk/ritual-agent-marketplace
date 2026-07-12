@@ -26,7 +26,7 @@ import {
   type AgentWallet,
 } from "@/lib/agent-wallet"
 import { type SerializedJob, deserializeJob } from "@/lib/onchain"
-import { formatRitual, truncateAddress, cn } from "@/lib/utils"
+import { formatRitual, shortAddress, cn } from "@/lib/utils"
 import type { JobStatus } from "@/lib/constants"
 
 const STORAGE_KEY = "pm_work_agent_address"
@@ -348,13 +348,13 @@ function WorkPageInner() {
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
             <span>
               Viewing:{" "}
-              <span className="font-mono text-[#00ff99]">{truncateAddress(addr, 6)}</span>
+              <span className="font-mono text-[#00ff99]">{shortAddress(addr, 6)}</span>
             </span>
             {wallet && (
               <span>
                 Signer:{" "}
                 <span className="font-mono text-foreground/80">
-                  {truncateAddress(wallet.address, 4)}
+                  {shortAddress(wallet.address, 4)}
                 </span>
                 {wallet.address.toLowerCase() === addr ? (
                   <span className="ml-1 text-[#00ff99]">· can sign</span>
@@ -415,7 +415,7 @@ function WorkPageInner() {
             <div className="flex flex-col items-center gap-2 rounded-2xl border border-border/60 py-16 text-center">
               <Inbox className="h-8 w-8 text-muted-foreground/50" />
               <p className="text-sm text-muted-foreground">
-                No jobs for {truncateAddress(addr, 6)} in this tab
+                No jobs for {shortAddress(addr, 6)} in this tab
               </p>
               <Button asChild variant="outline" className="mt-2 rounded-full">
                 <Link href="/jobs">Browse tasks</Link>
@@ -455,8 +455,8 @@ function WorkPageInner() {
                         </div>
                         <p className="mt-2 line-clamp-2 text-sm">{j.taskData || "(empty task)"}</p>
                         <p className="mt-1 font-mono text-[10px] text-muted-foreground">
-                          req {truncateAddress(j.requester)}
-                          {j.provider !== ZERO && ` · prov ${truncateAddress(j.provider)}`}
+                          req {shortAddress(j.requester)}
+                          {j.provider !== ZERO && ` · prov ${shortAddress(j.provider)}`}
                         </p>
                       </div>
                       <div className="flex flex-wrap gap-2">

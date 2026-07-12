@@ -8,8 +8,7 @@ import {
 } from "lucide-react"
 import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
 import { JOB_STATUS_LABELS } from "@/lib/constants"
-import { formatRating } from "@/lib/utils"
-import { cn } from "@/lib/utils"
+import { formatRating, formatRitual, shortAddress, isZeroAddress, cn } from "@/lib/utils"
 import { LiveBlock } from "@/components/live-block"
 import { useLiveBlock } from "@/hooks/use-live-block"
 import { AnimatedNumber } from "@/components/ui/animated-number"
@@ -145,37 +144,76 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                   Observe <ArrowUpRight className="ml-0.5 h-3 w-3" />
                 </Link>
               </div>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                {[
-                  { label: "Open", n: open, c: "bg-chart-3" },
-                  { label: "Active", n: active, c: "bg-chart-1" },
-                  { label: "Done", n: done, c: "bg-chart-2" },
-                  { label: "Disputed", n: disputed, c: "bg-destructive" },
-                ].map((s) => (
-                  <div key={s.label} className="rounded-xl border border-border/40 bg-background/40 p-3">
-                    <div className="mb-2 h-1 w-full overflow-hidden rounded-full bg-muted">
-                      <div
-                        className={cn("h-full rounded-full", s.c)}
-                        style={{ width: `${Math.min(100, (s.n / Math.max(1, jobs.length)) * 100 || 4)}%` }}
-                      />
-                    </div>
-                    <p className="text-lg font-semibold tabular-nums tracking-tight">{s.n}</p>
-                    <p className="text-[10px] text-muted-foreground">{s.label}</p>
+              {open === 0 && active === 0 && done === 0 ? (
+                <div className="rounded-xl border border-dashed border-border/50 bg-background/30 px-4 py-8 text-center">
+                  <p className="text-sm font-medium tracking-tight">Pipeline is empty</p>
+                  <p className="mx-auto mt-1.5 max-w-sm text-[12px] leading-relaxed text-muted-foreground">
+                    Open, active, and done are all zero. Post a task or deploy an agent to seed the
+                    market — this board fills from on-chain JobMarketV2 activity.
+                  </p>
+                  <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+                    <span className="rounded-full border border-border/50 px-2.5 py-1 text-[11px] text-muted-foreground">
+                      Open 0
+                    </span>
+                    <span className="rounded-full border border-border/50 px-2.5 py-1 text-[11px] text-muted-foreground">
+                      Active 0
+                    </span>
+                    <span className="rounded-full border border-border/50 px-2.5 py-1 text-[11px] text-muted-foreground">
+                      Done 0
+                    </span>
                   </div>
-                ))}
-              </div>
-              <div className="mt-5 flex h-20 items-end gap-[3px]">
-                {Array.from({ length: 40 }).map((_, i) => {
-                  const h = 18 + ((i * 19 + agents.length * 7 + jobs.length * 3) % 72)
-                  return (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-[2px] bg-foreground/[0.08] transition-colors hover:bg-foreground/20"
-                      style={{ height: `${h}%` }}
-                    />
-                  )
-                })}
-              </div>
+                  <div className="mt-4 flex flex-wrap justify-center gap-2">
+                    <Link href="/jobs" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
+                      Post a task
+                    </Link>
+                    <Link href="/create" className="inf-btn inf-btn-ghost h-8 px-3 text-xs">
+                      Deploy agent
+                    </Link>
+                    <Link href="/templates" className="inf-btn inf-btn-ghost h-8 px-3 text-xs">
+                      Use template
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                    {[
+                      { label: "Open", n: open, c: "bg-chart-3" },
+                      { label: "Active", n: active, c: "bg-chart-1" },
+                      { label: "Done", n: done, c: "bg-chart-2" },
+                      { label: "Disputed", n: disputed, c: "bg-destructive" },
+                    ].map((s) => (
+                      <div
+                        key={s.label}
+                        className="rounded-xl border border-border/40 bg-background/40 p-3"
+                      >
+                        <div className="mb-2 h-1 w-full overflow-hidden rounded-full bg-muted">
+                          <div
+                            className={cn("h-full rounded-full", s.c)}
+                            style={{
+                              width: `${Math.min(100, (s.n / Math.max(1, jobs.length)) * 100 || 4)}%`,
+                            }}
+                          />
+                        </div>
+                        <p className="text-lg font-semibold tabular-nums tracking-tight">{s.n}</p>
+                        <p className="text-[10px] text-muted-foreground">{s.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-5 flex h-20 items-end gap-[3px]">
+                    {Array.from({ length: 40 }).map((_, i) => {
+                      const h = 18 + ((i * 19 + agents.length * 7 + jobs.length * 3) % 72)
+                      return (
+                        <div
+                          key={i}
+                          className="flex-1 rounded-[2px] bg-foreground/[0.08] transition-colors hover:bg-foreground/20"
+                          style={{ height: `${h}%` }}
+                        />
+                      )
+                    })}
+                  </div>
+                </>
+              )}
             </div>
 
             <div className="inf-card p-4 lg:col-span-2">
@@ -187,7 +225,15 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
               </div>
               <ul className="space-y-0.5">
                 {recentJobs.length === 0 && (
-                  <li className="py-10 text-center text-xs text-muted-foreground">No tasks yet</li>
+                  <li className="flex flex-col items-center gap-2 py-10 text-center">
+                    <p className="text-xs font-medium text-foreground">No tasks on-chain</p>
+                    <p className="max-w-[16rem] text-[11px] text-muted-foreground">
+                      When jobs are posted they show here with requester short address and RIT reward.
+                    </p>
+                    <Link href="/jobs" className="text-[11px] text-[#00ff99] hover:underline">
+                      Open task board →
+                    </Link>
+                  </li>
                 )}
                 {recentJobs.map((j) => (
                   <li key={j.id}>
@@ -196,8 +242,19 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                       className="flex items-start justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40"
                     >
                       <div className="min-w-0">
-                        <p className="text-[13px] font-medium tracking-tight">Job #{j.id}</p>
-                        <p className="truncate text-[11px] text-muted-foreground">{j.taskData || "n/a"}</p>
+                        <p className="text-[13px] font-medium tracking-tight">
+                          Job #{j.id}{" "}
+                          <span className="font-mono text-[11px] font-normal text-[#00ff99]/90">
+                            {formatRitual(j.reward)}
+                          </span>
+                        </p>
+                        <p className="truncate text-[11px] text-muted-foreground">
+                          {j.taskData || "n/a"}
+                        </p>
+                        <p className="mt-0.5 font-mono text-[10px] text-muted-foreground/80">
+                          {shortAddress(j.requester)}
+                          {!isZeroAddress(j.provider) ? ` → ${shortAddress(j.provider)}` : " · awaiting provider"}
+                        </p>
                       </div>
                       <span className="shrink-0 rounded-md border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                         {JOB_STATUS_LABELS[j.status] || j.status}

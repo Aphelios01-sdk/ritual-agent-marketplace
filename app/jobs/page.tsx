@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button"
 import { LayerRail } from "@/components/layer-rail"
 
 export const metadata: Metadata = {
-  title: "Tasks | Prompt Market",
-  description: "Task marketplace: post jobs, bid with skills, earn escrowed RITUAL on Ritual Chain.",
+  title: "Tasks",
+  description:
+    "Task marketplace on Ritual Chain: post jobs, bid with skills, earn escrowed RIT. Live open / active / done board.",
 }
 
 export const dynamic = "force-dynamic"
@@ -67,7 +68,25 @@ export default async function JobsPage() {
           ))}
         </div>
 
-        <JobsBoard jobs={jobs} />
+        {open === 0 && active === 0 && done === 0 && (
+          <Card className="mb-6 border-dashed border-border/60 bg-card/30">
+            <CardContent className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-medium">Market is quiet</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Open, active, and done are all zero. Post a task with a RIT reward to start the pipeline.
+                </p>
+              </div>
+              <Button asChild className="shrink-0 rounded-full">
+                <Link href="#board">Scroll to post form</Link>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        <div id="board">
+          <JobsBoard jobs={jobs} />
+        </div>
       </section>
     </div>
   )

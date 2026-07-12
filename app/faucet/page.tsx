@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Droplets, Loader2, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getAgentWallet, getBalance } from "@/lib/agent-wallet"
-import { formatRitual, truncateAddress } from "@/lib/utils"
+import { formatRitual, shortAddress } from "@/lib/utils"
 
 export default function FaucetPage() {
   const [info, setInfo] = useState<any>(null)
@@ -71,7 +71,7 @@ export default function FaucetPage() {
         <div className="mb-4 grid gap-2 sm:grid-cols-2">
           <div className="rounded-xl border border-border/40 p-3">
             <p className="text-[10px] uppercase text-muted-foreground">Your wallet</p>
-            <p className="font-mono text-xs">{address ? truncateAddress(address, 6) : "—"}</p>
+            <p className="font-mono text-xs">{address ? shortAddress(address, 6) : "—"}</p>
           </div>
           <div className="rounded-xl border border-border/40 p-3">
             <p className="text-[10px] uppercase text-muted-foreground">Balance</p>

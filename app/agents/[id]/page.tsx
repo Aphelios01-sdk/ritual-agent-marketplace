@@ -8,7 +8,7 @@ import {
   type AgentInfo,
 } from "@/lib/constants"
 import { fetchAgents, fetchJobs } from "@/lib/onchain"
-import { formatRitual, formatRating, truncateAddress, getSkillBadgeColor, cn } from "@/lib/utils"
+import { formatRitual, formatRating, shortAddress, getSkillBadgeColor, cn } from "@/lib/utils"
 import { ReputationPanel } from "@/components/reputation-panel"
 import { SkillDemoPanel } from "@/components/skill-demo-panel"
 
@@ -132,7 +132,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
                   <Shield className="h-4 w-4 text-muted-foreground" />
                   <span className="text-muted-foreground">Contract:</span>
                   <a href={`${EXPLORER}/address/${agent.contractAddress}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-0.5 font-mono text-xs text-primary hover:underline">
-                    {truncateAddress(agent.contractAddress)} <ExternalLink className="h-3 w-3" />
+                    {shortAddress(agent.contractAddress)} <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
                 <div className="flex items-center gap-2">

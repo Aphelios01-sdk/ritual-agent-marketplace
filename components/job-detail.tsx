@@ -24,7 +24,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob, type OnchainBid, deserializeJob, type SerializedJob } from "@/lib/onchain"
-import { cn, formatRitual, truncateAddress } from "@/lib/utils"
+import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
 import {
   getAgentWallet,
   submitBid as submitBidOnChain,
@@ -120,12 +120,13 @@ export function JobDetail({
   const [rateVal, setRateVal] = useState(5)
 
   const resultHash = job.resultData ? computeResultHash(job.resultData) : ""
+  const hasProvider = !isZeroAddress(job.provider)
   const isRequester =
     walletAddr != null && walletAddr.toLowerCase() === job.requester.toLowerCase()
   const isProvider =
-    walletAddr != null &&
-    job.provider !== "0x0000000000000000000000000000000000000000" &&
-    walletAddr.toLowerCase() === job.provider.toLowerCase()
+    walletAddr != null && hasProvider && walletAddr.toLowerCase() === job.provider.toLowerCase()
+  /** Resolve / rate / dispute / claim only when a real provider is assigned */
+  const canResolve = hasProvider && job.status !== "OPEN"
   const maxRewardEth = Number(job.reward) / 1e18
 
   useEffect(() => {
@@ -257,7 +258,7 @@ export function JobDetail({
         </div>
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{formatRitual(job.reward)}</h1>
-          <span className="text-sm text-muted-foreground">max reward, held in escrow</span>
+          <span className="text-sm text-muted-foreground">max reward in escrow</span>
         </div>
       </div>
 
@@ -271,11 +272,26 @@ export function JobDetail({
               </pre>
               <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
                 <span>
-                  Requester <span className="font-mono text-foreground">{truncateAddress(job.requester)}</span>
+                  Requester{" "}
+                  <span className="font-mono text-foreground" title={job.requester}>
+                    {shortAddress(job.requester)}
+                  </span>
                 </span>
-                {job.provider !== "0x0000000000000000000000000000000000000000" && (
-                  <span>
-                    Provider <span className="font-mono text-foreground">{truncateAddress(job.provider)}</span>
+                <span>
+                  Provider{" "}
+                  <span
+                    className={cn(
+                      "font-mono",
+                      hasProvider ? "text-foreground" : "text-muted-foreground",
+                    )}
+                    title={hasProvider ? job.provider : "No provider until a bid is accepted"}
+                  >
+                    {hasProvider ? shortAddress(job.provider) : "unassigned"}
+                  </span>
+                </span>
+                {!hasProvider && job.status === "OPEN" && (
+                  <span className="rounded-full border border-border/50 px-2 py-0.5 text-[10px]">
+                    resolve locked until provider set
                   </span>
                 )}
                 <a
@@ -295,7 +311,13 @@ export function JobDetail({
             <Card className="surface-card border-[#00ff99]/20">
               <CardContent className="space-y-3 p-5">
                 <h3 className="font-semibold">On-chain actions</h3>
-                {isProvider && (job.status === "ASSIGNED" || job.status === "IN_PROGRESS") && (
+                {!canResolve && isRequester && job.status === "OPEN" && (
+                  <p className="rounded-lg border border-border/50 bg-muted/30 px-3 py-2 text-[11px] text-muted-foreground">
+                    Provider is unassigned (0x000…0). Accept a bid first — rate, dispute, and
+                    timeout resolve stay disabled until a provider is set.
+                  </p>
+                )}
+                {isProvider && canResolve && (job.status === "ASSIGNED" || job.status === "IN_PROGRESS") && (
                   <div className="flex flex-wrap gap-2">
                     {job.status === "ASSIGNED" && (
                       <Button
@@ -335,7 +357,7 @@ export function JobDetail({
                     </Button>
                   </div>
                 )}
-                {isRequester && job.status === "COMPLETED" && (
+                {isRequester && canResolve && job.status === "COMPLETED" && (
                   <div className="flex flex-wrap items-center gap-2">
                     <select
                       value={rateVal}
@@ -351,7 +373,7 @@ export function JobDetail({
                     <Button
                       size="sm"
                       className="rounded-full"
-                      disabled={actionBusy}
+                      disabled={actionBusy || !hasProvider}
                       onClick={() =>
                         runAction("rateProvider", () =>
                           rateProvider(getAgentWallet(), BigInt(job.id), BigInt(rateVal)),
@@ -364,7 +386,8 @@ export function JobDetail({
                       size="sm"
                       variant="outline"
                       className="rounded-full text-red-400"
-                      disabled={actionBusy}
+                      disabled={actionBusy || !hasProvider}
+                      title={!hasProvider ? "Provider not assigned" : undefined}
                       onClick={() =>
                         runAction("dispute", () => disputeJob(getAgentWallet(), BigInt(job.id)))
                       }
@@ -373,12 +396,13 @@ export function JobDetail({
                     </Button>
                   </div>
                 )}
-                {isRequester && (job.status === "ASSIGNED" || job.status === "IN_PROGRESS") && (
+                {isRequester && canResolve && (job.status === "ASSIGNED" || job.status === "IN_PROGRESS") && (
                   <Button
                     size="sm"
                     variant="outline"
                     className="rounded-full"
-                    disabled={actionBusy}
+                    disabled={actionBusy || !hasProvider}
+                    title={!hasProvider ? "Provider not assigned" : undefined}
                     onClick={() =>
                       runAction("claimTimeout", () =>
                         claimTimeout(getAgentWallet(), BigInt(job.id)),
@@ -387,6 +411,20 @@ export function JobDetail({
                   >
                     Claim timeout
                   </Button>
+                )}
+                {/* Explicitly disabled resolve controls when no provider */}
+                {isRequester && !canResolve && (
+                  <div className="flex flex-wrap gap-2 opacity-50">
+                    <Button size="sm" className="rounded-full" disabled>
+                      Rate provider
+                    </Button>
+                    <Button size="sm" variant="outline" className="rounded-full" disabled>
+                      Dispute / resolve
+                    </Button>
+                    <Button size="sm" variant="outline" className="rounded-full" disabled>
+                      Claim timeout
+                    </Button>
+                  </div>
                 )}
                 {actionMsg && (
                   <p
@@ -472,7 +510,7 @@ export function JobDetail({
                               <span className="flex h-6 w-6 items-center justify-center rounded-full border border-border font-mono text-[11px] text-muted-foreground">
                                 {i + 1}
                               </span>
-                              <span className="font-mono text-xs">{truncateAddress(b.provider)}</span>
+                              <span className="font-mono text-xs">{shortAddress(b.provider)}</span>
                             </div>
                             <div className="flex flex-wrap gap-x-3 gap-y-0.5 pl-8 text-[11px] text-muted-foreground">
                               <span>
@@ -518,9 +556,9 @@ export function JobDetail({
               {job.status === "OPEN" && bids.length > 0 && !isRequester && walletAddr && (
                 <p className="mt-3 text-[11px] text-muted-foreground">
                   Accept requires the requester wallet (
-                  <span className="font-mono">{truncateAddress(job.requester)}</span>
+                  <span className="font-mono">{shortAddress(job.requester)}</span>
                   ). Your agent is{" "}
-                  <span className="font-mono">{truncateAddress(walletAddr)}</span>.
+                  <span className="font-mono">{shortAddress(walletAddr)}</span>.
                 </p>
               )}
 
@@ -587,13 +625,13 @@ export function JobDetail({
                       <div className="rounded-lg border border-border/60 p-2.5">
                         <p className="font-mono text-[10px] text-muted-foreground">Requester</p>
                         <p className="mt-0.5 font-mono text-xs text-foreground">
-                          {truncateAddress(job.requester)}
+                          {shortAddress(job.requester)}
                         </p>
                       </div>
                       <div className="rounded-lg border border-border/60 p-2.5">
                         <p className="font-mono text-[10px] text-muted-foreground">Provider</p>
                         <p className="mt-0.5 font-mono text-xs text-foreground">
-                          {truncateAddress(job.provider)}
+                          {shortAddress(job.provider)}
                         </p>
                       </div>
                     </div>

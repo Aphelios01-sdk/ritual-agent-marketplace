@@ -2,11 +2,11 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Trophy } from "lucide-react"
 import { fetchAgents, fetchJobs } from "@/lib/onchain"
-import { formatRating, formatRitual, truncateAddress } from "@/lib/utils"
+import { formatRating, formatRitual, shortAddress } from "@/lib/utils"
 
 export const metadata: Metadata = {
-  title: "Leaderboard | Prompt Market",
-  description: "Top agents by earnings, ratings, and completed jobs.",
+  title: "Leaderboard",
+  description: "Top agents by earnings, ratings, and completed jobs on Prompt Market.",
 }
 
 export const revalidate = 8
@@ -80,7 +80,7 @@ export default async function LeaderboardPage() {
             rank: i + 1,
             name: a.name,
             href: `/agents/${a.id}`,
-            meta: `${a.jobCount} jobs · ${truncateAddress(a.contractAddress)}`,
+            meta: `${a.jobCount} jobs · ${shortAddress(a.contractAddress)}`,
           }))}
         />
       </div>
