@@ -36,6 +36,12 @@ function isValidAddress(v: string): v is `0x${string}` {
   return /^0x[a-fA-F0-9]{40}$/.test(v.trim())
 }
 
+/** Pull first 0x + 40 hex from messy clipboard paste. */
+function extractAddress(raw: string): string | null {
+  const m = raw.match(/0x[a-fA-F0-9]{40}/)
+  return m ? m[0] : null
+}
+
 function normalize(v: string) {
   return v.trim().toLowerCase()
 }
@@ -112,27 +118,33 @@ function WorkPageInner() {
   }, [load])
 
   const addr = agentAddress
+  const [appliedOk, setAppliedOk] = useState(false)
 
-  const applyAddress = (raw: string) => {
-    const v = raw.trim()
-    if (!v) {
+  const applyAddress = useCallback((raw: string) => {
+    const extracted = extractAddress(raw) || raw.trim()
+    if (!extracted) {
       setPasteError("Paste an agent address (0x…)")
-      return
+      setAppliedOk(false)
+      return false
     }
-    if (!isValidAddress(v)) {
+    if (!isValidAddress(extracted)) {
       setPasteError("Invalid address — need 0x + 40 hex chars")
-      return
+      setAppliedOk(false)
+      return false
     }
-    const n = normalize(v)
+    const n = normalize(extracted)
     setAgentAddress(n)
-    setPasteInput(v)
+    setPasteInput(extracted)
     setPasteError(null)
+    setAppliedOk(true)
     try {
-      localStorage.setItem(STORAGE_KEY, v)
+      localStorage.setItem(STORAGE_KEY, extracted)
     } catch {
       /* ignore */
     }
-  }
+    window.setTimeout(() => setAppliedOk(false), 2000)
+    return true
+  }, [])
 
   const useLocalWallet = () => {
     if (!wallet) return
@@ -145,7 +157,7 @@ function WorkPageInner() {
       setPasteInput(text.trim())
       applyAddress(text)
     } catch {
-      setPasteError("Clipboard blocked — paste into the field and press Apply")
+      setPasteError("Clipboard blocked — paste into the field, then tap Apply")
     }
   }
 
@@ -153,6 +165,7 @@ function WorkPageInner() {
     setAgentAddress("")
     setPasteInput("")
     setPasteError(null)
+    setAppliedOk(false)
     try {
       localStorage.removeItem(STORAGE_KEY)
     } catch {
@@ -228,71 +241,109 @@ function WorkPageInner() {
         </Button>
       </div>
 
-      <div className="mb-6 rounded-2xl border border-border/60 bg-card/40 p-4 sm:p-5">
-        <label className="mb-2 block text-xs font-medium text-muted-foreground">
+      <div className="relative z-20 mb-6 rounded-2xl border border-border/60 bg-card/50 p-4 sm:p-5">
+        <label htmlFor="work-agent-address" className="mb-2 block text-xs font-medium text-muted-foreground">
           Agent address
         </label>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <div className="relative min-w-0 flex-1">
+        <form
+          className="relative z-20 flex flex-col gap-3"
+          onSubmit={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            applyAddress(pasteInput)
+          }}
+        >
+          <div className="relative z-20 w-full">
             <input
+              id="work-agent-address"
+              name="agentAddress"
               value={pasteInput}
               onChange={(e) => {
-                setPasteInput(e.target.value)
+                const v = e.target.value
+                setPasteInput(v)
                 setPasteError(null)
+                setAppliedOk(false)
+                // Auto-apply when a full address is typed/pasted
+                const found = extractAddress(v)
+                if (found && found.length === 42) {
+                  applyAddress(found)
+                }
               }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") applyAddress(pasteInput)
+              onPaste={(e) => {
+                const text = e.clipboardData.getData("text")
+                const found = extractAddress(text)
+                if (found) {
+                  e.preventDefault()
+                  setPasteInput(found)
+                  applyAddress(found)
+                }
+              }}
+              onBlur={() => {
+                if (pasteInput.trim() && extractAddress(pasteInput)) {
+                  applyAddress(pasteInput)
+                }
               }}
               placeholder="0x… paste agent wallet / contract address"
               spellCheck={false}
               autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              inputMode="text"
               className={cn(
-                "h-11 w-full rounded-xl border bg-background px-3 pr-10 font-mono text-sm outline-none transition-colors",
+                "relative z-20 h-12 w-full rounded-xl border bg-background px-3 pr-10 font-mono text-sm outline-none transition-colors",
                 pasteError
                   ? "border-red-400/60 focus:border-red-400"
-                  : "border-border/60 focus:border-[#00ff99]/40",
+                  : appliedOk
+                    ? "border-[#00ff99]/50 focus:border-[#00ff99]"
+                    : "border-border/60 focus:border-[#00ff99]/40",
               )}
             />
             {pasteInput && (
               <button
                 type="button"
                 onClick={clearAddress}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-md p-1 text-muted-foreground hover:text-foreground"
+                className="absolute right-2 top-1/2 z-30 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground"
                 aria-label="Clear"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              className="h-11 gap-1.5 rounded-full bg-[#00ff99] px-4 text-black hover:bg-[#00ff99]/90"
-              onClick={() => applyAddress(pasteInput)}
+
+          <div className="relative z-20 flex flex-wrap gap-2">
+            <button
+              type="submit"
+              className={cn(
+                "relative z-20 inline-flex h-11 min-w-[7.5rem] cursor-pointer items-center justify-center gap-1.5 rounded-full px-5 text-sm font-semibold transition-colors",
+                "bg-[#00ff99] text-black hover:bg-[#00ff99]/90 active:scale-[0.98]",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00ff99]/60",
+              )}
             >
-              <Check className="h-3.5 w-3.5" /> Apply
-            </Button>
-            <Button
+              <Check className="h-3.5 w-3.5" />
+              {appliedOk ? "Applied" : "Apply"}
+            </button>
+            <button
               type="button"
-              variant="outline"
-              className="h-11 gap-1.5 rounded-full"
-              onClick={pasteFromClipboard}
+              onClick={() => void pasteFromClipboard()}
+              className="relative z-20 inline-flex h-11 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-border/60 bg-background px-4 text-sm font-medium text-foreground hover:bg-muted active:scale-[0.98]"
             >
               <ClipboardPaste className="h-3.5 w-3.5" /> Paste
-            </Button>
+            </button>
             {wallet && (
-              <Button
+              <button
                 type="button"
-                variant="outline"
-                className="h-11 gap-1.5 rounded-full"
                 onClick={useLocalWallet}
+                className="relative z-20 inline-flex h-11 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-border/60 bg-background px-4 text-sm font-medium text-foreground hover:bg-muted active:scale-[0.98]"
               >
                 <Wallet className="h-3.5 w-3.5" /> My wallet
-              </Button>
+              </button>
             )}
           </div>
-        </div>
+        </form>
         {pasteError && <p className="mt-2 text-xs text-red-400">{pasteError}</p>}
+        {appliedOk && !pasteError && (
+          <p className="mt-2 text-xs text-[#00ff99]">Address applied — inbox updated</p>
+        )}
         {addr && !pasteError && (
           <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
             <span>
