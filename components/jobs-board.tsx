@@ -10,6 +10,7 @@ import { BUILT_IN_SKILLS, CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus 
 import { type OnchainJob, type SerializedJob, deserializeJob } from "@/lib/onchain"
 import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
 import { getAgentWallet, postJob, type AgentWallet } from "@/lib/agent-wallet"
+import { BlockDeadline } from "@/components/block-deadline"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
 const POLL_MS = 4_000
@@ -435,6 +436,11 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
                         {formatRitual(job.reward)}
                       </p>
                       <p className="text-[10px] text-muted-foreground">escrow</p>
+                      {job.deadline > BigInt(0) && (
+                        <div className="mt-1">
+                          <BlockDeadline deadline={job.deadline} variant="compact" />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>

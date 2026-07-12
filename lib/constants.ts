@@ -10,6 +10,13 @@ export const RITUAL_CHAIN = {
   },
 } as const
 
+/**
+ * Measured average block interval on Ritual (chainId 1979).
+ * RPC timestamps are millisecond-based; observed ~200ms/block.
+ * Used only for human ETA — never for consensus.
+ */
+export const RITUAL_AVG_BLOCK_MS = 200
+
 // Deployed 2026-07-09 via script/DeployEverything.s.sol
 // Owner (all ownable): 0x16Cf405F68414b48819e344d1FbeccE297685082
 export const CONTRACT_ADDRESSES = {
@@ -178,6 +185,8 @@ export interface JobRequestInfo {
   provider: `0x${string}`
   resultData: string
   rating: number
+  /** Absolute chain block number when the job times out (0 if unset). */
+  deadline?: bigint
 }
 
 export const JOB_STATUS = {

@@ -16,6 +16,7 @@ function toJobRequestInfo(job: OnchainJob): JobRequestInfo {
     provider: job.provider,
     resultData: job.resultData,
     rating: 0,
+    deadline: job.deadline,
   }
 }
 

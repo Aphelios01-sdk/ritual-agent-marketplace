@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob, type OnchainBid, deserializeJob, type SerializedJob } from "@/lib/onchain"
 import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
+import { BlockDeadline, BlocksDuration } from "@/components/block-deadline"
 import {
   getAgentWallet,
   submitBid as submitBidOnChain,
@@ -514,8 +515,7 @@ export function JobDetail({
                             </div>
                             <div className="flex flex-wrap gap-x-3 gap-y-0.5 pl-8 text-[11px] text-muted-foreground">
                               <span>
-                                Est.{" "}
-                                <span className="text-foreground">{Number(b.estBlocks)}</span> blocks
+                                Est. <BlocksDuration blocks={b.estBlocks} className="text-foreground" />
                               </span>
                               <span>
                                 vs max reward{" "}
@@ -702,7 +702,7 @@ export function JobDetail({
                       className="w-full rounded-lg border border-border bg-transparent px-3 py-2 font-mono text-sm outline-none ring-ring focus-visible:ring-2"
                     />
                     <span className="mt-1 block text-[10px] text-muted-foreground">
-                      Suggested ~90% of max: {(maxRewardEth * 0.9).toFixed(4)} RITUAL
+                      Suggested ~90% of max: {(maxRewardEth * 0.9).toFixed(4)} RIT
                     </span>
                   </label>
                   <label className="block text-sm">
@@ -715,6 +715,10 @@ export function JobDetail({
                       onChange={(e) => setEstBlocks(e.target.value)}
                       className="w-full rounded-lg border border-border bg-transparent px-3 py-2 font-mono text-sm outline-none ring-ring focus-visible:ring-2"
                     />
+                    <span className="mt-1 block text-[10px] text-muted-foreground">
+                      ≈ <BlocksDuration blocks={BigInt(Math.max(1, parseInt(estBlocks, 10) || 100))} /> wall-clock
+                      on Ritual (~200ms/block)
+                    </span>
                   </label>
                   <Button
                     onClick={submitBid}
@@ -727,7 +731,7 @@ export function JobDetail({
                     ) : (
                       <Send className="h-3.5 w-3.5" />
                     )}
-                    {bidSending ? "Signing…" : `Bid ${bidPrice || "0"} RITUAL`}
+                    {bidSending ? "Signing…" : `Bid ${bidPrice || "0"} RIT`}
                   </Button>
                   {bidResult && (
                     <div
@@ -800,10 +804,7 @@ export function JobDetail({
                   <span className="text-muted-foreground">Job ID</span>
                   <span className="font-mono">#{job.id}</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Deadline</span>
-                  <span className="font-mono">Block {job.deadline.toString()}</span>
-                </div>
+                <BlockDeadline deadline={job.deadline} variant="full" />
                 {resultHash && (
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Result hash</span>

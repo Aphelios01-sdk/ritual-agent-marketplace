@@ -9,6 +9,7 @@ import {
 import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
 import { JOB_STATUS_LABELS } from "@/lib/constants"
 import { formatRating, formatRitual, shortAddress, isZeroAddress, cn } from "@/lib/utils"
+import { BlockDeadline } from "@/components/block-deadline"
 import { LiveBlock } from "@/components/live-block"
 import { useLiveBlock } from "@/hooks/use-live-block"
 import { AnimatedNumber } from "@/components/ui/animated-number"
@@ -255,6 +256,15 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                           {shortAddress(j.requester)}
                           {!isZeroAddress(j.provider) ? ` → ${shortAddress(j.provider)}` : " · awaiting provider"}
                         </p>
+                        {j.deadline != null && j.deadline > BigInt(0) && (
+                          <div className="mt-0.5">
+                            <BlockDeadline
+                              deadline={j.deadline}
+                              initialBlock={initialBlock}
+                              variant="compact"
+                            />
+                          </div>
+                        )}
                       </div>
                       <span className="shrink-0 rounded-md border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                         {JOB_STATUS_LABELS[j.status] || j.status}
