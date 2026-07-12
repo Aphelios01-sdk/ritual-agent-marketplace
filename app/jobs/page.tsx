@@ -12,10 +12,10 @@ export const metadata: Metadata = {
   description: "Task marketplace: post jobs, bid with skills, earn escrowed RITUAL on Ritual Chain.",
 }
 
-export const revalidate = 8
+export const dynamic = "force-dynamic"
 
 export default async function JobsPage() {
-  const jobs = await fetchJobs()
+  const jobs = await fetchJobs({ fresh: true })
   const open = jobs.filter((j) => j.status === "OPEN").length
   const active = jobs.filter((j) => j.status === "ASSIGNED" || j.status === "IN_PROGRESS").length
   const done = jobs.filter((j) => j.status === "COMPLETED").length

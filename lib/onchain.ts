@@ -12,17 +12,70 @@ export const publicClient = createPublicClient({
 const CONTRACT_ADDR = CONTRACT_ADDRESSES.agentRegistry as Address
 const JOB_MARKET_V2 = CONTRACT_ADDRESSES.jobMarketV2 as Address
 
-/** Short in-memory cache so rapid nav between pages reuses the last RPC result. */
+/** Short in-memory cache so rapid nav reuses last RPC result. Jobs stay fresher. */
 const CACHE_TTL_MS = 5_000
+const JOBS_CACHE_TTL_MS = 2_000
 type CacheEntry<T> = { at: number; data: T }
 let agentsCache: CacheEntry<AgentInfo[]> | null = null
 let jobsCache: CacheEntry<OnchainJob[]> | null = null
 let chainCache: CacheEntry<{ block: bigint; chainId: number } | null> | null = null
 
-function fromCache<T>(entry: CacheEntry<T> | null): T | null {
+function fromCache<T>(entry: CacheEntry<T> | null, ttl = CACHE_TTL_MS): T | null {
   if (!entry) return null
-  if (Date.now() - entry.at > CACHE_TTL_MS) return null
+  if (Date.now() - entry.at > ttl) return null
   return entry.data
+}
+
+/** Drop jobs cache so next fetch hits the chain (post/bid/assign). */
+export function invalidateJobsCache() {
+  jobsCache = null
+}
+
+/** JSON-safe job shape for API / client polling. */
+export type SerializedJob = {
+  id: string
+  requester: `0x${string}`
+  provider: `0x${string}`
+  reward: string
+  bondRequired: string
+  status: JobStatus
+  statusRaw: number
+  deadline: string
+  taskData: string
+  resultData: string
+  rating: number
+}
+
+export function serializeJob(j: OnchainJob): SerializedJob {
+  return {
+    id: j.id,
+    requester: j.requester,
+    provider: j.provider,
+    reward: j.reward.toString(),
+    bondRequired: j.bondRequired.toString(),
+    status: j.status,
+    statusRaw: j.statusRaw,
+    deadline: j.deadline.toString(),
+    taskData: j.taskData,
+    resultData: j.resultData,
+    rating: j.rating,
+  }
+}
+
+export function deserializeJob(j: SerializedJob): OnchainJob {
+  return {
+    id: j.id,
+    requester: j.requester,
+    provider: j.provider,
+    reward: BigInt(j.reward),
+    bondRequired: BigInt(j.bondRequired),
+    status: j.status,
+    statusRaw: j.statusRaw,
+    deadline: BigInt(j.deadline),
+    taskData: j.taskData,
+    resultData: j.resultData,
+    rating: j.rating,
+  }
 }
 
 function precompileType(addr: Address): "HTTP" | "LLM" {
@@ -255,14 +308,8 @@ export async function fetchBids(jobId: string): Promise<OnchainBid[]> {
   }
 }
 
-/** Single job read (no full list). */
+/** Single job read (always hits chain for detail freshness). */
 export async function fetchJob(id: string): Promise<OnchainJob | null> {
-  const cached = fromCache(jobsCache)
-  if (cached) {
-    const hit = cached.find((j) => j.id === id)
-    if (hit) return hit
-  }
-
   try {
     const raw = (await publicClient.readContract({
       address: JOB_MARKET_V2,
@@ -279,10 +326,12 @@ export async function fetchJob(id: string): Promise<OnchainJob | null> {
   }
 }
 
-/** Read all jobs in parallel. Cached ~5s. */
-export async function fetchJobs(): Promise<OnchainJob[]> {
-  const hit = fromCache(jobsCache)
-  if (hit) return hit
+/** Read all jobs in parallel. Cached briefly unless `fresh`. */
+export async function fetchJobs(opts?: { fresh?: boolean }): Promise<OnchainJob[]> {
+  if (!opts?.fresh) {
+    const hit = fromCache(jobsCache, JOBS_CACHE_TTL_MS)
+    if (hit) return hit
+  }
 
   try {
     const count = (await publicClient.readContract({
@@ -322,10 +371,12 @@ export async function fetchJobs(): Promise<OnchainJob[]> {
       if (mapped) jobs.push(mapped)
     }
 
+    // Newest first for board
+    jobs.sort((a, b) => Number(b.id) - Number(a.id))
     jobsCache = { at: Date.now(), data: jobs }
     return jobs
   } catch (e) {
     console.error("fetchJobs failed:", e)
-    return fromCache(jobsCache) ?? []
+    return fromCache(jobsCache, JOBS_CACHE_TTL_MS) ?? []
   }
 }
