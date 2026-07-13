@@ -39,6 +39,7 @@ const JOB_MARKET = (process.env.JOB_MARKET_V2 || "0xD4FD366d2C6884C5c76890a489Fc
 const STAKING = (process.env.STAKING || "0xdF186d42Ffe22246dB6FaE8d3E6AB29735ecfF18")
 const HEARTBEAT = (process.env.HEARTBEAT || "0x157802f666233ffd2723b0596fa89824D1aea5aB")
 const DIRECTORY = (process.env.DIRECTORY || "0x539753c8E5f3b69ecD3171B2bBFe46150294eaa2")
+const DISPUTE = (process.env.DISPUTE || "0xBCD900214234fDeCe9Edc689edc7D0317748e9B4")
 
 const HTTP_PC = "0x0000000000000000000000000000000000000801"
 const LLM_PC = "0x0000000000000000000000000000000000000802"
@@ -190,6 +191,60 @@ const JOB_ABI = [
   },
   {
     type: "function",
+    name: "getBids",
+    inputs: [{ name: "jobId", type: "uint256" }],
+    outputs: [
+      {
+        type: "tuple[]",
+        components: [
+          { name: "provider", type: "address" },
+          { name: "price", type: "uint256" },
+          { name: "estBlocks", type: "uint256" },
+          { name: "submittedAt", type: "uint256" },
+        ],
+      },
+    ],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "requestService",
+    inputs: [
+      { name: "requiredSkillIds", type: "bytes32[]" },
+      { name: "taskData", type: "bytes" },
+    ],
+    outputs: [{ type: "uint256" }],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "assignJob",
+    inputs: [
+      { name: "jobId", type: "uint256" },
+      { name: "bidIndex", type: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "rateProvider",
+    inputs: [
+      { name: "jobId", type: "uint256" },
+      { name: "rating", type: "uint256" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "dispute",
+    inputs: [{ name: "jobId", type: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "submitBid",
     inputs: [
       { name: "jobId", type: "uint256" },
@@ -215,6 +270,48 @@ const JOB_ABI = [
     ],
     outputs: [],
     stateMutability: "nonpayable",
+  },
+]
+
+const DISPUTE_ABI = [
+  {
+    type: "function",
+    name: "stakeAsVerifier",
+    inputs: [],
+    outputs: [],
+    stateMutability: "payable",
+  },
+  {
+    type: "function",
+    name: "vote",
+    inputs: [
+      { name: "disputeId", type: "uint256" },
+      { name: "v", type: "uint8" },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "nextDisputeId",
+    inputs: [],
+    outputs: [{ type: "uint256" }],
+    stateMutability: "view",
+  },
+  {
+    type: "function",
+    name: "disputes",
+    inputs: [{ name: "", type: "uint256" }],
+    outputs: [
+      { name: "id", type: "uint256" },
+      { name: "jobId", type: "uint256" },
+      { name: "requester", type: "address" },
+      { name: "provider", type: "address" },
+      { name: "status", type: "uint8" },
+      { name: "votesForRequester", type: "uint256" },
+      { name: "votesForProvider", type: "uint256" },
+    ],
+    stateMutability: "view",
   },
 ]
 
@@ -421,8 +518,70 @@ const TOOLS = [
     },
   },
   {
+    name: "pm_post_job",
+    description:
+      "USER role: post a job with escrowed reward (requestService). Pass skill_ids + task + reward in RITUAL.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        task: { type: "string", description: "Prompt / task text" },
+        reward: { type: "string", description: "Escrow reward in RITUAL e.g. \"0.1\"" },
+        skill_ids: { type: "array", items: { type: "string" }, description: "Required skill ids" },
+      },
+      required: ["task", "reward"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "pm_list_bids",
+    description: "USER role: list bids on a job before assign.",
+    inputSchema: {
+      type: "object",
+      properties: { job_id: { type: "string" } },
+      required: ["job_id"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "pm_assign_job",
+    description: "USER role: assign a bid (bid_index from pm_list_bids).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        job_id: { type: "string" },
+        bid_index: { type: "number" },
+        top_up: { type: "string", description: "Optional top-up RITUAL (default 0)" },
+      },
+      required: ["job_id", "bid_index"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "pm_rate",
+    description: "USER role: rate provider 1–5 after completion.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        job_id: { type: "string" },
+        rating: { type: "number", description: "1 to 5" },
+      },
+      required: ["job_id", "rating"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "pm_dispute_job",
+    description: "USER role: open a dispute on a job.",
+    inputSchema: {
+      type: "object",
+      properties: { job_id: { type: "string" } },
+      required: ["job_id"],
+      additionalProperties: false,
+    },
+  },
+  {
     name: "pm_submit_bid",
-    description: "Bid on an open job.",
+    description: "ASP role: bid on an open job.",
     inputSchema: {
       type: "object",
       properties: {
@@ -431,6 +590,40 @@ const TOOLS = [
         est_blocks: { type: "number", description: "Estimated blocks (default 100)" },
       },
       required: ["job_id", "price"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "pm_stake_verifier",
+    description: "EVALUATOR role: stake as dispute council verifier (msg.value).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        amount: { type: "string", description: "Stake amount in RITUAL" },
+      },
+      required: ["amount"],
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "pm_list_disputes",
+    description: "EVALUATOR role: list recent disputes (best-effort read).",
+    inputSchema: {
+      type: "object",
+      properties: { limit: { type: "number" } },
+      additionalProperties: false,
+    },
+  },
+  {
+    name: "pm_vote_dispute",
+    description: "EVALUATOR role: vote on dispute. favor: requester | provider (maps to 0 | 1).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        dispute_id: { type: "string" },
+        favor: { type: "string", enum: ["requester", "provider"] },
+      },
+      required: ["dispute_id", "favor"],
       additionalProperties: false,
     },
   },
@@ -742,6 +935,93 @@ async function handleTool(name, args = {}) {
       return text({ ok: true, tx: hash, metadataURI: args.metadata_uri })
     }
 
+    case "pm_post_job": {
+      const { wallet } = requireSigner()
+      const skillIds = (args.skill_ids?.length ? args.skill_ids : [SKILL_CATALOG[0].skillId]).map(
+        (id) => id,
+      )
+      const value = parseEther(String(args.reward))
+      const hash = await wallet.writeContract({
+        address: JOB_MARKET,
+        abi: JOB_ABI,
+        functionName: "requestService",
+        args: [skillIds, stringToHex(String(args.task))],
+        value,
+      })
+      const receipt = await publicClient.waitForTransactionReceipt({ hash })
+      const next = await publicClient.readContract({
+        address: JOB_MARKET,
+        abi: JOB_ABI,
+        functionName: "nextJobId",
+      })
+      return text({
+        ok: true,
+        tx: hash,
+        block: String(receipt.blockNumber),
+        jobId: String(next - 1n),
+        reward: String(args.reward),
+        skillIds,
+      })
+    }
+
+    case "pm_list_bids": {
+      const bids = await publicClient.readContract({
+        address: JOB_MARKET,
+        abi: JOB_ABI,
+        functionName: "getBids",
+        args: [BigInt(args.job_id)],
+      })
+      return text({
+        jobId: String(args.job_id),
+        bids: bids.map((b, i) => ({
+          index: i,
+          provider: b.provider,
+          price: formatEther(b.price),
+          estBlocks: String(b.estBlocks),
+          submittedAt: String(b.submittedAt),
+        })),
+      })
+    }
+
+    case "pm_assign_job": {
+      const { wallet } = requireSigner()
+      const topUp = args.top_up ? parseEther(String(args.top_up)) : 0n
+      const hash = await wallet.writeContract({
+        address: JOB_MARKET,
+        abi: JOB_ABI,
+        functionName: "assignJob",
+        args: [BigInt(args.job_id), BigInt(args.bid_index)],
+        value: topUp,
+      })
+      await publicClient.waitForTransactionReceipt({ hash })
+      return text({ ok: true, tx: hash, jobId: String(args.job_id), bidIndex: args.bid_index })
+    }
+
+    case "pm_rate": {
+      const { wallet } = requireSigner()
+      const rating = BigInt(Math.min(5, Math.max(1, Number(args.rating) || 1)))
+      const hash = await wallet.writeContract({
+        address: JOB_MARKET,
+        abi: JOB_ABI,
+        functionName: "rateProvider",
+        args: [BigInt(args.job_id), rating],
+      })
+      await publicClient.waitForTransactionReceipt({ hash })
+      return text({ ok: true, tx: hash, rating: String(rating) })
+    }
+
+    case "pm_dispute_job": {
+      const { wallet } = requireSigner()
+      const hash = await wallet.writeContract({
+        address: JOB_MARKET,
+        abi: JOB_ABI,
+        functionName: "dispute",
+        args: [BigInt(args.job_id)],
+      })
+      await publicClient.waitForTransactionReceipt({ hash })
+      return text({ ok: true, tx: hash, jobId: String(args.job_id) })
+    }
+
     case "pm_submit_bid": {
       const { wallet } = requireSigner()
       const hash = await wallet.writeContract({
@@ -756,6 +1036,75 @@ async function handleTool(name, args = {}) {
       })
       await publicClient.waitForTransactionReceipt({ hash })
       return text({ ok: true, tx: hash, jobId: String(args.job_id) })
+    }
+
+    case "pm_stake_verifier": {
+      const { wallet } = requireSigner()
+      const hash = await wallet.writeContract({
+        address: DISPUTE,
+        abi: DISPUTE_ABI,
+        functionName: "stakeAsVerifier",
+        args: [],
+        value: parseEther(String(args.amount)),
+      })
+      await publicClient.waitForTransactionReceipt({ hash })
+      return text({ ok: true, tx: hash, amount: String(args.amount) })
+    }
+
+    case "pm_list_disputes": {
+      const limit = Math.min(Number(args.limit) || 20, 50)
+      let next = 0n
+      try {
+        next = await publicClient.readContract({
+          address: DISPUTE,
+          abi: DISPUTE_ABI,
+          functionName: "nextDisputeId",
+        })
+      } catch {
+        return text({
+          count: 0,
+          disputes: [],
+          note: "DisputeCouncil nextDisputeId unavailable — check contract layout",
+        })
+      }
+      const disputes = []
+      const n = Number(next)
+      for (let id = n; id >= 1 && disputes.length < limit; id--) {
+        try {
+          const d = await publicClient.readContract({
+            address: DISPUTE,
+            abi: DISPUTE_ABI,
+            functionName: "disputes",
+            args: [BigInt(id)],
+          })
+          disputes.push({
+            id: String(d[0] ?? id),
+            jobId: String(d[1]),
+            requester: d[2],
+            provider: d[3],
+            status: Number(d[4]),
+            votesForRequester: String(d[5]),
+            votesForProvider: String(d[6]),
+          })
+        } catch {
+          /* skip */
+        }
+      }
+      return text({ count: disputes.length, disputes })
+    }
+
+    case "pm_vote_dispute": {
+      const { wallet } = requireSigner()
+      const favor = String(args.favor || "").toLowerCase()
+      const v = favor === "provider" ? 1 : 0
+      const hash = await wallet.writeContract({
+        address: DISPUTE,
+        abi: DISPUTE_ABI,
+        functionName: "vote",
+        args: [BigInt(args.dispute_id), v],
+      })
+      await publicClient.waitForTransactionReceipt({ hash })
+      return text({ ok: true, tx: hash, disputeId: String(args.dispute_id), favor, v })
     }
 
     case "pm_start_processing": {

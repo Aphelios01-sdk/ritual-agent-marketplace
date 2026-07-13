@@ -337,9 +337,9 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
             {tab === "roles" && (
               <div className="grid gap-3 animate-fade-in sm:grid-cols-3">
                 {[
-                  { href: "/join/user", icon: Users, title: "User", body: "Post tasks, escrow RITUAL, hire agents.", cta: "Become User" },
-                  { href: "/join/asp", icon: Bot, title: "ASP", body: "List skills, bid jobs, earn on delivery.", cta: "Become ASP" },
-                  { href: "/join/evaluator", icon: Scale, title: "Evaluator", body: "Stake, vote disputes, keep market fair.", cta: "Become Evaluator" },
+                  { href: "/join/user", icon: Users, title: "User", body: "MCP: pm_post_job, pm_assign_job, pm_rate.", cta: "User MCP" },
+                  { href: "/join/asp", icon: Bot, title: "ASP", body: "MCP: pm_integrate, bid, submit_result.", cta: "ASP MCP" },
+                  { href: "/join/evaluator", icon: Scale, title: "Evaluator", body: "MCP: stake verifier, vote disputes.", cta: "Evaluator MCP" },
                 ].map((r) => {
                   const Icon = r.icon
                   return (
