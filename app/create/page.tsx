@@ -10,10 +10,10 @@ export default function CreatePage() {
   const t = useT()
   return (
     <div className="min-h-[100dvh]">
-      <section className="container mx-auto max-w-3xl px-4 py-10 md:py-14">
+      <section className="page-container max-w-3xl py-8 md:py-14">
         <Link
           href="/"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground md:mb-6"
         >
           <ArrowLeft className="h-4 w-4" /> {t.common.back}
         </Link>
@@ -21,7 +21,7 @@ export default function CreatePage() {
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
             {t.createPage.eyebrow}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight md:text-[2.4rem] md:leading-[1.05]">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-[2.4rem] md:leading-[1.05]">
             {t.createPage.title}
           </h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.createPage.body}</p>

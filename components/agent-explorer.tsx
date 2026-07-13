@@ -127,7 +127,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
     <div className="min-h-[calc(100dvh-3.5rem)]">
       {/* Compact command header. Fits above fold */}
       <div className="border-b border-border/50 bg-card/20">
-        <div className="container mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-4 md:flex-row-md:items-center md:justify-between md:py-3.5">
+        <div className="container mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-4 md:flex-row md:items-center md:justify-between md:py-3.5">
           <div className="min-w-0">
             <div className="mb-1 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-primary">

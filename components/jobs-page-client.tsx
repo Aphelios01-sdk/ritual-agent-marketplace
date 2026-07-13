@@ -18,30 +18,30 @@ export function JobsPageClient({ jobs }: { jobs: OnchainJob[] }) {
   return (
     <div className="min-h-[100dvh]">
       <LayerRail activeId="matching" />
-      <section className="container mx-auto max-w-[1400px] px-4 py-10 md:py-14">
+      <section className="page-container py-8 md:py-14">
         <Link
           href="/"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+          className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground md:mb-6"
         >
           <ArrowLeft className="h-4 w-4" /> {t.common.back}
         </Link>
-        <div className="mb-8 flex flex-col gap-6 lg:flex-row-lg:items-end lg:justify-between">
+        <div className="mb-6 flex flex-col gap-4 lg:mb-8 lg:flex-row lg:items-end lg:justify-between lg:gap-6">
           <div className="max-w-[60ch]">
             <p className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
               <Layers className="h-3 w-3" /> {t.jobs.eyebrow}
             </p>
-            <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-[2.6rem] md:leading-[1.05]">
               {t.jobs.title}
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t.jobs.body}</p>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild className="gap-1.5 rounded-full">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 sm:flex-wrap lg:flex">
+            <Button asChild className="h-11 gap-1.5 rounded-full sm:h-10">
               <Link href="/join/user">
                 <ListTodo className="h-4 w-4" /> {t.jobs.postAsUser}
               </Link>
             </Button>
-            <Button asChild variant="outline" className="gap-1.5 rounded-full">
+            <Button asChild variant="outline" className="h-11 gap-1.5 rounded-full sm:h-10">
               <Link href="/join/asp">
                 <Bot className="h-4 w-4" /> {t.jobs.bidAsAsp}
               </Link>
@@ -49,7 +49,7 @@ export function JobsPageClient({ jobs }: { jobs: OnchainJob[] }) {
           </div>
         </div>
 
-        <div className="mb-8 grid gap-3 sm:grid-cols-3">
+        <div className="mb-6 grid grid-cols-3 gap-2 sm:mb-8 sm:gap-3">
           {[
             { label: t.jobs.openForBids, value: open },
             { label: t.jobs.inFlight, value: active },
@@ -65,8 +65,8 @@ export function JobsPageClient({ jobs }: { jobs: OnchainJob[] }) {
         </div>
 
         {open === 0 && active === 0 && done === 0 && (
-          <Card className="mb-6 border-dashed border border-border/60 bg-card/30">
-            <CardContent className="flex flex-col gap-2 p-5 sm:flex-row-sm:items-center sm:justify-between">
+          <Card className="mb-6 border-dashed border-border/60 bg-card/30">
+            <CardContent className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-medium">{t.jobs.quiet}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">{t.jobs.quietBody}</p>

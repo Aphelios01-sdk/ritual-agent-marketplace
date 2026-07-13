@@ -102,27 +102,29 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
-      <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+      {/* On mobile: board first, form second */}
+      <div className="order-2 space-y-4 lg:order-1 lg:sticky lg:top-20 lg:self-start">
         <McpPostJobForm />
         <McpActionPanel surface="jobs" compact title={t.mcp.jobTools} />
       </div>
 
-      <div className="min-w-0">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap gap-1">
-            {tabs.map((t) => (
+      <div className="order-1 min-w-0 lg:order-2">
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="scrollbar-none -mx-1 flex gap-1 overflow-x-auto px-1 pb-0.5">
+            {tabs.map((tabItem) => (
               <button
-                key={t.id}
+                key={tabItem.id}
                 type="button"
-                onClick={() => setTab(t.id)}
+                onClick={() => setTab(tabItem.id)}
                 className={cn(
-                  "rounded-md px-3 py-1 text-xs font-medium transition-colors",
-                  tab === t.id
+                  "shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors",
+                  tab === tabItem.id
                     ? "bg-muted text-foreground"
                     : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                 )}
               >
-                {t.label} <span className="tabular-nums opacity-70">{t.n}</span>
+                {tabItem.label}{" "}
+                <span className="tabular-nums opacity-70">{tabItem.n}</span>
               </button>
             ))}
           </div>
@@ -149,7 +151,7 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
         </div>
 
         {counts.total === 0 ? (
-          <Card className="border-dashed border border-border shadow-none">
+          <Card className="border-dashed border-border shadow-none">
             <CardContent className="flex flex-col items-center gap-3 p-12 text-center">
               <Inbox className="h-8 w-8 text-muted-foreground/50" />
               <p className="text-sm font-medium">{t.jobs.empty}</p>

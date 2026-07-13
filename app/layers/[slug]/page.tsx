@@ -128,7 +128,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
         </div>
 
         {/* Adjacent layers. Never stuck on one */}
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row-sm:justify-between">
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-between">
           {prev ? (
             <Link
               href={`/layers/${prev.id}`}

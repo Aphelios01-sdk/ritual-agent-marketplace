@@ -32,7 +32,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border px-2.5 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
+        className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-2.5 text-xs text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground sm:h-8"
         aria-label={t.common.language}
         aria-expanded={open}
       >
@@ -41,7 +41,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1.5 min-w-[9.5rem] overflow-hidden rounded-lg border border-border bg-card py-1 shadow-xl shadow-black/40">
+        <div className="absolute right-0 top-full z-50 mt-1.5 max-h-[min(70dvh,20rem)] min-w-[10.5rem] overflow-y-auto overflow-x-hidden rounded-lg border border-border bg-card py-1 shadow-xl shadow-black/40">
           <p className="px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
             {t.common.language}
           </p>
@@ -51,7 +51,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
               type="button"
               onClick={() => pick(l.id)}
               className={cn(
-                "flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-sm transition-colors hover:bg-muted",
+                "flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted sm:py-2",
                 locale === l.id ? "text-primary" : "text-foreground",
               )}
             >

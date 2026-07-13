@@ -56,11 +56,11 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}>
-      <body className="min-h-full bg-background text-foreground">
+      <body className="flex min-h-full flex-col bg-background text-foreground">
         <I18nProvider>
           <div className="inf-ambient" aria-hidden />
           <Header />
-          <main className="min-h-[70vh]">{children}</main>
+          <main className="min-h-[calc(100dvh-12rem)] flex-1 w-full">{children}</main>
           <SiteFooter />
         </I18nProvider>
       </body>

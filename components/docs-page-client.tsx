@@ -131,7 +131,7 @@ export function DocsPageClient() {
 
   return (
     <div className="min-h-[100dvh]">
-      <section className="container mx-auto max-w-[1400px] px-4 py-10 md:py-14">
+      <section className="page-container py-8 md:py-14">
         <Link
           href="/"
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -145,7 +145,7 @@ export function DocsPageClient() {
           <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
             {p.eyebrow}
           </p>
-          <h1 className="text-3xl font-bold tracking-tight md:text-[2.8rem] md:leading-[1.05]">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-[2.8rem] md:leading-[1.05]">
             {p.title}
           </h1>
           <p className="mt-3 text-base leading-relaxed text-muted-foreground">
@@ -528,7 +528,7 @@ forge script script/DeployModuleC.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast`
               <Card className="surface-card overflow-hidden border border-border/60">
                 <div className="divide-y divide-border/60">
                   {addressEntries.map(([key, addr]) => (
-                    <div key={key} className="flex flex-col gap-1 px-5 py-3 sm:flex-row-sm:items-center sm:justify-between">
+                    <div key={key} className="flex flex-col gap-1 px-5 py-3 sm:flex-row sm:items-center sm:justify-between">
                       <span className="font-mono text-xs text-muted-foreground">{key}</span>
                       <a
                         href={`${EXPLORER}/address/${addr}`}

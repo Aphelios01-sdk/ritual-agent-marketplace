@@ -24,12 +24,12 @@ export function LeaderboardPageClient({
   const p = t.leaderboardPage
 
   return (
-    <div className="inf-container py-10 md:py-14">
+    <div className="inf-container py-8 md:py-14">
       <div className="mb-8 flex items-start gap-3">
         <Trophy className="mt-1 h-6 w-6 text-[#00ff99]" />
         <div>
           <p className="inf-eyebrow mb-2">{p.compete}</p>
-          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{p.title}</h1>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">{p.title}</h1>
           <p className="mt-2 text-sm text-muted-foreground">{p.body}</p>
         </div>
       </div>

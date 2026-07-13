@@ -61,7 +61,32 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
   ]
 
   return (
-    <div className="flex min-h-[calc(100dvh-3.5rem)]">
+    <div className="flex min-h-[calc(100dvh-3rem)] flex-col md:flex-row">
+      {/* Mobile horizontal nav */}
+      <div className="border-b border-border/40 md:hidden">
+        <nav className="scrollbar-none flex gap-1 overflow-x-auto px-3 py-2">
+          {SIDE.map((item) => {
+            const Icon = item.icon
+            const activeItem = item.href === "/dashboard"
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs transition-colors",
+                  activeItem
+                    ? "bg-muted text-foreground"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                )}
+              >
+                <Icon className="h-3.5 w-3.5 opacity-80" />
+                {item.label}
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+
       <aside className="hidden w-[220px] shrink-0 border-r border-border/40 bg-card/20 md:flex md:flex-col">
         <div className="border-b border-border/40 px-4 py-4">
           <p className="text-[11px] text-muted-foreground">{d.workspace}</p>
@@ -96,10 +121,10 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
       </aside>
 
       <main className="min-w-0 flex-1">
-        <div className="border-b border-border/40 px-4 py-4 sm:px-6">
-          <div className="flex flex-col gap-3 sm:flex-row-sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-lg font-semibold tracking-tight sm:text-xl">{d.overview}</h1>
+        <div className="border-b border-border/40 px-3 py-3 sm:px-6 sm:py-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <h1 className="text-base font-semibold tracking-tight sm:text-xl">{d.overview}</h1>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
                 <span>
                   {d.console}: {live.online || onchain ? d.live : d.degraded}
@@ -107,19 +132,19 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                 <LiveBlock initialBlock={initialBlock} variant="compact" />
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Link href="/jobs" className="inf-btn inf-btn-ghost h-8 px-3 text-xs">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+              <Link href="/jobs" className="inf-btn inf-btn-ghost h-9 px-3 text-xs sm:h-8">
                 {d.postTask}
               </Link>
-              <Link href="/create" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
+              <Link href="/create" className="inf-btn inf-btn-primary h-9 px-3 text-xs sm:h-8">
                 {d.deploy}
               </Link>
             </div>
           </div>
         </div>
 
-        <div className="space-y-5 p-4 sm:p-6">
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="space-y-4 p-3 sm:space-y-5 sm:p-6">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 xl:grid-cols-4">
             {kpis.map((k) => {
               const Icon = k.icon
               return (
@@ -150,7 +175,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                 </Link>
               </div>
               {open === 0 && active === 0 && done === 0 ? (
-                <div className="rounded-xl border border-border-dashed border border-border/50 bg-background/30 px-4 py-8 text-center">
+                <div className="rounded-xl border border-dashed border-border/50 bg-background/30 px-4 py-8 text-center">
                   <p className="text-sm font-medium tracking-tight">{d.pipelineEmpty}</p>
                   <p className="mx-auto mt-1.5 max-w-sm text-[12px] leading-relaxed text-muted-foreground">
                     {d.pipelineEmptyBody}
@@ -280,7 +305,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
           </div>
 
           <div id="agents" className="inf-card overflow-hidden">
-            <div className="flex flex-col gap-3 border-b border-border/40 p-4 sm:flex-row-sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 border-b border-border/40 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold tracking-tight">{d.agentsSection}</p>
                 <p className="text-[11px] text-muted-foreground">{d.registrySub}</p>

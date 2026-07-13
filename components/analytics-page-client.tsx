@@ -52,7 +52,7 @@ export function AnalyticsPageClient({ data }: { data: AnalyticsPayload }) {
 
   return (
     <div className="min-h-[100dvh]">
-      <section className="container mx-auto max-w-[1400px] px-4 py-10 md:py-14">
+      <section className="page-container py-8 md:py-14">
         <Link
           href="/"
           className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -61,7 +61,7 @@ export function AnalyticsPageClient({ data }: { data: AnalyticsPayload }) {
         </Link>
         <div className="mb-8 max-w-[60ch] animate-fade-up">
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">{p.eyebrow}</p>
-          <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">{p.title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl md:text-[2.6rem] md:leading-[1.05]">{p.title}</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
           <div className="mt-3">
             <LiveBlock initialBlock={data.initialBlock} variant="inline" />

@@ -26,7 +26,7 @@ const colorText: Record<MarketLayer["color"], string> = {
 export function LayersStack({ compact = false }: { compact?: boolean }) {
   return (
     <section className={cn("container mx-auto max-w-[1400px] px-4", compact ? "py-8" : "py-14")}>
-      <div className="mb-8 flex flex-col gap-4 md:flex-row-md:items-end md:justify-between">
+      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="max-w-xl animate-fade-up">
           <p className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
             <Layers className="h-3.5 w-3.5" /> Multi-layer architecture

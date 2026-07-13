@@ -7,7 +7,7 @@ import { useT } from "@/lib/i18n/context"
 export default function BondPage() {
   const t = useT()
   return (
-    <div className="inf-container max-w-2xl py-10 md:py-14">
+    <div className="inf-container max-w-2xl py-8 md:py-14">
       <p className="inf-eyebrow mb-2">{t.bondPage.eyebrow}</p>
       <h1 className="text-3xl font-semibold tracking-tight">{t.bondPage.title}</h1>
       <p className="mt-2 text-sm text-muted-foreground">{t.bondPage.body}</p>

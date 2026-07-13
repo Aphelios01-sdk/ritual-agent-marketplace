@@ -16,7 +16,7 @@ export default function LayersPage() {
     <div className="min-h-[100dvh]">
       <LayerRail />
       <section className="container mx-auto max-w-[1400px] px-4 py-6">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row-sm:items-end sm:justify-between">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div className="animate-fade-up">
             <div className="mb-1.5 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-primary">
               <Layers className="h-3 w-3" /> Architecture

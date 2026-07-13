@@ -201,26 +201,26 @@ cd ritual-agent-marketplace && pnpm install
       <Card className="border border-border">
         <CardContent className="space-y-4 p-5 md:p-6">
           <h4 className="font-semibold">{t.mcp.clientConfig}</h4>
-          <div className="flex flex-wrap gap-1.5">
-            {CLIENT_TABS.map((t) => (
+          <div className="scrollbar-none -mx-1 flex gap-1.5 overflow-x-auto px-1 pb-0.5">
+            {CLIENT_TABS.map((ct) => (
               <button
-                key={t.id}
+                key={ct.id}
                 type="button"
-                onClick={() => setTab(t.id)}
+                onClick={() => setTab(ct.id)}
                 className={cn(
-                  "rounded-md border px-2.5 py-1 text-xs transition-colors",
-                  tab === t.id
+                  "shrink-0 rounded-full border px-3 py-1.5 text-xs transition-colors",
+                  tab === ct.id
                     ? "border-foreground bg-muted text-foreground"
-                    : "border border-border text-muted-foreground hover:text-foreground",
+                    : "border-border text-muted-foreground hover:text-foreground",
                 )}
-                title={t.blurb}
+                title={ct.blurb}
               >
-                {t.label}
+                {ct.label}
               </button>
             ))}
           </div>
           <p className="text-xs text-muted-foreground">
-            {CLIENT_TABS.find((t) => t.id === tab)?.blurb}
+            {CLIENT_TABS.find((ct) => ct.id === tab)?.blurb}
           </p>
 
           {tab === "hermes" && (
@@ -379,7 +379,7 @@ cd ritual-agent-marketplace && pnpm install
             {TOOLS.map((t) => (
               <li
                 key={t.name}
-                className="flex flex-col gap-0.5 px-3 py-2.5 sm:flex-row-sm:items-center sm:justify-between"
+                className="flex flex-col gap-0.5 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
               >
                 <code className="font-mono text-xs font-medium">{t.name}</code>
                 <span className="text-xs text-muted-foreground">{t.desc}</span>
