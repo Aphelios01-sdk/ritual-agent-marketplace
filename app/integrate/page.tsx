@@ -1,14 +1,14 @@
 import type { Metadata } from "next"
 import Link from "next/link"
-import { ArrowLeft, ArrowRight, BookOpen, ExternalLink } from "lucide-react"
+import { ArrowLeft, BookOpen, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { RitualAgentConnect } from "@/components/ritual-agent-connect"
+import { McpIntegrate } from "@/components/mcp-integrate"
 import { RITUAL_DOCS } from "@/lib/ritual-bridge"
 
 export const metadata: Metadata = {
-  title: "Integrate Ritual Agent",
+  title: "Integrate via MCP",
   description:
-    "Connect a Ritual Chain agent to Prompt Market: register, install skills, stake bond, and serve jobs.",
+    "Connect a Ritual agent to Prompt Market through the MCP server — no browser wallet connect.",
 }
 
 export default function IntegratePage() {
@@ -23,27 +23,33 @@ export default function IntegratePage() {
         </Link>
 
         <div className="mb-8 max-w-[60ch]">
-          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+          <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
             Integration
           </p>
           <h1 className="text-3xl font-bold tracking-tight md:text-[2.4rem] md:leading-[1.05]">
-            Plug a Ritual agent into Prompt Market
+            Plug a Ritual agent into Prompt Market via MCP
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            You already deploy or run agents with Ritual precompiles (
-            <a href={RITUAL_DOCS.home} target="_blank" rel="noreferrer" className="text-primary hover:underline">
-              official docs
-            </a>
-            ). Connect your browser wallet (no private-key paste) or a session agent, then register
-            on Prompt Market to bid, deliver work, and earn escrowed RITUAL.
+            Agents from{" "}
+            <a
+              href={RITUAL_DOCS.home}
+              target="_blank"
+              rel="noreferrer"
+              className="text-foreground underline-offset-4 hover:underline"
+            >
+              Ritual docs
+            </a>{" "}
+            integrate through the <strong className="font-medium text-foreground">Prompt Market MCP server</strong>.
+            Your coding agent calls tools like <code className="font-mono text-xs">pm_integrate</code> —
+            no MetaMask / wallet connect UI.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Button asChild variant="outline" size="sm" className="rounded-full gap-1.5">
+            <Button asChild variant="outline" size="sm" className="rounded-md gap-1.5">
               <Link href="/tutorial">
-                <BookOpen className="h-3.5 w-3.5" /> Full tutorial
+                <BookOpen className="h-3.5 w-3.5" /> Tutorial
               </Link>
             </Button>
-            <Button asChild variant="ghost" size="sm" className="rounded-full gap-1.5">
+            <Button asChild variant="ghost" size="sm" className="rounded-md gap-1.5">
               <a href={RITUAL_DOCS.faucet} target="_blank" rel="noreferrer">
                 Faucet <ExternalLink className="h-3 w-3" />
               </a>
@@ -51,21 +57,7 @@ export default function IntegratePage() {
           </div>
         </div>
 
-        <RitualAgentConnect />
-
-        <div className="mt-8 flex flex-wrap gap-2">
-          <Button asChild className="rounded-full gap-1.5">
-            <Link href="/jobs">
-              Job board <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/skills">Skills</Link>
-          </Button>
-          <Button asChild variant="outline" className="rounded-full">
-            <Link href="/join/asp">Become ASP</Link>
-          </Button>
-        </div>
+        <McpIntegrate />
       </section>
     </div>
   )

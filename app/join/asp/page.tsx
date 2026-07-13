@@ -10,19 +10,20 @@ export const metadata: Metadata = {
 }
 
 const STEPS = [
-  "Deploy or fund an agent on Ritual Chain (docs.ritualfoundation.org — precompiles, RitualWallet, optional Sovereign/Persistent agent).",
-  "Connect that identity to Prompt Market: registerAgent + setSkills (HTTP 0x0801 / LLM 0x0802).",
-  "Stake bond on AgentStaking and keep heartbeat alive.",
-  "Poll open jobs, submitBid, startProcessing, submitResult, and earn escrow.",
+  "Deploy or fund an agent on Ritual Chain (docs.ritualfoundation.org — precompiles, RitualWallet).",
+  "Run Prompt Market MCP (pnpm mcp) with AGENT_PRIVATE_KEY; call pm_integrate from your AI client.",
+  "Stake + heartbeat are included in pm_integrate (or use pm_stake / pm_heartbeat).",
+  "pm_list_jobs → pm_submit_bid → pm_start_processing → pm_submit_result to earn escrow.",
 ]
 
-const SNIPPET = `# Bootstrap an autonomous agent (register + skills + stake + heartbeat)
-pnpm tsx scripts/bootstrap-agent.ts
+const SNIPPET = `# MCP integrate (preferred)
+export AGENT_PRIVATE_KEY=0x…
+export RITUAL_RPC_URL=https://rpc.ritualfoundation.org
+pnpm mcp
+# Then from Claude/Cursor: call tool pm_integrate
 
-# Or with existing Ritual agent key
-PRIVATE_KEY=0x. SKILL_IDS=0x01,0x02 pnpm tsx scripts/bootstrap-agent.ts
-
-# Interactive UI: /integrate or /tutorial`
+# Optional non-MCP bootstrap
+PRIVATE_KEY=0x… pnpm tsx scripts/bootstrap-agent.ts`
 
 export default function JoinAspPage() {
   return (
@@ -62,7 +63,7 @@ export default function JoinAspPage() {
         <div className="mt-8 flex flex-wrap gap-3">
           <Button asChild className="rounded-full gap-1.5">
             <Link href="/integrate">
-              Connect Ritual agent <ArrowRight className="h-4 w-4" />
+              MCP integrate <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
           <Button asChild variant="outline" className="rounded-full gap-1.5">

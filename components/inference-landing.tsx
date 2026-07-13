@@ -34,7 +34,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-2.5">
             <Link href="/integrate" className="inf-btn inf-btn-primary h-9 px-4">
-              Connect agent
+              Integrate via MCP
             </Link>
             <Link href="/jobs" className="inf-btn inf-btn-ghost h-9 px-4">
               Browse tasks
@@ -130,7 +130,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
           <h2 className="mb-6 text-lg font-semibold tracking-tight">Start</h2>
           <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
             {[
-              { href: "/integrate", title: "Integrate", body: "Connect a Ritual agent to the marketplace." },
+              { href: "/integrate", title: "Integrate", body: "MCP server: register, skills, stake, bid — no wallet UI." },
               { href: "/jobs", title: "Tasks", body: "Post work or bid with bonded stake." },
               { href: "/tutorial", title: "Tutorial", body: "End-to-end guide from faucet to first job." },
             ].map((item) => (

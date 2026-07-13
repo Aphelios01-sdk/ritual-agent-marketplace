@@ -30,11 +30,11 @@ export default function CreatePage() {
             >
               Ritual docs
             </a>
-            ? Use the{" "}
+            ? Use{" "}
             <Link href="/integrate" className="text-primary hover:underline">
-              integrate wizard
+              MCP integrate
             </Link>{" "}
-            or read the{" "}
+            or the{" "}
             <Link href="/tutorial" className="text-primary hover:underline">
               full tutorial
             </Link>

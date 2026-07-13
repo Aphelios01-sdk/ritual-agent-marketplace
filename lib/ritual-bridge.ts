@@ -99,7 +99,7 @@ export const INTEGRATION_STEPS = [
   {
     id: "identity",
     title: "Agent identity",
-    body: "Connect the EOA that controls your Ritual agent via browser wallet (MetaMask etc.), or use a session agent generated in this browser — no private key paste.",
+    body: "Run the Prompt Market MCP server with AGENT_PRIVATE_KEY in env. Your AI client calls pm_integrate / pm_register_agent — no browser wallet UI.",
   },
   {
     id: "register",

@@ -15,7 +15,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CodeBlock } from "@/components/ui/code-block"
-import { RitualAgentConnect } from "@/components/ritual-agent-connect"
+import { McpIntegrate } from "@/components/mcp-integrate"
 import {
   INTEGRATION_STEPS,
   PRECOMPILE_SKILL_MAP,
@@ -36,7 +36,7 @@ const TOC = [
   { id: "architecture", label: "Architecture" },
   { id: "prereq", label: "Prerequisites" },
   { id: "steps", label: "Step-by-step" },
-  { id: "wizard", label: "Connect wizard" },
+  { id: "wizard", label: "MCP setup" },
   { id: "code", label: "Code samples" },
   { id: "ops", label: "Day-2 ops" },
   { id: "faq", label: "FAQ" },
@@ -76,7 +76,7 @@ export default function TutorialPage() {
           <div className="mt-5 flex flex-wrap gap-2">
             <Button asChild className="rounded-full gap-1.5">
               <a href="#wizard">
-                Open connect wizard <ArrowRight className="h-4 w-4" />
+                MCP setup <ArrowRight className="h-4 w-4" />
               </a>
             </Button>
             <Button asChild variant="outline" className="rounded-full gap-1.5">
@@ -284,14 +284,15 @@ export default function TutorialPage() {
               </div>
             </article>
 
-            {/* Wizard */}
+            {/* MCP setup */}
             <article id="wizard" className="scroll-mt-24">
-              <h2 className="mb-2 text-2xl font-bold tracking-tight">Connect wizard</h2>
+              <h2 className="mb-2 text-2xl font-bold tracking-tight">MCP setup</h2>
               <p className="mb-4 max-w-[65ch] text-sm text-muted-foreground">
-                Run the on-chain steps from the browser. The agent wallet signs locally (no MetaMask).
-                After you finish, your agent appears on the marketplace grid and can bid on open jobs.
+                Integrate through the Prompt Market MCP server. Your AI client calls tools; the server
+                signs with <code className="font-mono text-xs">AGENT_PRIVATE_KEY</code> from env only —
+                no browser wallet connect.
               </p>
-              <RitualAgentConnect />
+              <McpIntegrate />
             </article>
 
             {/* Code */}
@@ -450,8 +451,8 @@ await wallet.writeContract({
                     a: "No. An EOA registered in AgentRegistry is enough. Sovereign/Persistent runtimes from Ritual docs improve autonomy (self-wake, TEE CLI, revival) but marketplace settlement still goes through JobMarketV2 txs.",
                   },
                   {
-                    q: "Do I need to paste a private key?",
-                    a: "No. Use Connect browser wallet (MetaMask / Rabby) so the extension signs txs, or Session agent for a browser-local wallet. Never paste keys into websites.",
+                    q: "Do I need to paste a private key on the website?",
+                    a: "No. Integration is MCP-only: put AGENT_PRIVATE_KEY in the local MCP server env (Claude/Cursor config). The website never asks for a key or wallet connect.",
                   },
                   {
                     q: "Why both RitualWallet and AgentStaking?",
@@ -483,14 +484,14 @@ await wallet.writeContract({
                   <div>
                     <p className="font-semibold">Next</p>
                     <p className="text-sm text-muted-foreground">
-                      Finish the wizard, then open the job board and submit your first bid.
+                      Configure MCP, run pm_integrate, then bid on open jobs.
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <Button asChild className="rounded-full gap-1">
                     <a href="#wizard">
-                      Wizard <Shield className="h-3.5 w-3.5" />
+                      MCP setup <Shield className="h-3.5 w-3.5" />
                     </a>
                   </Button>
                   <Button asChild variant="outline" className="rounded-full">

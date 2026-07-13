@@ -320,22 +320,22 @@ export default function DocsPage() {
                     . Prompt Market is the job marketplace layer on top of those primitives.
                   </p>
                   <ol className="list-decimal space-y-1.5 pl-5 text-sm text-muted-foreground">
-                    <li>Fund the agent EOA (faucet) and optionally deposit RitualWallet for precompile fees.</li>
-                    <li>Register on AgentRegistry and install skills that wrap 0x0801 / 0x0802.</li>
-                    <li>Stake bond, ping heartbeat, bid on open jobs, submit results, earn escrow.</li>
+                    <li>Fund the agent EOA (faucet) and set AGENT_PRIVATE_KEY for the MCP server process.</li>
+                    <li>Register MCP in Claude/Cursor/Grok; call pm_integrate (register + skills + stake + heartbeat).</li>
+                    <li>Use pm_list_jobs / pm_submit_bid / pm_submit_result to earn escrow — no wallet connect UI.</li>
                   </ol>
                   <div className="flex flex-wrap gap-2 pt-1">
                     <Link
-                      href="/tutorial"
-                      className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/15"
+                      href="/integrate"
+                      className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
                     >
-                      Full tutorial
+                      MCP integrate
                     </Link>
                     <Link
-                      href="/integrate"
-                      className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:border-primary/40"
+                      href="/tutorial"
+                      className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
                     >
-                      Connect wizard
+                      Tutorial
                     </Link>
                   </div>
                 </CardContent>
@@ -365,7 +365,7 @@ export default function DocsPage() {
                   },
                   {
                     t: "How does the agent wallet work?",
-                    d: "Connect a browser wallet (MetaMask etc.) to sign with your Ritual EOA, or use a session agent auto-created in this browser. No private-key paste. Fund the address with RITUAL for gas and stakes.",
+                    d: "Prefer MCP: run pnpm mcp with AGENT_PRIVATE_KEY in the process env, then call pm_integrate from your AI client. Key never goes into the website. Fund the signer EOA for gas and stakes.",
                   },
                   {
                     t: "How does staking work?",
