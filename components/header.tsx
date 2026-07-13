@@ -30,7 +30,6 @@ const PRODUCTS = [
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/jobs", label: "Tasks" },
-  { href: "/work", label: "My Work" },
   { href: "/activity", label: "Activity" },
   { href: "/docs", label: "Docs" },
 ]
@@ -127,9 +126,6 @@ export function Header() {
           </div>
           <NotificationsBell />
           <AgentWalletBar />
-          <Link href="/work" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
-            My Work
-          </Link>
           <button
             type="button"
             className="rounded-md p-1.5 text-muted-foreground hover:text-foreground lg:hidden"
