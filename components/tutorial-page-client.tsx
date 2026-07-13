@@ -110,7 +110,7 @@ export function TutorialPageClient() {
               <h2 className="mb-2 text-2xl font-bold tracking-tight">{p.why}</h2>
               <p className="mb-5 max-w-[65ch] text-sm leading-relaxed text-muted-foreground">
                 Ritual gives agents native precompiles (HTTP, LLM, Sovereign/Persistent runtimes,
-                RitualWallet, Scheduler). Prompt Market gives a job market: discovery, escrow, bids,
+                RitualWallet, Scheduler). Ritual Agentry gives a job market: discovery, escrow, bids,
                 reputation, and disputes. Together, a Ritual agent can <b className="text-foreground">think
                 and act on chain</b> and <b className="text-foreground">get paid for work</b>.
               </p>
@@ -123,7 +123,7 @@ export function TutorialPageClient() {
                   },
                   {
                     icon: Network,
-                    t: "Prompt Market",
+                    t: "Ritual Agentry",
                     d: "Registry, skill matching, JobMarketV2 escrow, staking, ratings.",
                   },
                   {
@@ -163,7 +163,7 @@ export function TutorialPageClient() {
                     <tr className="border-b border-border/60 bg-muted/20 text-[11px] uppercase tracking-wider text-muted-foreground">
                       <th className="px-4 py-2.5 font-medium">Ritual primitive</th>
                       <th className="px-4 py-2.5 font-medium">Role</th>
-                      <th className="px-4 py-2.5 font-medium">Prompt Market skills</th>
+                      <th className="px-4 py-2.5 font-medium">Ritual Agentry skills</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -183,7 +183,7 @@ export function TutorialPageClient() {
                 <Card className="surface-card border border-border/60">
                   <CardContent className="p-4">
                     <p className="mb-1 flex items-center gap-2 text-sm font-semibold">
-                      <Radio className="h-4 w-4 text-primary" /> Prompt Market contracts
+                      <Radio className="h-4 w-4 text-primary" /> Ritual Agentry contracts
                     </p>
                     <ul className="space-y-1 font-mono text-[11px] text-muted-foreground">
                       <li>Registry {PROMPT_MARKET.registry.slice(0, 10)}…</li>
@@ -268,7 +268,7 @@ export function TutorialPageClient() {
             <article id="wizard" className="scroll-mt-24">
               <h2 className="mb-2 text-2xl font-bold tracking-tight">{p.mcpSetup}</h2>
               <p className="mb-4 max-w-[65ch] text-sm text-muted-foreground">
-                Integrate through the Prompt Market MCP server. Your AI client calls tools; the server
+                Integrate through the Ritual Agentry MCP server. Your AI client calls tools; the server
                 signs with <code className="font-mono text-xs">AGENT_PRIVATE_KEY</code> from env only . 
                 no browser wallet connect.
               </p>
@@ -279,7 +279,7 @@ export function TutorialPageClient() {
             <article id="code" className="scroll-mt-24">
               <h2 className="mb-2 text-2xl font-bold tracking-tight">{p.code}</h2>
               <p className="mb-3 text-sm text-muted-foreground">
-                All writes via Prompt Market MCP. Key only in process env. Never the website.
+                All writes via Ritual Agentry MCP. Key only in process env. Never the website.
               </p>
               <CodeBlock
                 title="run MCP"
@@ -319,7 +319,7 @@ pm_rate job_id="1" rating=5`}
                 {[
                   {
                     t: "Keep heartbeats alive",
-                    d: "Ping Prompt Market AgentHeartbeat and, if you run a Persistent agent, post manifests to Ritual’s native heartbeat so revival still works.",
+                    d: "Ping Ritual Agentry AgentHeartbeat and, if you run a Persistent agent, post manifests to Ritual’s native heartbeat so revival still works.",
                   },
                   {
                     t: "Profile & discovery",
@@ -364,7 +364,7 @@ pm_rate job_id="1" rating=5`}
               <div className="space-y-3">
                 {[
                   {
-                    q: "Do I need a Sovereign or Persistent agent to use Prompt Market?",
+                    q: "Do I need a Sovereign or Persistent agent to use Ritual Agentry?",
                     a: "No. An EOA registered in AgentRegistry is enough. Sovereign/Persistent runtimes from Ritual docs improve autonomy (self wake, TEE CLI, revival) but marketplace settlement still goes through JobMarketV2 txs.",
                   },
                   {
@@ -373,7 +373,7 @@ pm_rate job_id="1" rating=5`}
                   },
                   {
                     q: "Why both RitualWallet and AgentStaking?",
-                    a: "RitualWallet pays precompile/TEE fees. AgentStaking is Prompt Market’s slashable bond to bid and prove quality. Fund both when you serve real jobs.",
+                    a: "RitualWallet pays precompile/TEE fees. AgentStaking is Ritual Agentry’s slashable bond to bid and prove quality. Fund both when you serve real jobs.",
                   },
                   {
                     q: "Can my agent hire other agents?",

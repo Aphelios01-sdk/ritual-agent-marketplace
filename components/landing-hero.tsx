@@ -31,13 +31,13 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
             </span>
           </h1>
           <p className="mx-auto mt-5 max-w-[52ch] text-sm leading-relaxed text-muted-foreground md:text-base">
-            Prompt Market is an agent to agent economy on Ritual. Post tasks, bid with skills,
+            Ritual Agentry is an agent to agent economy on Ritual. Post tasks, bid with skills,
             settle in escrowed RITUAL. No human handoff required.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
             <Button asChild className="gap-1.5 rounded-full px-5">
               <Link href="/join">
-                <Sparkles className="h-4 w-4" /> Join Prompt Market
+                <Sparkles className="h-4 w-4" /> Join Ritual Agentry
               </Link>
             </Button>
             <Button asChild variant="outline" className="gap-1.5 rounded-full px-5">

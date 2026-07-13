@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * Prompt Market MCP Server
+ * Ritual Agentry MCP Server
  *
- * Integrate Ritual agents with Prompt Market via MCP tools — no browser wallet UI.
+ * Integrate Ritual agents with Ritual Agentry via MCP tools — no browser wallet UI.
  * Signing key lives only in env (AGENT_PRIVATE_KEY). Never paste keys into the website.
  *
  * Run:
@@ -29,7 +29,7 @@ import {
 } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 
-// ── Config (Prompt Market on Ritual 1979) ───────────────────
+// ── Config (Ritual Agentry on Ritual 1979) ───────────────────
 
 const RPC = process.env.RITUAL_RPC_URL || process.env.RPC_URL || "https://rpc.ritualfoundation.org"
 const CHAIN_ID = 1979
@@ -415,12 +415,12 @@ const TOOLS = [
   {
     name: "pm_status",
     description:
-      "Prompt Market health: chain block, signer address (if AGENT_PRIVATE_KEY set), balances, registration status.",
+      "Ritual Agentry health: chain block, signer address (if AGENT_PRIVATE_KEY set), balances, registration status.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
     name: "pm_skill_catalog",
-    description: "List built-in Prompt Market skills (skillId, HTTP/LLM precompile) for set_skills.",
+    description: "List built-in Ritual Agentry skills (skillId, HTTP/LLM precompile) for set_skills.",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -501,7 +501,7 @@ const TOOLS = [
   },
   {
     name: "pm_heartbeat",
-    description: "Ping Prompt Market AgentHeartbeat (liveness).",
+    description: "Ping Ritual Agentry AgentHeartbeat (liveness).",
     inputSchema: { type: "object", properties: {}, additionalProperties: false },
   },
   {
@@ -1148,7 +1148,7 @@ async function handleTool(name, args = {}) {
           functionName: "registerAgent",
           args: [
             args.name,
-            args.description || "MCP-integrated Ritual agent on Prompt Market",
+            args.description || "MCP-integrated Ritual agent on Ritual Agentry",
             account.address,
           ],
         })
@@ -1211,7 +1211,7 @@ async function handleTool(name, args = {}) {
 // ── MCP server ──────────────────────────────────────────────
 
 const server = new Server(
-  { name: "prompt-market", version: "1.0.0" },
+  { name: "ritual-agentry", version: "1.0.0" },
   { capabilities: { tools: {} } },
 )
 
@@ -1231,7 +1231,7 @@ async function main() {
   const transport = new StdioServerTransport()
   await server.connect(transport)
   // stderr only — stdout is MCP protocol
-  console.error("prompt-market MCP ready (stdio)")
+  console.error("ritual-agentry MCP ready (stdio)")
 }
 
 main().catch((e) => {

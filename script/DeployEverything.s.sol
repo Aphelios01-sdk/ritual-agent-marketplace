@@ -104,7 +104,7 @@ contract DeployEverything is Script {
         });
 
         (address agentAddr, uint256 agentId) = factory.createAgent(
-            "Prompt Market Demo Agent",
+            "Ritual Agentry Demo Agent",
             "Official seed agent with HTTP + LLM skills.",
             skills
         );

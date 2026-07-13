@@ -1,5 +1,5 @@
 /**
- * Client config snippets for Prompt Market MCP server.
+ * Client config snippets for Ritual Agentry MCP server.
  * Used by /integrate UI. keep secrets as placeholders only.
  */
 
@@ -32,7 +32,7 @@ export function claudeDesktopJson(serverPath: string, agentKey?: string) {
   return JSON.stringify(
     {
       mcpServers: {
-        "prompt-market": stdioServer(serverPath, agentKey),
+        "ritual-agentry": stdioServer(serverPath, agentKey),
       },
     },
     null,
@@ -49,7 +49,7 @@ export function hermesYaml(serverPath: string, agentKey?: string) {
   const env = mcpEnv(agentKey)
   return `# ~/.hermes/config.yaml. merge under mcp_servers
 mcp_servers:
-  prompt market:
+  ritual-agentry:
     command: node
     args:
       - ${serverPath} env: AGENT_PRIVATE_KEY: "${env.AGENT_PRIVATE_KEY}" RITUAL_RPC_URL: "${env.RITUAL_RPC_URL}"
@@ -59,14 +59,14 @@ mcp_servers:
 /** OpenClaw CLI add + config file shape (mcp.servers) */
 export function openclawAddCommand(serverPath: string, agentKey?: string) {
   const env = mcpEnv(agentKey)
-  return `# Add Prompt Market as OpenClaw managed MCP server
-openclaw mcp add prompt-market \\
+  return `# Add Ritual Agentry as OpenClaw managed MCP server
+openclaw mcp add ritual-agentry \\
   --command node \\
   --arg "${serverPath}" \\
   --env AGENT_PRIVATE_KEY=${env.AGENT_PRIVATE_KEY} \\
   --env RITUAL_RPC_URL=${env.RITUAL_RPC_URL} # Probe
-openclaw mcp doctor prompt market --probe
-openclaw mcp tools prompt market
+openclaw mcp doctor ritual agentry --probe
+openclaw mcp tools ritual agentry
 `
 }
 
@@ -76,7 +76,7 @@ export function openclawJson(serverPath: string, agentKey?: string) {
     {
       mcp: {
         servers: {
-          "prompt-market": {
+          "ritual-agentry": {
             command: "node",
             args: [serverPath],
             env: {
@@ -93,19 +93,19 @@ export function openclawJson(serverPath: string, agentKey?: string) {
 }
 
 /**
- * Ritual / Prompt Market agent worker:
+ * Ritual Agentry agent worker:
  * - EOA must match on chain agent (register via pm_integrate)
  * - Optional soul/memory for Sovereign or Persistent agent loops (docs.ritualfoundation.org)
  */
 export function ritualAgentYaml(serverPath: string, agentKey?: string) {
   const env = mcpEnv(agentKey)
-  return `# ritual agent.yaml. worker for agents listed on Prompt Market
+  return `# ritual agent.yaml. worker for agents listed on Ritual Agentry
 # AGENT_PRIVATE_KEY must be the same EOA registered as agentContract.
 
 agent:
   name: "RitualAgent"
   chain_id: 1979
-  rpc: ${env.RITUAL_RPC_URL} # Fund this address (faucet) for gas + stake + RitualWallet precompile fees # address: derived from AGENT_PRIVATE_KEY mcp: prompt market: command: node args: ["${serverPath}"] env: AGENT_PRIVATE_KEY: "${env.AGENT_PRIVATE_KEY}" RITUAL_RPC_URL: "${env.RITUAL_RPC_URL}" # Bootstrap on first run (AI client should call these tools):
+  rpc: ${env.RITUAL_RPC_URL} # Fund this address (faucet) for gas + stake + RitualWallet precompile fees # address: derived from AGENT_PRIVATE_KEY mcp: ritual-agentry: command: node args: ["${serverPath}"] env: AGENT_PRIVATE_KEY: "${env.AGENT_PRIVATE_KEY}" RITUAL_RPC_URL: "${env.RITUAL_RPC_URL}" # Bootstrap on first run (AI client should call these tools):
 # pm_status
 # pm_integrate name="RitualAgent" stake_amount="0.1"
 # pm_set_profile metadata_uri="https://…/avatar.png"
@@ -130,14 +130,14 @@ if [[ ! -f "\$SERVER" ]]; then
   SERVER="\$REPO/mcp/server.mjs"
 fi
 
-echo "Starting Prompt Market MCP: \$SERVER"
+echo "Starting Ritual Agentry MCP: \$SERVER"
 exec node "\$SERVER"
 `
 }
 
 export function mcporterAdd(serverPath: string, agentKey?: string) {
   const env = mcpEnv(agentKey)
-  return `mcporter config add prompt-market \\ --command node \\ --arg "${serverPath}" \\
+  return `mcporter config add ritual-agentry \\ --command node \\ --arg "${serverPath}" \\
   --env AGENT_PRIVATE_KEY=${env.AGENT_PRIVATE_KEY} \\
   --env RITUAL_RPC_URL=${env.RITUAL_RPC_URL}`
 }
@@ -152,7 +152,7 @@ pnpm mcp
 export const CLIENT_TABS: { id: McpClientId; label: string; blurb: string }[] = [
   { id: "hermes", label: "Hermes", blurb: "~/.hermes/config.yaml · mcp_servers" },
   { id: "openclaw", label: "OpenClaw", blurb: "openclaw mcp add · mcp.servers" },
-  { id: "ritual", label: "Ritual agent", blurb: "Prompt Market agent worker + soul loop" },
+  { id: "ritual", label: "Ritual agent", blurb: "Ritual Agentry agent worker + soul loop" },
   { id: "claude", label: "Claude Desktop", blurb: "claude_desktop_config.json" },
   { id: "cursor", label: "Cursor / Grok", blurb: "mcp.json" },
   { id: "mcporter", label: "mcporter", blurb: "CLI registry" },

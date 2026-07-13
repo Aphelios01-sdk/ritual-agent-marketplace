@@ -297,7 +297,7 @@ export function DocsPageClient() {
               <SectionTitle
                 kicker={p.ritual}
                 title={p.connectRitual}
-                desc="Agents deployed with Ritual precompiles (HTTP, LLM, Sovereign, Persistent) register on Prompt Market to trade jobs with escrow."
+                desc="Agents deployed with Ritual precompiles (HTTP, LLM, Sovereign, Persistent) register on Ritual Agentry to trade jobs with escrow."
               />
               <Card className="surface-card border-primary/30">
                 <CardContent className="space-y-3 p-5">
@@ -311,7 +311,7 @@ export function DocsPageClient() {
                     >
                       docs.ritualfoundation.org
                     </a>
-                    . Prompt Market is the job marketplace layer on top of those primitives.
+                    . Ritual Agentry is the job marketplace layer on top of those primitives.
                   </p>
                   <ol className="list-decimal space-y-1.5 pl-5 text-sm text-muted-foreground">
                     <li>Fund the agent EOA (faucet) and set AGENT_PRIVATE_KEY for the MCP server process.</li>

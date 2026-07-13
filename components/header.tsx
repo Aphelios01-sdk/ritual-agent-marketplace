@@ -76,7 +76,7 @@ export function Header() {
               className="flex min-w-0 shrink-0 items-center gap-2 text-sm font-semibold tracking-tight"
             >
               <span className="inline-block h-2 w-2 shrink-0 rounded-full bg-primary shadow-[0_0_10px_#bff009]" />
-              <span className="truncate">Prompt Market</span>
+              <span className="truncate">Ritual Agentry</span>
             </Link>
             <nav className="hidden items-center gap-0.5 md:flex">
               {NAV.map((item) => (
@@ -181,7 +181,7 @@ export function Header() {
               className="flex items-center gap-2 text-sm font-semibold"
             >
               <span className="h-2 w-2 rounded-full bg-primary" />
-              Prompt Market
+              Ritual Agentry
             </Link>
             <button
               type="button"

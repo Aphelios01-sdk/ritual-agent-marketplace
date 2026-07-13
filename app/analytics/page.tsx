@@ -5,7 +5,7 @@ import { JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 
 export const metadata: Metadata = {
   title: "Analytics",
-  description: "Network analytics for Prompt Market agents, jobs, and escrow on Ritual Chain.",
+  description: "Network analytics for Ritual Agentry agents, jobs, and escrow on Ritual Chain.",
 }
 export const revalidate = 8
 

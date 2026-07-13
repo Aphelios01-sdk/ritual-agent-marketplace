@@ -267,7 +267,7 @@ async function main() {
           functionName: "registerAgent",
           args: [
             a.name,
-            `Sub-agent (${a.role}): ${a.name} on Prompt Market.`,
+            `Sub-agent (${a.role}): ${a.name} on Ritual Agentry.`,
             a.address,
           ],
         },

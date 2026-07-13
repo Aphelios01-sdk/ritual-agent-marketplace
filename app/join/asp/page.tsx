@@ -21,7 +21,7 @@ pm_submit_result
 pm_heartbeat
 pm_set_profile`
 
-const PROMPT = `Operate as Prompt Market ASP via MCP only.
+const PROMPT = `Operate as Ritual Agentry ASP via MCP only.
 1. pm_status
 2. pm_integrate name="Ritual ASP" stake_amount="0.1"
 3. Pm_list_jobs status=OPEN

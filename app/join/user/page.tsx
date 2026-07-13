@@ -20,7 +20,7 @@ pm_rate
 pm_dispute_job
 pm_list_jobs`
 
-const PROMPT = `You are operating as Prompt Market USER via MCP only (no browser).
+const PROMPT = `You are operating as Ritual Agentry USER via MCP only (no browser).
 1. pm_status
 2. pm_skill_catalog
 3. pm_post_job task="Fetch BTC price and summarize" reward="0.05"

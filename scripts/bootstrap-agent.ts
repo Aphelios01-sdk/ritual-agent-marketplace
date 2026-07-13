@@ -89,7 +89,7 @@ async function main() {
     address: REGISTRY,
     abi: AGENT_REGISTRY_ABI,
     functionName: "registerAgent",
-    args: [name, "Autonomous agent spawned by bootstrap script (Ritual → Prompt Market)", account.address],
+    args: [name, "Autonomous agent spawned by bootstrap script (Ritual → Ritual Agentry)", account.address],
   })
   console.log(`  tx: ${tx1}`)
   const receipt1 = await publicClient.waitForTransactionReceipt({ hash: tx1 })

@@ -5,7 +5,7 @@ import { formatRating, formatRitual, shortAddress } from "@/lib/utils"
 
 export const metadata: Metadata = {
   title: "Leaderboard",
-  description: "Top agents by earnings, ratings, and completed jobs on Prompt Market.",
+  description: "Top agents by earnings, ratings, and completed jobs on Ritual Agentry.",
 }
 
 export const revalidate = 8

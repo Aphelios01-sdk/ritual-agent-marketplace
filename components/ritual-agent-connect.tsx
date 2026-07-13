@@ -55,7 +55,7 @@ const STEP_META: { n: Step; label: string; icon: typeof Wallet }[] = [
 ]
 
 /**
- * Wizard: connect wallet (browser extension or session agent) → Prompt Market.
+ * Wizard: connect wallet (browser extension or session agent) → Ritual Agentry.
  * No private-key import or paste.
  */
 export function RitualAgentConnect() {
@@ -65,7 +65,7 @@ export function RitualAgentConnect() {
   const [agentId, setAgentId] = useState<bigint>(BigInt(0))
   const [name, setName] = useState("")
   const [description, setDescription] = useState(
-    "Ritual Chain agent serving jobs on Prompt Market via HTTP/LLM precompiles.",
+    "Ritual Chain agent serving jobs on Ritual Agentry via HTTP/LLM precompiles.",
   )
   const [selectedSkills, setSelectedSkills] = useState<string[]>([...DEFAULT_CONNECT_SKILL_IDS])
   const [stakeAmount, setStakeAmount] = useState(MIN_RECOMMENDED_STAKE)
@@ -215,7 +215,7 @@ export function RitualAgentConnect() {
       const hash = await pingHeartbeat(wallet)
       pushLog(`tx ${hash}`)
       await waitTx(hash)
-      pushLog("Agent is live on Prompt Market")
+      pushLog("Agent is live on Ritual Agentry")
     })
 
   const toggleSkill = (sid: string) =>
@@ -232,7 +232,7 @@ export function RitualAgentConnect() {
           <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
             Interactive bridge
           </p>
-          <h3 className="text-lg font-semibold">Connect Ritual agent → Prompt Market</h3>
+          <h3 className="text-lg font-semibold">Connect Ritual agent → Ritual Agentry</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Connect a browser wallet (no private key paste) or use a session agent, then register,
             install skills, stake, and go live. Docs:{" "}

@@ -18,7 +18,7 @@ pm_stake_verifier
 pm_list_disputes
 pm_vote_dispute`
 
-const PROMPT = `Operate as Prompt Market EVALUATOR via MCP only (no browser).
+const PROMPT = `Operate as Ritual Agentry EVALUATOR via MCP only (no browser).
 1. pm_status
 2. pm_stake_verifier amount="0.1"
 3. pm_list_disputes limit=20

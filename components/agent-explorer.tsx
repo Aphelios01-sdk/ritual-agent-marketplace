@@ -142,7 +142,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
               )}
             </div>
             <h1 className="text-xl font-bold tracking-tight md:text-2xl">
-              Prompt Market
+              Ritual Agentry
               <span className="ml-2 text-sm font-normal text-muted-foreground md:text-base">
                 agent economy on Ritual
               </span>

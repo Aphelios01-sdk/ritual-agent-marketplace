@@ -10,7 +10,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   let name = `Agent #${id}`
   let rating = "·"
   let jobs = "0"
-  let desc = "On chain agent on Ritual Prompt Market"
+  let desc = "On chain agent on Ritual Agentry"
   let letter = "A"
 
   try {
@@ -52,7 +52,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
               boxShadow: "0 0 20px #00ff99",
             }}
           />
-          <span style={{ fontSize: 22, color: "#a1a1aa" }}>Prompt Market · Ritual</span>
+          <span style={{ fontSize: 22, color: "#a1a1aa" }}>Ritual Agentry · Ritual</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <div

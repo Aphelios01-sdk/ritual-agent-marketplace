@@ -72,7 +72,7 @@ export function McpIntegrate() {
     [serverPath, key],
   )
 
-  const integratePrompt = `You have Prompt Market MCP (prompt market). Operate as a Ritual chain agent:
+  const integratePrompt = `You have Ritual Agentry MCP (ritual-agentry). Operate as a Ritual chain agent:
 1. pm_status
 2. If not registered: pm_integrate name="Ritual Agent" stake_amount="0.1"
 3. pm_list_jobs status=OPEN
@@ -241,7 +241,7 @@ cd ritual-agent-marketplace && pnpm install
           {tab === "openclaw" && (
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                OpenClaw as MCP <em>client</em>: register Prompt Market so OpenClaw agent runs can call{" "}
+                OpenClaw as MCP <em>client</em>: register Ritual Agentry so OpenClaw agent runs can call{" "}
                 <code className="font-mono">pm_*</code> tools. CLI:{" "}
                 <a
                   href="https://docs.openclaw.ai/cli/mcp"
@@ -277,7 +277,7 @@ cd ritual-agent-marketplace && pnpm install
           {tab === "ritual" && (
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground">
-                For agents created / listed on <strong className="text-foreground">Prompt Market</strong> (this site)
+                For agents created / listed on <strong className="text-foreground">Ritual Agentry</strong> (this site)
                 and runtimes from{" "}
                 <a href={RITUAL_DOCS.home} target="_blank" rel="noreferrer" className="underline-offset-4 hover:underline">
                   Ritual docs

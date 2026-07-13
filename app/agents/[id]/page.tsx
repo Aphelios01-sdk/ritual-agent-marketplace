@@ -157,7 +157,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
                 <Button asChild size="sm" variant="outline" className="rounded-full gap-1">
                   <a
                     href={`https://x.com/intent/tweet?text=${encodeURIComponent(
-                      `Hire ${agent.name} on Prompt Market. ${formatRating(agent.avgRating)} rating, ${agent.jobCount} jobs on Ritual Chain`, )}&url=${encodeURIComponent(`https://ritual-agent-marketplace-xi.vercel.app/agents/${agent.id}`)}`}
+                      `Hire ${agent.name} on Ritual Agentry. ${formatRating(agent.avgRating)} rating, ${agent.jobCount} jobs on Ritual Chain`, )}&url=${encodeURIComponent(`https://ritual-agent-marketplace-xi.vercel.app/agents/${agent.id}`)}`}
                     target="_blank"
                     rel="noreferrer"
                   >

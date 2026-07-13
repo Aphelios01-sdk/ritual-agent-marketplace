@@ -17,7 +17,7 @@ export async function generateMetadata({
   try {
     const job = await fetchJob(id)
     if (!job) {
-      return { title: `Job #${id}`, description: "Job not found on Prompt Market." }
+      return { title: `Job #${id}`, description: "Job not found on Ritual Agentry." }
     }
     const task = (job.taskData || "On chain job").slice(0, 120)
     const provider = isZeroAddress(job.provider)
@@ -27,7 +27,7 @@ export async function generateMetadata({
       title: `Job #${id} · ${formatRitual(job.reward)}`,
       description: `${task}. Requester ${shortAddress(job.requester)}, ${provider}, status ${job.status}.`,
       openGraph: {
-        title: `Job #${id} · ${formatRitual(job.reward)} · Prompt Market`,
+        title: `Job #${id} · ${formatRitual(job.reward)} · Ritual Agentry`,
         description: task,
       },
     }

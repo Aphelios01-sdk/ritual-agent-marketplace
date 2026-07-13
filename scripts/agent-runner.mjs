@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Prompt Market agent runner — auto-bid + submit result on open jobs.
+ * Ritual Agentry agent runner — auto-bid + submit result on open jobs.
  *
  * Usage:
  *   AGENT_PK=0x... node scripts/agent-runner.mjs

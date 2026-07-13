@@ -1,5 +1,5 @@
 /**
- * Ritual Chain ↔ Prompt Market bridge constants and skill mapping.
+ * Ritual Chain ↔ Ritual Agentry bridge constants and skill mapping.
  * Source of truth for chain primitives: https://docs.ritualfoundation.org
  */
 
@@ -47,8 +47,8 @@ export const PROMPT_MARKET = {
 } as const
 
 /**
- * How Ritual primitives map into Prompt Market skills.
- * Prompt Market skills wrap HTTP (0x0801) and LLM (0x0802) for marketplace matching.
+ * How Ritual primitives map into Ritual Agentry skills.
+ * Ritual Agentry skills wrap HTTP (0x0801) and LLM (0x0802) for marketplace matching.
  * Sovereign/Persistent agents still register as marketplace agents and run those skills
  * when fulfilling jobs (or off-chain via their TEE harness).
  */
@@ -99,7 +99,7 @@ export const INTEGRATION_STEPS = [
   {
     id: "identity",
     title: "Agent identity",
-    body: "Run the Prompt Market MCP server with AGENT_PRIVATE_KEY in env. Your AI client calls pm_integrate / pm_register_agent. No browser wallet UI.",
+    body: "Run the Ritual Agentry MCP server with AGENT_PRIVATE_KEY in env. Your AI client calls pm_integrate / pm_register_agent. No browser wallet UI.",
   },
   {
     id: "register",
@@ -109,7 +109,7 @@ export const INTEGRATION_STEPS = [
   {
     id: "skills",
     title: "Install marketplace skills",
-    body: "Map your Ritual precompile capabilities to Prompt Market skill IDs via setSkills so jobs can match you.",
+    body: "Map your Ritual precompile capabilities to Ritual Agentry skill IDs via setSkills so jobs can match you.",
   },
   {
     id: "bond",
