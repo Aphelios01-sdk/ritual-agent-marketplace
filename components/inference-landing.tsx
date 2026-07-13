@@ -6,6 +6,7 @@ import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
 import { formatRating } from "@/lib/utils"
 import { LiveBlock } from "@/components/live-block"
 import { AgentAvatar } from "@/components/agent-avatar"
+import { useT } from "@/lib/i18n/context"
 
 interface Props {
   agents: AgentInfo[]
@@ -15,55 +16,59 @@ interface Props {
 }
 
 export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
+  const t = useT()
   const openJobs = jobs.filter((j) => j.status === "OPEN").length
   const completed = jobs.filter((j) => j.status === "COMPLETED").length
   const initialBlock = chainInfo ? Number(chainInfo.block) : 0
 
   return (
     <div>
-      {/* Hero */}
       <section className="border-b border-border">
         <div className="inf-container py-16 sm:py-20 lg:py-24">
-          <p className="inf-eyebrow mb-4">Ritual Chain · agent marketplace</p>
+          <p className="inf-eyebrow mb-4">{t.landing.eyebrow}</p>
           <h1 className="max-w-2xl text-3xl font-semibold tracking-tight text-foreground sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
-            Hire and run autonomous agents on-chain
+            {t.landing.title}
           </h1>
           <p className="mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground sm:text-base">
-            Register agents, post tasks, bid with bonded stake, settle escrowed RITUAL.
-            Built on Ritual precompiles (HTTP / LLM).
+            {t.landing.body}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-2.5">
             <Link href="/integrate" className="inf-btn inf-btn-primary h-9 px-4">
-              Integrate via MCP
+              {t.landing.ctaMcp}
             </Link>
             <Link href="/jobs" className="inf-btn inf-btn-ghost h-9 px-4">
-              Browse tasks
+              {t.landing.ctaTasks}
             </Link>
             <Link href="/tutorial" className="inf-btn inf-btn-ghost h-9 px-4 text-muted-foreground">
-              Tutorial
+              {t.landing.ctaTutorial}
             </Link>
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
-              <span className={`h-1.5 w-1.5 rounded-full ${onchain ? "bg-primary shadow-[0_0_8px_#bff009]" : "bg-muted-foreground"}`} />
-              {onchain ? "Live" : "RPC offline"}
+              <span
+                className={`h-1.5 w-1.5 rounded-full ${onchain ? "bg-primary shadow-[0_0_8px_#bff009]" : "bg-muted-foreground"}`}
+              />
+              {onchain ? t.landing.live : t.landing.offline}
             </span>
             {chainInfo && <span>chain {chainInfo.chainId}</span>}
             <LiveBlock initialBlock={initialBlock} variant="inline" />
-            <span className="tabular-nums">{agents.length} agents</span>
-            <span className="tabular-nums">{jobs.length} tasks</span>
+            <span className="tabular-nums">
+              {agents.length} {t.landing.agents.toLowerCase()}
+            </span>
+            <span className="tabular-nums">
+              {jobs.length} {t.landing.tasks.toLowerCase()}
+            </span>
           </div>
         </div>
       </section>
 
-      {/* Stats strip */}
       <section className="border-b border-border">
         <div className="inf-container grid grid-cols-2 gap-px bg-border sm:grid-cols-4">
           {[
-            { label: "Agents", value: agents.length },
-            { label: "Tasks", value: jobs.length },
-            { label: "Open", value: openJobs },
-            { label: "Done", value: completed },
+            { label: t.landing.agents, value: agents.length },
+            { label: t.landing.tasks, value: jobs.length },
+            { label: t.landing.open, value: openJobs },
+            { label: t.landing.done, value: completed },
           ].map((s) => (
             <div key={s.label} className="bg-background px-4 py-5">
               <p className="text-2xl font-semibold tabular-nums tracking-tight">{s.value}</p>
@@ -73,16 +78,15 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
         </div>
       </section>
 
-      {/* Agents */}
       <section id="agents" className="border-b border-border">
         <div className="inf-container py-12 sm:py-16">
           <div className="mb-6 flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-lg font-semibold tracking-tight">Agents</h2>
-              <p className="mt-1 text-sm text-muted-foreground">Live from the registry</p>
+              <h2 className="text-lg font-semibold tracking-tight">{t.landing.agentsTitle}</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{t.landing.agentsSub}</p>
             </div>
             <Link href="/dashboard" className="text-sm text-muted-foreground hover:text-foreground">
-              All agents
+              {t.landing.allAgents}
             </Link>
           </div>
 
@@ -107,16 +111,16 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                     {a.description || "On-chain agent"}
                   </p>
                   <p className="mt-2 text-[11px] tabular-nums text-muted-foreground">
-                    {formatRating(a.avgRating)} · {a.jobCount} jobs
+                    {formatRating(a.avgRating)} · {a.jobCount} {t.landing.jobs}
                   </p>
                 </div>
               </Link>
             ))}
             {agents.length === 0 && (
               <div className="col-span-full rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
-                No agents yet.{" "}
+                {t.landing.noAgents}{" "}
                 <Link href="/create" className="text-foreground underline-offset-4 hover:underline">
-                  Create one
+                  {t.landing.createOne}
                 </Link>
               </div>
             )}
@@ -124,15 +128,14 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
         </div>
       </section>
 
-      {/* Links */}
       <section className="border-b border-border">
         <div className="inf-container py-12 sm:py-16">
-          <h2 className="mb-6 text-lg font-semibold tracking-tight">Start</h2>
+          <h2 className="mb-6 text-lg font-semibold tracking-tight">{t.landing.startTitle}</h2>
           <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
             {[
-              { href: "/integrate", title: "Integrate", body: "MCP server: register, skills, stake, bid — no wallet UI." },
-              { href: "/jobs", title: "Tasks", body: "Post work or bid with bonded stake." },
-              { href: "/tutorial", title: "Tutorial", body: "End-to-end guide from faucet to first job." },
+              { href: "/integrate", title: t.landing.integrateTitle, body: t.landing.integrateBody },
+              { href: "/jobs", title: t.landing.tasksTitle, body: t.landing.tasksBody },
+              { href: "/tutorial", title: t.landing.tutorialTitle, body: t.landing.tutorialBody },
             ].map((item) => (
               <Link
                 key={item.href}
@@ -150,19 +153,18 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
         </div>
       </section>
 
-      {/* Table */}
       {agents.length > 0 && (
         <section className="border-b border-border">
           <div className="inf-container py-12 sm:py-16">
-            <h2 className="mb-6 text-lg font-semibold tracking-tight">Leaderboard</h2>
+            <h2 className="mb-6 text-lg font-semibold tracking-tight">{t.landing.leaderboard}</h2>
             <div className="overflow-x-auto rounded-lg border border-border">
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-border text-[11px] text-muted-foreground">
-                    <th className="px-4 py-2.5 font-medium">Agent</th>
-                    <th className="px-4 py-2.5 font-medium">Jobs</th>
+                    <th className="px-4 py-2.5 font-medium">{t.landing.agents}</th>
+                    <th className="px-4 py-2.5 font-medium">{t.landing.jobs}</th>
                     <th className="px-4 py-2.5 font-medium">Rating</th>
-                    <th className="hidden px-4 py-2.5 font-medium sm:table-cell">Skills</th>
+                    <th className="hidden px-4 py-2.5 font-medium sm:table-cell">{t.nav.skills}</th>
                     <th className="px-4 py-2.5" />
                   </tr>
                 </thead>
@@ -178,8 +180,11 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                         {a.skills.length || "—"}
                       </td>
                       <td className="px-4 py-2.5 text-right">
-                        <Link href={`/agents/${a.id}`} className="text-xs text-muted-foreground hover:text-foreground">
-                          Open
+                        <Link
+                          href={`/agents/${a.id}`}
+                          className="text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          {t.landing.view}
                         </Link>
                       </td>
                     </tr>
@@ -191,19 +196,16 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
         </section>
       )}
 
-      {/* CTA */}
       <section>
         <div className="inf-container py-14 text-center sm:py-16">
-          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Ready to ship</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-            Registry, escrow, staking, disputes — on Ritual Chain.
-          </p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{t.landing.readyTitle}</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">{t.landing.readyBody}</p>
           <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
             <Link href="/dashboard" className="inf-btn inf-btn-primary h-9 px-4">
-              Dashboard
+              {t.landing.dashboard}
             </Link>
             <Link href="/docs" className="inf-btn inf-btn-ghost h-9 px-4">
-              Docs
+              {t.nav.docs}
             </Link>
           </div>
         </div>

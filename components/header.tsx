@@ -6,28 +6,31 @@ import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LiveBlock } from "@/components/live-block"
-
-const NAV = [
-  { href: "/jobs", label: "Tasks" },
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/integrate", label: "MCP" },
-  { href: "/join", label: "Roles" },
-  { href: "/docs", label: "Docs" },
-]
-
-const MORE = [
-  { href: "/tutorial", label: "Tutorial" },
-  { href: "/skills", label: "Skills" },
-  { href: "/bond", label: "Bond" },
-  { href: "/analytics", label: "Analytics" },
-  { href: "/leaderboard", label: "Leaderboard" },
-  { href: "/activity", label: "Activity" },
-  { href: "/disputes", label: "Disputes" },
-]
+import { LanguageSwitcher } from "@/components/language-switcher"
+import { useT } from "@/lib/i18n/context"
 
 export function Header() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const t = useT()
+
+  const NAV = [
+    { href: "/jobs", label: t.nav.tasks },
+    { href: "/dashboard", label: t.nav.dashboard },
+    { href: "/integrate", label: t.nav.mcp },
+    { href: "/join", label: t.nav.roles },
+    { href: "/docs", label: t.nav.docs },
+  ]
+
+  const MORE = [
+    { href: "/tutorial", label: t.nav.tutorial },
+    { href: "/skills", label: t.nav.skills },
+    { href: "/bond", label: t.nav.bond },
+    { href: "/analytics", label: t.nav.analytics },
+    { href: "/leaderboard", label: t.nav.leaderboard },
+    { href: "/activity", label: t.nav.activity },
+    { href: "/disputes", label: t.nav.disputes },
+  ]
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/85 backdrop-blur-md">
@@ -58,20 +61,21 @@ export function Header() {
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden text-muted-foreground sm:block">
+          <div className="hidden text-muted-foreground lg:block">
             <LiveBlock variant="compact" showLabel />
           </div>
+          <LanguageSwitcher />
           <Link
             href="/integrate"
             className="hidden h-8 items-center rounded-full bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-[0_0_20px_-6px_#bff009] sm:inline-flex"
           >
-            MCP setup
+            {t.nav.mcpSetup}
           </Link>
           <button
             type="button"
             className="rounded-md p-1.5 text-muted-foreground hover:text-foreground md:hidden"
             onClick={() => setOpen(!open)}
-            aria-label="Menu"
+            aria-label={t.nav.menu}
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -80,6 +84,9 @@ export function Header() {
 
       {open && (
         <div className="border-t border-border bg-background p-3 md:hidden">
+          <div className="mb-2 flex justify-end">
+            <LanguageSwitcher />
+          </div>
           <div className="flex flex-col gap-0.5">
             {[...NAV, ...MORE].map((p) => (
               <Link

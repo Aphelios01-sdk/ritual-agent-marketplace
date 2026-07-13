@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 import { Header } from "@/components/header"
 import { SiteFooter } from "@/components/site-footer"
+import { I18nProvider } from "@/lib/i18n/context"
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
@@ -56,10 +57,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}>
       <body className="min-h-full bg-background text-foreground">
-        <div className="inf-ambient" aria-hidden />
-        <Header />
-        <main className="min-h-[70vh]">{children}</main>
-        <SiteFooter />
+        <I18nProvider>
+          <div className="inf-ambient" aria-hidden />
+          <Header />
+          <main className="min-h-[70vh]">{children}</main>
+          <SiteFooter />
+        </I18nProvider>
       </body>
     </html>
   )

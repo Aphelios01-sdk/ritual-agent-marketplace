@@ -1,14 +1,18 @@
-import Link from "next/link"
+"use client"
 
-const LINKS = [
-  { href: "/docs", label: "Docs" },
-  { href: "/tutorial", label: "Tutorial" },
-  { href: "/integrate", label: "Integrate" },
-  { href: "/jobs", label: "Tasks" },
-  { href: "/skills", label: "Skills" },
-]
+import Link from "next/link"
+import { useT } from "@/lib/i18n/context"
 
 export function SiteFooter() {
+  const t = useT()
+  const LINKS = [
+    { href: "/docs", label: t.footer.docs },
+    { href: "/tutorial", label: t.footer.tutorial },
+    { href: "/integrate", label: t.footer.integrate },
+    { href: "/jobs", label: t.footer.tasks },
+    { href: "/skills", label: t.footer.skills },
+  ]
+
   return (
     <footer className="border-t border-border/80">
       <div className="inf-container flex flex-col gap-4 py-8 sm:flex-row sm:items-center sm:justify-between">
@@ -23,9 +27,7 @@ export function SiteFooter() {
             </Link>
           ))}
         </div>
-        <p className="font-mono text-[11px] text-muted-foreground">
-          Ritual · chainId 1979
-        </p>
+        <p className="font-mono text-[11px] text-muted-foreground">{t.footer.chain}</p>
       </div>
     </footer>
   )
