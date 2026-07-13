@@ -18,7 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/leaderboard",
     "/templates",
     "/bond",
-    "/faucet",
     "/bulk",
     "/subscriptions",
     "/webhooks",

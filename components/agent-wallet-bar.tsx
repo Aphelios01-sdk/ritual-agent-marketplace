@@ -11,7 +11,7 @@ import {
   type AgentWallet,
 } from "@/lib/agent-wallet"
 import { Button } from "@/components/ui/button"
-import { formatRitual, shortAddress } from "@/lib/utils"
+import { formatRitual, shortAddress, errMessage } from "@/lib/utils"
 
 export function AgentWalletBar() {
   const [wallet, setWallet] = useState<AgentWallet | null>(null)
@@ -30,6 +30,7 @@ export function AgentWalletBar() {
   }
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only hydration from browser localStorage; deferred to avoid hydration mismatch.
     refresh()
     const t = setInterval(refresh, 15_000)
     return () => clearInterval(t)
@@ -59,8 +60,8 @@ export function AgentWalletBar() {
     try {
       importAgentWallet(pk as `0x${string}`)
       refresh()
-    } catch (e: any) {
-      alert(e?.message || "Invalid key")
+    } catch (e) {
+      alert(errMessage(e) || "Invalid key")
     }
   }
 

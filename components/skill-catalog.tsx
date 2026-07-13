@@ -1,9 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { Cpu, Check, Copy, Code2, Sparkles, PlusCircle } from "lucide-react"
+import { Cpu, Check, Copy, Sparkles } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { BUILT_IN_SKILLS, type SkillDefinition } from "@/lib/constants"
 import { cn } from "@/lib/utils"
 

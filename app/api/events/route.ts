@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createPublicClient, http } from "viem"
+import { createPublicClient, http, type AbiEvent } from "viem"
 import { RITUAL_CHAIN, CONTRACT_ADDRESSES } from "@/lib/constants"
 import { JOB_MARKET_V2_ABI } from "@/lib/contract-abi-v2"
 
@@ -16,7 +16,7 @@ const JOB_MARKET_V2 = CONTRACT_ADDRESSES.jobMarketV2 as `0x${string}`
 // Pull event definitions directly from the canonical ABI so parameter names always match.
 const EVENT_ABIS = JOB_MARKET_V2_ABI.filter(
   (e) => e.type === "event" && ["JobRequested", "JobAssigned", "JobCompleted", "JobDisputed", "BidSubmitted"].includes(e.name),
-) as any
+) as AbiEvent[]
 
 export async function GET() {
   try {
@@ -30,19 +30,21 @@ export async function GET() {
       toBlock: block,
     })
 
-    const events = logs.map((log: any) => {
+    const events = logs.map((log) => {
       const blockNum = log.blockNumber ? Number(log.blockNumber) : 0
       const name = log.eventName || ""
-      const args = log.args || {}
+      const args = (log.args ?? {}) as Record<string, unknown>
+      const head = (v: unknown) =>
+        (typeof v === "string" ? v : "").slice(0, 10)
 
       let summary = ""
       let jobRef = "?"
       if (name === "JobRequested") {
         jobRef = String(args.id ?? "?")
-        summary = `Job #${jobRef} requested by ${(args.requester || "").slice(0, 10)}…`
+        summary = `Job #${jobRef} requested by ${head(args.requester)}…`
       } else if (name === "JobAssigned") {
         jobRef = String(args.jobId ?? "?")
-        summary = `Job #${jobRef} → ${(args.provider || "").slice(0, 10)}…`
+        summary = `Job #${jobRef} → ${head(args.provider)}…`
       } else if (name === "JobCompleted") {
         jobRef = String(args.id ?? "?")
         summary = `Job #${jobRef} completed`
@@ -51,7 +53,7 @@ export async function GET() {
         summary = `Job #${jobRef} disputed`
       } else if (name === "BidSubmitted") {
         jobRef = String(args.jobId ?? "?")
-        summary = `Bid #${jobRef} by ${(args.provider || "").slice(0, 10)}…`
+        summary = `Bid #${jobRef} by ${head(args.provider)}…`
       }
 
       return { name, block: blockNum, summary }
@@ -61,7 +63,8 @@ export async function GET() {
       block: block.toString(),
       events: events.slice(-20),
     })
-  } catch (e: any) {
-    return NextResponse.json({ error: "events-unreachable", detail: String(e?.message || e) }, { status: 502 })
+  } catch (e) {
+    const detail = e instanceof Error ? e.message : String(e)
+    return NextResponse.json({ error: "events-unreachable", detail }, { status: 502 })
   }
 }

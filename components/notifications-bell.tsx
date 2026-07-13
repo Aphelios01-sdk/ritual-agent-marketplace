@@ -38,6 +38,7 @@ export function NotificationsBell() {
   }, [open])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch for polling; setState occurs after await, not synchronously.
     load()
     const t = setInterval(load, 8_000)
     return () => clearInterval(t)

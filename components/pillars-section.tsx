@@ -35,7 +35,7 @@ export function PillarsSection() {
         </p>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {PILLARS.map((p, i) => {
+        {PILLARS.map((p) => {
           const Icon = p.icon
           return (
             <Card

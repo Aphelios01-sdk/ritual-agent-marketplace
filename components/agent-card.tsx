@@ -21,7 +21,7 @@ function trustInfo(agent: AgentInfo) {
   return { verified, trending }
 }
 
-export function AgentCard({ agent, featured, index = 0, className }: AgentCardProps) {
+export function AgentCard({ agent, featured, className }: AgentCardProps) {
   const { verified, trending } = trustInfo(agent)
   return (
     <Link

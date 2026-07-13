@@ -19,6 +19,7 @@ export default function ApiKeysPage() {
   const refresh = () => setKeys(listApiKeys())
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only hydration from browser localStorage; deferred to avoid hydration mismatch.
     refresh()
   }, [])
 

@@ -7,6 +7,7 @@ import { BUILT_IN_SKILLS } from "@/lib/constants"
 import { createSubcontract, getAgentWallet } from "@/lib/agent-wallet"
 import { keccak256, toBytes } from "viem"
 import type { Address } from "viem"
+import { toWei, errMessage } from "@/lib/utils"
 
 export default function SubcontractPage() {
   const [parentJobId, setParentJobId] = useState("")
@@ -36,13 +37,13 @@ export default function SubcontractPage() {
         child as Address,
         [skillId as `0x${string}`],
         task,
-        BigInt(Math.floor(parseFloat(rewardChild) * 1e18)),
-        BigInt(Math.floor(parseFloat(parentReward) * 1e18)),
+        toWei(rewardChild),
+        toWei(parentReward),
         1,
       )
       setMsg(`Subcontract created: ${hash}`)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(false)
     }

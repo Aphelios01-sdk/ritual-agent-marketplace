@@ -5,7 +5,7 @@ import { AgentGrid } from "@/components/agent-grid"
 import { BUILT_IN_SKILLS, type AgentInfo, type JobRequestInfo } from "@/lib/constants"
 import { MARKET_LAYERS } from "@/lib/layers"
 import {
-  Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, TrendingUp, Search,
+  Bot, Wifi, Activity, Boxes, ArrowUpDown, Radio, Search,
   BadgeCheck, ArrowRight, Layers, Users, Route, Sparkles, Briefcase, Scale,
 } from "lucide-react"
 import Link from "next/link"

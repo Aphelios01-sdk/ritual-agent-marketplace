@@ -53,7 +53,7 @@ export function RolesSection() {
         </p>
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
-        {ROLES.map((role, i) => {
+        {ROLES.map((role) => {
           const Icon = role.icon
           return (
             <Card

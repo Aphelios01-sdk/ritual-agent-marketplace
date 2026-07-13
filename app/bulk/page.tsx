@@ -5,6 +5,7 @@ import { Layers, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BUILT_IN_SKILLS } from "@/lib/constants"
 import { getAgentWallet, submitBatchJobs } from "@/lib/agent-wallet"
+import { toWei, errMessage } from "@/lib/utils"
 
 export default function BulkPage() {
   const [skillId, setSkillId] = useState<string>(BUILT_IN_SKILLS[0].skillId)
@@ -25,7 +26,7 @@ export default function BulkPage() {
     setMsg(null)
     try {
       const w = getAgentWallet()
-      const rewardWei = BigInt(Math.floor(parseFloat(reward) * 1e18))
+      const rewardWei = toWei(reward)
       const hash = await submitBatchJobs(
         w,
         items.map((taskData) => ({
@@ -35,8 +36,8 @@ export default function BulkPage() {
         })),
       )
       setMsg(`Batch submitted: ${hash} (${items.length} jobs)`)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(false)
     }

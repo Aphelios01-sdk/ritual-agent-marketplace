@@ -8,7 +8,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { BUILT_IN_SKILLS, CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob, type SerializedJob, deserializeJob } from "@/lib/onchain"
-import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
+import { cn, formatRitual, shortAddress, isZeroAddress, toWei } from "@/lib/utils"
 import { getAgentWallet, postJob, type AgentWallet } from "@/lib/agent-wallet"
 import { BlockDeadline } from "@/components/block-deadline"
 
@@ -33,6 +33,7 @@ function AgentWalletBadge() {
 
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only hydration from browser localStorage; setState deferred to after SSR to avoid hydration mismatch.
       setWallet(getAgentWallet())
     } catch {
       /* SSR */
@@ -72,7 +73,7 @@ function PostJobCard({ onPosted }: { onPosted?: () => void }) {
     setResult(null)
     try {
       const wallet = getAgentWallet()
-      const rewardWei = BigInt(Math.floor(parseFloat(reward) * 1e18))
+      const rewardWei = toWei(reward)
       const hash = await postJob(wallet, [skillId as `0x${string}`], prompt, rewardWei)
       setResult({ ok: true, txHash: hash })
       setPrompt("")
@@ -191,8 +192,15 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
   const [refreshing, setRefreshing] = useState(false)
   const [lastTs, setLastTs] = useState<number | null>(null)
 
+  // Reset local copy when server props change (navigation) — render-time adjust
+  // avoids a setState-in-effect cascading render.
+  const [serverJobs, setServerJobs] = useState(initialJobs)
+  if (serverJobs !== initialJobs) {
+    setServerJobs(initialJobs)
+    setJobs(initialJobs)
+  }
+
   const refresh = useCallback(async (manual = false) => {
-    if (manual) setRefreshing(true)
     try {
       const res = await fetch("/api/jobs", { cache: "no-store" })
       if (!res.ok) return
@@ -207,13 +215,9 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
     }
   }, [])
 
-  // Sync when server props change (navigation)
-  useEffect(() => {
-    setJobs(initialJobs)
-  }, [initialJobs])
-
   // Poll for new / completed jobs
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch for polling; setState occurs after await, not synchronously.
     refresh(false)
     const t = setInterval(() => refresh(false), POLL_MS)
     return () => clearInterval(t)
@@ -298,7 +302,10 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
             )}
             <button
               type="button"
-              onClick={() => refresh(true)}
+              onClick={() => {
+                setRefreshing(true)
+                refresh(true)
+              }}
               className="inline-flex items-center gap-1 rounded-md border border-border/60 px-2 py-1 hover:bg-muted/40"
               title="Refresh"
             >

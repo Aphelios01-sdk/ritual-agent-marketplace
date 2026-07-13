@@ -12,7 +12,7 @@ import {
   pingHeartbeat,
   type AgentWallet,
 } from "@/lib/agent-wallet"
-import { formatRitual, shortAddress } from "@/lib/utils"
+import { formatRitual, shortAddress, toWei, errMessage } from "@/lib/utils"
 
 export default function BondPage() {
   const [wallet, setWallet] = useState<AgentWallet | null>(null)
@@ -36,6 +36,7 @@ export default function BondPage() {
   useEffect(() => {
     try {
       const w = getAgentWallet()
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only hydration from browser localStorage; deferred to avoid hydration mismatch.
       setWallet(w)
       refresh(w)
     } catch {
@@ -51,8 +52,8 @@ export default function BondPage() {
       const hash = await fn()
       setMsg(`Tx: ${hash}`)
       setTimeout(() => refresh(wallet), 2500)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(false)
     }
@@ -96,7 +97,7 @@ export default function BondPage() {
               act(() =>
                 stakeBond(
                   wallet!,
-                  BigInt(Math.floor(parseFloat(amount || "0") * 1e18)),
+                  toWei(amount || "0"),
                 ),
               )
             }

@@ -5,6 +5,7 @@ import { Webhook, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { eventTypeHash, getAgentWallet, registerWebhook } from "@/lib/agent-wallet"
 import type { Address } from "viem"
+import { errMessage } from "@/lib/utils"
 
 const EVENTS = ["JobRequested", "JobAssigned", "JobCompleted", "BidSubmitted", "JobDisputed"]
 
@@ -32,8 +33,8 @@ export default function WebhooksPage() {
         selected.map(eventTypeHash),
       )
       setMsg(`Webhook registered: ${hash}`)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(false)
     }

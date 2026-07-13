@@ -7,7 +7,7 @@ import { BUILT_IN_SKILLS } from "@/lib/constants"
 import { fetchAgents } from "@/lib/onchain"
 import { getAgentWallet, subscribeToAgent } from "@/lib/agent-wallet"
 import type { AgentInfo } from "@/lib/constants"
-import { shortAddress } from "@/lib/utils"
+import { shortAddress, toWei, errMessage } from "@/lib/utils"
 import type { Address } from "viem"
 
 export default function SubscriptionsPage() {
@@ -22,33 +22,20 @@ export default function SubscriptionsPage() {
   const [msg, setMsg] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch("/api/stats")
-      .then((r) => r.json())
-      .catch(() => null)
-    // load agents via jobs API pattern — use public page data
-    import("@/lib/onchain").then(async (m) => {
-      try {
-        // client can't call server-only easily; use lightweight list from dashboard-like fetch
-        const res = await fetch("/", { cache: "no-store" })
-        void res
-      } catch {
-        /* ignore */
-      }
-    })
-    // Prefer dedicated list: reuse agents from a simple client fetch against explorer isn't available.
-    // Fall back: user pastes address; also try to hydrate from window cache if any.
+    let cancelled = false
     ;(async () => {
       try {
-        const { publicClient } = await import("@/lib/onchain")
-        void publicClient
-        // fetchAgents is server-friendly with viem public client — works in client too
         const list = await fetchAgents()
+        if (cancelled) return
         setAgents(list)
         if (list[0]) setAgent(list[0].contractAddress)
       } catch {
         /* offline */
       }
     })()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const submit = async () => {
@@ -61,13 +48,13 @@ export default function SubscriptionsPage() {
         agent as Address,
         [skillId as `0x${string}`],
         task,
-        BigInt(Math.floor(parseFloat(price) * 1e18)),
+        toWei(price),
         BigInt(periodBlocks),
         BigInt(periods),
       )
       setMsg(`Subscribed: ${hash}`)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(false)
     }

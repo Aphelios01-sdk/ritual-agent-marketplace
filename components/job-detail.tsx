@@ -24,7 +24,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob, type OnchainBid, deserializeJob, type SerializedJob } from "@/lib/onchain"
-import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
+import { cn, formatRitual, shortAddress, isZeroAddress, toWei } from "@/lib/utils"
 import { BlockDeadline, BlocksDuration } from "@/components/block-deadline"
 import {
   getAgentWallet,
@@ -91,6 +91,17 @@ export function JobDetail({
   const [bids, setBids] = useState<BidView[]>(initialBids)
   const [walletAddr, setWalletAddr] = useState<string | null>(null)
 
+  // Reset local copy when server props change (navigation between jobs) via
+  // render-time adjustment instead of setState-in-effect.
+  const [prevJob, setPrevJob] = useState(initialJob)
+  const [prevBids, setPrevBids] = useState(initialBids)
+  if (prevJob !== initialJob || prevBids !== initialBids) {
+    setPrevJob(initialJob)
+    setPrevBids(initialBids)
+    setJob(initialJob)
+    setBids(initialBids)
+  }
+
   // Bid form
   const defaultPrice = (() => {
     try {
@@ -132,6 +143,7 @@ export function JobDetail({
 
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only hydration from browser localStorage; deferred to avoid hydration mismatch.
       setWalletAddr(getAgentWallet().address)
     } catch {
       /* SSR */
@@ -161,11 +173,6 @@ export function JobDetail({
   }, [job.id])
 
   useEffect(() => {
-    setJob(initialJob)
-    setBids(initialBids)
-  }, [initialJob, initialBids])
-
-  useEffect(() => {
     const t = setInterval(refresh, POLL_MS)
     return () => clearInterval(t)
   }, [refresh])
@@ -181,7 +188,7 @@ export function JobDetail({
       }
       const blocks = BigInt(Math.max(1, parseInt(estBlocks, 10) || 100))
       const wallet = getAgentWallet()
-      const priceWei = BigInt(Math.floor(price * 1e18))
+      const priceWei = toWei(bidPrice)
       const hash = await submitBidOnChain(wallet, BigInt(job.id), priceWei, blocks)
       setBidResult({ ok: true, txHash: hash })
       setTimeout(refresh, 1500)

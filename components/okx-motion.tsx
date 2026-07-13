@@ -20,18 +20,16 @@ export function Reveal({
   delay?: number
 }) {
   const ref = useRef<HTMLDivElement | null>(null)
-  const [on, setOn] = useState(false)
+  const [on, setOn] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  )
 
   useEffect(() => {
+    if (on) return // reduced-motion: already revealed
     const el = ref.current
     if (!el) return
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      setOn(true)
-      return
-    }
     const io = new IntersectionObserver(
       ([e]) => {
         if (e.isIntersecting) {
@@ -43,7 +41,7 @@ export function Reveal({
     )
     io.observe(el)
     return () => io.disconnect()
-  }, [])
+  }, [on])
 
   return (
     <div
@@ -209,6 +207,11 @@ export function CountUp({
   const ref = useRef<HTMLSpanElement | null>(null)
   const [n, setN] = useState(0)
   const [started, setStarted] = useState(false)
+  const [reduced] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+  )
 
   useEffect(() => {
     const el = ref.current
@@ -227,14 +230,7 @@ export function CountUp({
   }, [])
 
   useEffect(() => {
-    if (!started) return
-    if (
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      setN(value)
-      return
-    }
+    if (!started || reduced) return
     const start = performance.now()
     let raf = 0
     const tick = (t: number) => {
@@ -245,11 +241,11 @@ export function CountUp({
     }
     raf = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(raf)
-  }, [started, value, duration])
+  }, [started, reduced, value, duration])
 
   return (
     <span ref={ref} className={className}>
-      {n}
+      {reduced ? value : n}
     </span>
   )
 }

@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Gavel, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { getAgentWallet, stakeAsVerifier, voteDispute } from "@/lib/agent-wallet"
+import { toWei, errMessage } from "@/lib/utils"
 
 export function DisputeActions() {
   const [stakeAmt, setStakeAmt] = useState("0.1")
@@ -17,8 +18,8 @@ export function DisputeActions() {
     try {
       const hash = await fn()
       setMsg(`Tx: ${hash}`)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(false)
     }
@@ -49,7 +50,7 @@ export function DisputeActions() {
             run(() =>
               stakeAsVerifier(
                 getAgentWallet(),
-                BigInt(Math.floor(parseFloat(stakeAmt || "0") * 1e18)),
+                toWei(stakeAmt || "0"),
               ),
             )
           }

@@ -26,7 +26,7 @@ import {
   type AgentWallet,
 } from "@/lib/agent-wallet"
 import { type SerializedJob, deserializeJob } from "@/lib/onchain"
-import { formatRitual, shortAddress, cn } from "@/lib/utils"
+import { formatRitual, shortAddress, cn, errMessage } from "@/lib/utils"
 import type { JobStatus } from "@/lib/constants"
 
 const STORAGE_KEY = "pm_work_agent_address"
@@ -76,6 +76,7 @@ function WorkPageInner() {
   useEffect(() => {
     try {
       const w = getAgentWallet()
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only hydration from browser localStorage; deferred to avoid hydration mismatch.
       setWallet(w)
       const fromQuery =
         searchParams.get("address") ||
@@ -99,7 +100,6 @@ function WorkPageInner() {
   }, [searchParams])
 
   const load = useCallback(async () => {
-    setLoading(true)
     try {
       const res = await fetch("/api/jobs?fresh=1", { cache: "no-store" })
       const data = await res.json()
@@ -112,6 +112,7 @@ function WorkPageInner() {
   }, [])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- initial fetch for polling; setState occurs after await, not synchronously.
     load()
     const t = setInterval(load, 6_000)
     return () => clearInterval(t)
@@ -218,8 +219,8 @@ function WorkPageInner() {
       const hash = await fn()
       setMsg(`Tx sent: ${hash.slice(0, 12)}…`)
       setTimeout(load, 2000)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(null)
     }

@@ -6,6 +6,7 @@ import { FileText, Loader2, Rocket } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { BUILT_IN_SKILLS } from "@/lib/constants"
 import { createTemplate, getAgentWallet, postJob } from "@/lib/agent-wallet"
+import { toWei, errMessage } from "@/lib/utils"
 
 const PRESETS = [
   {
@@ -59,11 +60,11 @@ export default function TemplatesPage() {
         name,
         [skillId as `0x${string}`],
         task,
-        BigInt(Math.floor(parseFloat(reward) * 1e18)),
+        toWei(reward),
       )
       setMsg(`Template tx: ${hash}`)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(false)
     }
@@ -78,11 +79,11 @@ export default function TemplatesPage() {
         w,
         [skillId as `0x${string}`],
         task,
-        BigInt(Math.floor(parseFloat(reward) * 1e18)),
+        toWei(reward),
       )
       setMsg(`Job posted: ${hash}`)
-    } catch (e: any) {
-      setMsg(e?.shortMessage || e?.message || String(e))
+    } catch (e) {
+      setMsg(errMessage(e))
     } finally {
       setBusy(false)
     }

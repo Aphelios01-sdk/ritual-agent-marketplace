@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createPublicClient, http } from "viem"
+import { createPublicClient, http, type AbiEvent } from "viem"
 import { RITUAL_CHAIN, CONTRACT_ADDRESSES } from "@/lib/constants"
 import { JOB_MARKET_V2_ABI } from "@/lib/contract-abi-v2"
 
@@ -19,7 +19,7 @@ const EVENT_ABIS = JOB_MARKET_V2_ABI.filter(
     ["JobRequested", "JobAssigned", "JobCompleted", "JobDisputed", "BidSubmitted"].includes(
       e.name as string,
     ),
-) as any
+) as AbiEvent[]
 
 export async function GET() {
   try {
@@ -33,28 +33,36 @@ export async function GET() {
       toBlock: block,
     })
 
-    const events = logs.map((log: any) => {
+    const events = logs.map((log) => {
       const blockNum = log.blockNumber ? Number(log.blockNumber) : 0
       const name = log.eventName || ""
-      const args = log.args || {}
+      const args = (log.args ?? {}) as Record<string, unknown>
+      const addr = (v: unknown) => (typeof v === "string" ? v : "")
+      const ref = (...keys: string[]) => {
+        for (const k of keys) {
+          const v = args[k]
+          if (v !== undefined && v !== null) return String(v)
+        }
+        return "?"
+      }
 
       let summary = ""
       let jobRef = "?"
       if (name === "JobRequested") {
-        jobRef = String(args.id ?? args.jobId ?? "?")
-        summary = `Job #${jobRef} posted by ${short(args.requester)}`
+        jobRef = ref("id", "jobId")
+        summary = `Job #${jobRef} posted by ${short(addr(args.requester))}`
       } else if (name === "JobAssigned") {
-        jobRef = String(args.jobId ?? args.id ?? "?")
-        summary = `Job #${jobRef} assigned → ${short(args.provider)}`
+        jobRef = ref("jobId", "id")
+        summary = `Job #${jobRef} assigned → ${short(addr(args.provider))}`
       } else if (name === "JobCompleted") {
-        jobRef = String(args.id ?? args.jobId ?? "?")
+        jobRef = ref("id", "jobId")
         summary = `Job #${jobRef} completed · escrow released`
       } else if (name === "JobDisputed") {
-        jobRef = String(args.id ?? args.jobId ?? "?")
+        jobRef = ref("id", "jobId")
         summary = `Job #${jobRef} disputed · council opens`
       } else if (name === "BidSubmitted") {
-        jobRef = String(args.jobId ?? args.id ?? "?")
-        summary = `Bid on job #${jobRef} by ${short(args.provider)}`
+        jobRef = ref("jobId", "id")
+        summary = `Bid on job #${jobRef} by ${short(addr(args.provider))}`
       }
 
       return {
@@ -70,9 +78,10 @@ export async function GET() {
       block: block.toString(),
       events: events.slice(-60),
     })
-  } catch (e: any) {
+  } catch (e) {
+    const detail = e instanceof Error ? e.message : String(e)
     return NextResponse.json(
-      { error: "activity-unreachable", detail: String(e?.message || e) },
+      { error: "activity-unreachable", detail },
       { status: 502 },
     )
   }

@@ -1,9 +1,25 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { parseEther } from "viem"
 import type { SkillDefinition } from "./constants"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+const RIT_AMOUNT_RE = /^\d+(\.\d+)?$/
+
+/**
+ * Parse a human RIT amount (e.g. "0.1", "12.5") to wei using viem's
+ * fixed-point parser. Throws on invalid input — callers wrap in try/catch.
+ *
+ * Use this instead of `BigInt(Math.floor(parseFloat(x) * 1e18))`, which loses
+ * wei precision (e.g. "0.07" → 69999999999999987 instead of 70000000000000000).
+ */
+export function toWei(input: string | number): bigint {
+  const s = (typeof input === "number" ? String(input) : (input ?? "")).trim()
+  if (!RIT_AMOUNT_RE.test(s)) throw new Error("Invalid RIT amount")
+  return parseEther(s)
 }
 
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000" as const
@@ -82,6 +98,18 @@ function toEthNumber(wei: bigint | string | number): number {
   } catch {
     return 0
   }
+}
+
+/** Extract a short human message from a caught value (Error, viem error, string). */
+export function errMessage(e: unknown): string {
+  if (e && typeof e === "object") {
+    const v = e as { shortMessage?: string; message?: string; details?: string }
+    if (v.shortMessage) return v.shortMessage
+    if (v.details) return v.details
+    if (v.message) return v.message
+  }
+  if (typeof e === "string") return e
+  return String(e)
 }
 
 export function formatRating(rating: number): string {

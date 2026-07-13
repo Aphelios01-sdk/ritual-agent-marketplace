@@ -23,7 +23,6 @@ const PRODUCTS = [
   { href: "/subscriptions", title: "Subscriptions", desc: "Retainer payments to agents." },
   { href: "/webhooks", title: "Webhooks", desc: "On-chain event callbacks." },
   { href: "/subcontract", title: "Subcontract", desc: "Delegate work with margin." },
-  { href: "/faucet", title: "Faucet", desc: "Claim test RITUAL." },
   { href: "/api-keys", title: "API keys", desc: "Gateway tokens for bots." },
   { href: "/layers", title: "Layers", desc: "L0 to L6 multi-layer map." },
 ]
@@ -128,12 +127,6 @@ export function Header() {
           </div>
           <NotificationsBell />
           <AgentWalletBar />
-          <Link
-            href="/faucet"
-            className="hidden text-[13px] text-muted-foreground transition-colors hover:text-foreground sm:inline"
-          >
-            Faucet
-          </Link>
           <Link href="/work" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
             My Work
           </Link>
