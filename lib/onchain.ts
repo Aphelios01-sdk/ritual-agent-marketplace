@@ -2,6 +2,8 @@ import { createPublicClient, http, type Address } from "viem"
 import { RITUAL_CHAIN, type AgentInfo, type SkillDefinition, type JobStatus, CONTRACT_ADDRESSES } from "./constants"
 import { AGENT_REGISTRY_ABI } from "./contract-abi"
 import { JOB_MARKET_V2_ABI } from "./contract-abi-v2"
+import { AGENT_DIRECTORY_ABI } from "./contract-abi-b"
+import { parseAvatarFromMetadataURI } from "./agent-profile"
 
 const RPC = process.env.RITUAL_RPC_URL || RITUAL_CHAIN.rpcUrls.default.http[0]
 export const publicClient = createPublicClient({
@@ -11,6 +13,7 @@ export const publicClient = createPublicClient({
 
 const CONTRACT_ADDR = CONTRACT_ADDRESSES.agentRegistry as Address
 const JOB_MARKET_V2 = CONTRACT_ADDRESSES.jobMarketV2 as Address
+const AGENT_DIRECTORY = CONTRACT_ADDRESSES.agentDirectory as Address
 
 /** Short in-memory cache so rapid nav reuses last RPC result. Jobs stay fresher. */
 const CACHE_TTL_MS = 5_000
@@ -177,6 +180,64 @@ function mapAgent(id: bigint, raw: RawAgent | Record<string, unknown>, skills: S
   }
 }
 
+type RawProfileTuple = readonly [`0x${string}`, readonly `0x${string}`[], string, boolean]
+type RawProfileNamed = {
+  category?: `0x${string}`
+  tags?: readonly `0x${string}`[]
+  metadataURI?: string
+  set?: boolean
+}
+
+function mapProfileMetadata(raw: RawProfileTuple | RawProfileNamed | null | undefined): {
+  metadataURI?: string
+  avatarUrl?: string
+} {
+  if (!raw) return {}
+  let metadataURI = ""
+  if (Array.isArray(raw)) {
+    metadataURI = String(raw[2] ?? "")
+  } else {
+    metadataURI = String((raw as RawProfileNamed).metadataURI ?? "")
+  }
+  if (!metadataURI) return {}
+  return {
+    metadataURI,
+    avatarUrl: parseAvatarFromMetadataURI(metadataURI),
+  }
+}
+
+/** Fetch AgentDirectory profile for one agent contract address. */
+export async function fetchAgentProfile(agent: Address): Promise<{ metadataURI?: string; avatarUrl?: string }> {
+  try {
+    const raw = (await publicClient.readContract({
+      address: AGENT_DIRECTORY,
+      abi: AGENT_DIRECTORY_ABI,
+      functionName: "getProfile",
+      args: [agent],
+    })) as RawProfileTuple | RawProfileNamed
+    return mapProfileMetadata(raw)
+  } catch {
+    return {}
+  }
+}
+
+/** Attach metadataURI / avatarUrl from AgentDirectory (parallel). */
+async function attachProfiles(agents: AgentInfo[]): Promise<AgentInfo[]> {
+  if (agents.length === 0) return agents
+  const profiles = await Promise.all(
+    agents.map((a) => fetchAgentProfile(a.contractAddress)),
+  )
+  return agents.map((a, i) => {
+    const p = profiles[i]
+    if (!p?.metadataURI && !p?.avatarUrl) return a
+    return {
+      ...a,
+      metadataURI: p.metadataURI,
+      avatarUrl: p.avatarUrl,
+    }
+  })
+}
+
 function mapJob(
   id: bigint,
   raw: readonly [
@@ -262,12 +323,18 @@ export async function fetchAgents(): Promise<AgentInfo[]> {
       if (mapped) agents.push(mapped)
     }
 
-    agentsCache = { at: Date.now(), data: agents }
-    return agents
+    const withProfiles = await attachProfiles(agents)
+    agentsCache = { at: Date.now(), data: withProfiles }
+    return withProfiles
   } catch (e) {
     console.error("fetchAgents failed:", e)
     return fromCache(agentsCache) ?? []
   }
+}
+
+/** Drop agents cache so next fetch re-reads profiles (after setProfile). */
+export function invalidateAgentsCache() {
+  agentsCache = null
 }
 
 export async function fetchChainInfo(): Promise<{ block: bigint; chainId: number } | null> {

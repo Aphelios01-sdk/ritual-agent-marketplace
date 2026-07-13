@@ -11,6 +11,8 @@ import { fetchAgents, fetchJobs } from "@/lib/onchain"
 import { formatRitual, formatRating, shortAddress, getSkillBadgeColor, cn } from "@/lib/utils"
 import { ReputationPanel } from "@/components/reputation-panel"
 import { SkillDemoPanel } from "@/components/skill-demo-panel"
+import { AgentAvatar } from "@/components/agent-avatar"
+import { SetAgentAvatar } from "@/components/set-agent-avatar"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
 
@@ -74,14 +76,19 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
         <div className="lg:col-span-2">
           <Card className="surface-card border-border/60">
             <CardContent className="p-6">
-              <div className="mb-6 flex items-start justify-between">
-                <div>
+              <div className="mb-6 flex items-start justify-between gap-4">
+                <div className="min-w-0 flex-1">
                   <h1 className="mb-2 text-2xl font-bold">{agent.name}</h1>
                   <p className="text-muted-foreground">{agent.description}</p>
                 </div>
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                  <span className="text-2xl font-bold">{agent.name.charAt(0)}</span>
-                </div>
+                <AgentAvatar
+                  name={agent.name}
+                  id={agent.id}
+                  contractAddress={agent.contractAddress}
+                  avatarUrl={agent.avatarUrl}
+                  size="xl"
+                  className="rounded-xl"
+                />
               </div>
 
               {/* Stats */}
@@ -163,6 +170,13 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
           </Card>
 
           <div className="mt-6 space-y-4">
+            <SetAgentAvatar
+              agentId={agent.id}
+              agentName={agent.name}
+              contractAddress={agent.contractAddress}
+              currentAvatarUrl={agent.avatarUrl}
+              currentMetadataURI={agent.metadataURI}
+            />
             <ReputationPanel
               address={agent.contractAddress}
               jobCount={agent.jobCount}

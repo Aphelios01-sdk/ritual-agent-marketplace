@@ -22,7 +22,7 @@ import { privateKeyToAccount, generatePrivateKey, type PrivateKeyAccount } from 
 import { RITUAL_CHAIN, CONTRACT_ADDRESSES } from "./constants"
 import { JOB_MARKET_V2_ABI, AGENT_STAKING_ABI, AGENT_HEARTBEAT_ABI } from "./contract-abi-v2"
 import { AGENT_REGISTRY_ABI } from "./contract-abi"
-import { JOB_TEMPLATES_ABI, AGENT_REPUTATION_ABI } from "./contract-abi-b"
+import { JOB_TEMPLATES_ABI, AGENT_REPUTATION_ABI, AGENT_DIRECTORY_ABI } from "./contract-abi-b"
 import {
   DISPUTE_COUNCIL_ABI,
   SUBSCRIPTION_MANAGER_ABI,
@@ -42,6 +42,7 @@ const BULK = CONTRACT_ADDRESSES.bulkJobBatcher as Address
 const WEBHOOKS = CONTRACT_ADDRESSES.webhookRegistry as Address
 const SUBCON = CONTRACT_ADDRESSES.agentSubcontractor as Address
 const REPUTATION = CONTRACT_ADDRESSES.agentReputation as Address
+const DIRECTORY = CONTRACT_ADDRESSES.agentDirectory as Address
 
 const PK_KEY = "agent_pk"
 const API_KEYS_KEY = "pm_api_keys"
@@ -317,6 +318,40 @@ export async function readReputation(agent: Address): Promise<{
   } catch {
     return null
   }
+}
+
+/**
+ * Update agent profile on AgentDirectory (category, tags, metadataURI).
+ * Caller must be a registered agent (msg.sender = agent contract address).
+ * metadataURI typically holds JSON `{"image":"https://..."}` or a bare image URL.
+ */
+export async function setAgentProfile(
+  wallet: AgentWallet,
+  category: `0x${string}`,
+  tags: readonly `0x${string}`[],
+  metadataURI: string,
+): Promise<Hash> {
+  return wallet.client.writeContract({
+    account: wallet.account,
+    address: DIRECTORY,
+    abi: AGENT_DIRECTORY_ABI,
+    functionName: "setProfile",
+    args: [category, [...tags], metadataURI],
+    chain: RITUAL_CHAIN,
+  })
+}
+
+/** Convenience: set only the avatar image (category defaults to keccak256("general")). */
+export async function setAgentAvatar(
+  wallet: AgentWallet,
+  imageUrl: string,
+  existingMetadataURI?: string,
+): Promise<Hash> {
+  // Lazy import avoids circular deps with onchain consumers
+  const { encodeMetadataURI } = await import("./agent-profile")
+  const metadataURI = encodeMetadataURI({ image: imageUrl, existing: existingMetadataURI })
+  const category = keccak256(toBytes("general")) as `0x${string}`
+  return setAgentProfile(wallet, category, [], metadataURI)
 }
 
 // ── Templates ───────────────────────────────────────────────

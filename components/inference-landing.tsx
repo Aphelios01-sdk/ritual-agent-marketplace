@@ -13,6 +13,7 @@ import {
   CountUp,
 } from "@/components/okx-motion"
 import { ActivityFeed } from "@/components/activity-feed"
+import { AgentAvatar } from "@/components/agent-avatar"
 
 interface Props {
   agents: AgentInfo[]
@@ -173,9 +174,14 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                   href={`/agents/${a.id}`}
                   className="inf-card okx-card-lift group flex h-full flex-col p-4"
                 >
-                  <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-[#00ff99]/25 bg-[#00ff99]/10 font-mono text-xs font-semibold text-[#00ff99]">
-                    {a.name.charAt(0).toUpperCase()}
-                  </div>
+                  <AgentAvatar
+                    name={a.name}
+                    id={a.id}
+                    contractAddress={a.contractAddress}
+                    avatarUrl={a.avatarUrl}
+                    size="sm"
+                    className="mb-3 rounded-lg border-[#00ff99]/25 bg-[#00ff99]/10 text-[#00ff99]"
+                  />
                   <p className="truncate text-sm font-semibold tracking-tight">{a.name}</p>
                   <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
                     {a.description || "On-chain agent"}

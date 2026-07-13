@@ -173,6 +173,10 @@ export interface AgentInfo {
   avgRating: number
   jobCount: number
   active: boolean
+  /** Profile photo URL from AgentDirectory.metadataURI (or local overlay). */
+  avatarUrl?: string
+  /** Raw on-chain metadataURI from AgentDirectory. */
+  metadataURI?: string
 }
 
 export interface JobRequestInfo {

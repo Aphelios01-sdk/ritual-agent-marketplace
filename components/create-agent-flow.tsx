@@ -2,12 +2,15 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { ArrowRight, ArrowLeft, Check, Shield, Sparkles } from "lucide-react"
+import { ArrowRight, ArrowLeft, Check, Shield, Sparkles, Camera } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CodeBlock } from "@/components/ui/code-block"
 import { SkillCard } from "@/components/skill-catalog"
+import { ProfilePhotoPicker } from "@/components/profile-photo-picker"
+import { AgentAvatar } from "@/components/agent-avatar"
 import { BUILT_IN_SKILLS } from "@/lib/constants"
+import { setLocalAvatar, encodeMetadataURI } from "@/lib/agent-profile"
 
 type Step = 1 | 2 | 3
 
@@ -15,6 +18,7 @@ export function CreateAgentFlow() {
   const [step, setStep] = useState<Step>(1)
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
+  const [avatarUrl, setAvatarUrl] = useState("")
   const [selected, setSelected] = useState<string[]>([])
 
   const toggle = (sid: string) =>
@@ -26,6 +30,32 @@ export function CreateAgentFlow() {
     { n: 1 as Step, label: "Agent details", icon: Sparkles },
     { n: 2 as Step, label: "Choose skills", icon: Shield },
   ]
+
+  const persistDraftAvatar = () => {
+    if (!avatarUrl || !name) return
+    // Draft key by name slug so review / later pages can pick it up
+    const draftKey = `draft:${name.trim().toLowerCase()}`
+    setLocalAvatar(draftKey, avatarUrl)
+  }
+
+  const goReview = () => {
+    persistDraftAvatar()
+    setStep(3)
+  }
+
+  const metadataURI = avatarUrl
+    ? encodeMetadataURI({ image: avatarUrl, name, description })
+    : ""
+
+  const configYaml = [
+    `name: ${name}`,
+    `description: ${description}`,
+    avatarUrl ? `avatar: ${avatarUrl.startsWith("data:") ? "[data-url]" : avatarUrl}` : null,
+    metadataURI && !avatarUrl.startsWith("data:") ? `metadataURI: ${metadataURI}` : null,
+    `skills: ${chosen.map((s) => s.name).join(", ") || "none"}`,
+  ]
+    .filter(Boolean)
+    .join("\n")
 
   return (
     <div className="space-y-6">
@@ -54,9 +84,16 @@ export function CreateAgentFlow() {
               <div>
                 <h3 className="text-lg font-semibold">Configure your agent</h3>
                 <p className="text-sm text-muted-foreground">
-                  Define the agent identity. No wallet or gas needed. This builds the agent configuration locally.
+                  Define the agent identity and profile photo. No wallet or gas needed for this step — configuration is built locally.
                 </p>
               </div>
+
+              <ProfilePhotoPicker
+                value={avatarUrl}
+                onChange={setAvatarUrl}
+                name={name || "Agent"}
+              />
+
               <div className="grid gap-3">
                 <label className="text-sm">
                   <span className="mb-1 block text-muted-foreground">Name</span>
@@ -90,7 +127,7 @@ export function CreateAgentFlow() {
               </div>
               <div className="flex justify-between">
                 <Button variant="ghost" onClick={() => setStep(1)} className="gap-1.5"><ArrowLeft className="h-4 w-4" /> Back</Button>
-                <Button onClick={() => setStep(3)} className="gap-1.5">
+                <Button onClick={goReview} className="gap-1.5">
                   <Shield className="h-4 w-4" /> Review ({selected.length})
                 </Button>
               </div>
@@ -102,13 +139,21 @@ export function CreateAgentFlow() {
       {step === 3 && (
         <Card className="surface-card border-primary/40">
           <CardContent className="p-6">
-            <div className="flex flex-col items-center gap-2 text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/15 text-primary">
-                <Check className="h-6 w-6" />
+            <div className="flex flex-col items-center gap-3 text-center">
+              <AgentAvatar
+                name={name}
+                avatarUrl={avatarUrl || undefined}
+                size="xl"
+                className="rounded-2xl border-primary/30"
+              />
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-primary">
+                <Check className="h-4 w-4" />
               </div>
               <h3 className="text-xl font-semibold">Agent configuration ready</h3>
               <p className="max-w-md text-sm text-muted-foreground">
-                <b className="text-foreground">{name}</b> with {chosen.length} skill{chosen.length === 1 ? "" : "s"}. Install each package, then register them on-chain via <code className="font-mono text-xs">setSkills</code>.
+                <b className="text-foreground">{name}</b> with {chosen.length} skill{chosen.length === 1 ? "" : "s"}
+                {avatarUrl ? " and a profile photo" : ""}. Install each package, register on-chain, then call{" "}
+                <code className="font-mono text-xs">setProfile</code> with your metadataURI to publish the avatar.
               </p>
             </div>
 
@@ -118,12 +163,26 @@ export function CreateAgentFlow() {
               ))}
             </div>
 
+            {avatarUrl && (
+              <div className="mt-4 flex items-start gap-2 rounded-lg border border-border/60 bg-muted/30 p-3 text-left text-xs text-muted-foreground">
+                <Camera className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
+                <span>
+                  Profile photo is included in the config. After registration, open the agent page and use{" "}
+                  <b className="text-foreground">Set on-chain</b> so marketplace cards show the photo for everyone
+                  (HTTPS/IPFS URL recommended for chain storage).
+                </span>
+              </div>
+            )}
+
             <div className="mt-5 flex flex-wrap justify-center gap-2">
               <Button asChild><Link href="/skills">Full skill catalog</Link></Button>
               <Button variant="outline" asChild><Link href="/">View marketplace</Link></Button>
+              <Button variant="ghost" onClick={() => setStep(1)} className="gap-1.5">
+                <ArrowLeft className="h-4 w-4" /> Edit details
+              </Button>
             </div>
 
-            <CodeBlock className="mt-4" lang="agent" code={`name: ${name}\ndescription: ${description}\nskills: ${chosen.map((s) => s.name).join(", ") || "none"}`} />
+            <CodeBlock className="mt-4" lang="agent" code={configYaml} />
           </CardContent>
         </Card>
       )}

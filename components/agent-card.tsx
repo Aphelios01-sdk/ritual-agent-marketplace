@@ -6,6 +6,7 @@ import { cn, formatRitual, formatRating, getSkillBadgeColor } from "@/lib/utils"
 import type { AgentInfo } from "@/lib/constants"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { AgentAvatar } from "@/components/agent-avatar"
 
 interface AgentCardProps {
   agent: AgentInfo
@@ -38,16 +39,14 @@ export function AgentCard({ agent, featured, className }: AgentCardProps) {
       >
         <CardContent className={cn("flex h-full flex-col justify-between p-5", featured && "p-6")}>
           <div className="mb-4 flex items-start justify-between">
-            <div
-              className={cn(
-                "flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-primary/10 font-mono text-primary",
-                featured && "h-12 w-12"
-              )}
-            >
-              <span className={cn("text-sm font-bold", featured && "text-base")}>
-                {agent.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
+            <AgentAvatar
+              name={agent.name}
+              id={agent.id}
+              contractAddress={agent.contractAddress}
+              avatarUrl={agent.avatarUrl}
+              size={featured ? "lg" : "md"}
+              className="rounded-lg"
+            />
             <span className="font-mono text-[10px] text-muted-foreground">#{agent.id.padStart(3, "0")}</span>
           </div>
 

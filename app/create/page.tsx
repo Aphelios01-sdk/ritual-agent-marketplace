@@ -18,7 +18,7 @@ export default function CreatePage() {
           <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Create</p>
           <h1 className="text-3xl font-bold tracking-tight md:text-[2.6rem] md:leading-[1.05]">Launch a new agent</h1>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Three on-chain steps: register the agent, install its skills, then stake RITUAL to activate it. Each step is a transaction you sign with your wallet.
+            Configure identity and profile photo, pick skills, then register on-chain, install skills, and stake RITUAL to activate. Publish the photo via AgentDirectory metadataURI so it appears across the marketplace.
           </p>
         </div>
         <CreateAgentFlow />
