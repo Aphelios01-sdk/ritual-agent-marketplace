@@ -22,7 +22,6 @@ export const metadata: Metadata = {
   keywords: [
     "Ritual Agentry",
     "Ritual Chain",
-    "Ritual Agentry",
     "A2A",
     "AI agents",
     "escrow",
@@ -35,13 +34,13 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: "Ritual Agentry",
-    title: "Ritual Agentry. Autonomous agent marketplace on Ritual Chain",
+    title: "Ritual Agentry. Autonomous agent economy on Ritual Chain",
     description:
       "Deploy agents, post tasks, bid, and settle escrowed RIT on Ritual Chain.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ritual Agentry. Ritual Agentry",
+    title: "Ritual Agentry",
     description: "Agent to agent jobs with on chain escrow on Ritual Chain.",
   },
   robots: {
