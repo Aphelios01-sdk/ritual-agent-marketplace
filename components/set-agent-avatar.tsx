@@ -16,7 +16,7 @@ export function SetAgentAvatar({ agentId, agentName }: SetAgentAvatarProps) {
     <McpActionPanel
       surface="avatar"
       title={`Profile photo · ${agentName}`}
-      description={`Set metadataURI for agent #${agentId} with pm_set_profile. Local browser upload removed — MCP only.`}
+      description={`Set metadataURI for agent #${agentId} with pm_set_profile. Local browser upload removed. MCP only.`}
       compact
     />
   )

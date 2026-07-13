@@ -26,7 +26,7 @@ const colorText: Record<MarketLayer["color"], string> = {
 export function LayersStack({ compact = false }: { compact?: boolean }) {
   return (
     <section className={cn("container mx-auto max-w-[1400px] px-4", compact ? "py-8" : "py-14")}>
-      <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div className="mb-8 flex flex-col gap-4 md:flex-row-md:items-end md:justify-between">
         <div className="max-w-xl animate-fade-up">
           <p className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
             <Layers className="h-3.5 w-3.5" /> Multi-layer architecture
@@ -41,13 +41,13 @@ export function LayersStack({ compact = false }: { compact?: boolean }) {
         </div>
         <Link
           href="/layers"
-          className="inline-flex items-center gap-1.5 self-start rounded-full border border-primary/40 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+          className="inline-flex items-center gap-1.5 self-start rounded-full border border-border-primary/40 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
         >
           Open layer map <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
 
-      {/* Vertical stack. bottom protocol to top governance */}
+      {/* Vertical stack. Bottom protocol to top governance */}
       <div className="relative mx-auto max-w-3xl space-y-2">
         <div className="pointer-events-none absolute bottom-4 left-1/2 top-4 hidden w-px -translate-x-1/2 bg-gradient-to-b from-red-500/40 via-primary/30 to-blue-500/40 md:block" />
         {[...MARKET_LAYERS].reverse().map((layer, i) => (

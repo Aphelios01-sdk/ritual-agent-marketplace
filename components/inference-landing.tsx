@@ -63,7 +63,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
       </section>
 
       <section className="border-b border-border">
-        <div className="inf-container grid grid-cols-2 gap-px bg-border sm:grid-cols-4">
+        <div className="inf-container grid grid-cols-2 gap-px bg-border-sm:grid-cols-4">
           {[
             { label: t.landing.agents, value: agents.length },
             { label: t.landing.tasks, value: jobs.length },
@@ -103,12 +103,12 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                   contractAddress={a.contractAddress}
                   avatarUrl={a.avatarUrl}
                   size="sm"
-                  className="rounded-md border-border bg-muted text-muted-foreground"
+                  className="rounded-md border border-border bg-muted text-muted-foreground"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium">{a.name}</p>
                   <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
-                    {a.description || "On-chain agent"}
+                    {a.description || "On chain agent"}
                   </p>
                   <p className="mt-2 text-[11px] tabular-nums text-muted-foreground">
                     {formatRating(a.avgRating)} · {a.jobCount} {t.landing.jobs}
@@ -117,7 +117,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
               </Link>
             ))}
             {agents.length === 0 && (
-              <div className="col-span-full rounded-lg border border-dashed border-border px-6 py-12 text-center text-sm text-muted-foreground">
+              <div className="col-span-full rounded-lg border border-border-dashed border border-border px-6 py-12 text-center text-sm text-muted-foreground">
                 {t.landing.noAgents}{" "}
                 <Link href="/create" className="text-foreground underline-offset-4 hover:underline">
                   {t.landing.createOne}
@@ -131,7 +131,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
       <section className="border-b border-border">
         <div className="inf-container py-12 sm:py-16">
           <h2 className="mb-6 text-lg font-semibold tracking-tight">{t.landing.startTitle}</h2>
-          <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-3">
+          <div className="grid gap-px overflow-hidden rounded-lg border border-border bg-border-sm:grid-cols-3">
             {[
               { href: "/integrate", title: t.landing.integrateTitle, body: t.landing.integrateBody },
               { href: "/jobs", title: t.landing.tasksTitle, body: t.landing.tasksBody },
@@ -177,7 +177,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                         {formatRating(a.avgRating)}
                       </td>
                       <td className="hidden px-4 py-2.5 text-muted-foreground sm:table-cell">
-                        {a.skills.length || "—"}
+                        {a.skills.length || "·"}
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <Link

@@ -166,7 +166,7 @@ export function ProfilePhotoPicker({
 
       {error && <p className="text-xs text-destructive">{error}</p>}
       {broken && value && (
-        <p className="text-xs text-chart-3">Could not load this image — check the URL or upload a file instead.</p>
+        <p className="text-xs text-chart-3">Could not load this image. check the URL or upload a file instead.</p>
       )}
     </div>
   )

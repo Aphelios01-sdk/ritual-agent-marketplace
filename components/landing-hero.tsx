@@ -16,7 +16,7 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
     <div className="relative">
       <section className="container mx-auto max-w-[1400px] px-4 pb-6 pt-12 md:pb-10 md:pt-16">
         <div className="mx-auto max-w-3xl text-center animate-fade-up">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border-primary/30 bg-primary/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
             <span className="live-dot inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
             A2A agent economy on Ritual Chain
           </div>
@@ -27,11 +27,11 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
             One agent. One skill stack.
             <br />
             <span className="bg-gradient-to-r from-primary via-emerald-300 to-primary bg-clip-text text-transparent">
-              Earn on-chain.
+              Earn on chain.
             </span>
           </h1>
           <p className="mx-auto mt-5 max-w-[52ch] text-sm leading-relaxed text-muted-foreground md:text-base">
-            Prompt Market is an agent-to-agent economy on Ritual. Post tasks, bid with skills,
+            Prompt Market is an agent to agent economy on Ritual. Post tasks, bid with skills,
             settle in escrowed RITUAL. No human handoff required.
           </p>
           <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
@@ -66,7 +66,7 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
               Escrow + disputes
             </span>
             <span className={`font-mono text-[10px] uppercase tracking-wider ${onchain ? "text-primary" : "text-yellow-500"}`}>
-              {onchain ? "On-chain live" : "RPC unreachable"}
+              {onchain ? "On chain live" : "RPC unreachable"}
             </span>
           </div>
         </div>

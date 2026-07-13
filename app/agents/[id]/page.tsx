@@ -32,7 +32,7 @@ function countSkillTypes(skills: AgentInfo["skills"]) {
 export default async function AgentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
-  // Look up on-chain
+  // Look up on chain
   let agent: AgentInfo | undefined
   try {
     const onchain = await fetchAgents()
@@ -54,7 +54,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
 
   const skillCounts = countSkillTypes(agent.skills)
 
-  // Audit trail: on-chain jobs where this agent is provider or requester.
+  // Audit trail: on chain jobs where this agent is provider or requester.
   const onchainJobs = await fetchJobs()
   const addr = agent.contractAddress.toLowerCase()
   const agentHistory = onchainJobs
@@ -74,7 +74,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Agent Profile */}
         <div className="lg:col-span-2">
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-6">
               <div className="mb-6 flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
@@ -157,8 +157,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
                 <Button asChild size="sm" variant="outline" className="rounded-full gap-1">
                   <a
                     href={`https://x.com/intent/tweet?text=${encodeURIComponent(
-                      `Hire ${agent.name} on Prompt Market — ${formatRating(agent.avgRating)} rating, ${agent.jobCount} jobs on Ritual Chain`,
-                    )}&url=${encodeURIComponent(`https://ritual-agent-marketplace-xi.vercel.app/agents/${agent.id}`)}`}
+                      `Hire ${agent.name} on Prompt Market. ${formatRating(agent.avgRating)} rating, ${agent.jobCount} jobs on Ritual Chain`, )}&url=${encodeURIComponent(`https://ritual-agent-marketplace-xi.vercel.app/agents/${agent.id}`)}`}
                     target="_blank"
                     rel="noreferrer"
                   >
@@ -189,7 +188,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
         {/* Activity sidebar */}
         <div className="space-y-4">
           {/* Incoming Jobs */}
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <Clock className="h-4 w-4 text-yellow-500" />
@@ -216,7 +215,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
           </Card>
 
           {/* Active Jobs */}
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <Cpu className="h-4 w-4 text-blue-500" />
@@ -243,7 +242,7 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
           </Card>
 
           {/* Completed */}
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-4">
               <div className="mb-3 flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />
@@ -278,18 +277,18 @@ export default async function AgentDetailPage({ params }: { params: Promise<{ id
 
       {/* Audit trail */}
       <div className="mt-8">
-        <Card className="surface-card border-border/60">
+        <Card className="surface-card border border-border/60">
           <CardContent className="p-5">
             <div className="mb-4 flex items-center gap-2">
               <History className="h-4 w-4 text-primary" />
-              <h3 className="font-semibold">On-chain history</h3>
+              <h3 className="font-semibold">On chain history</h3>
               <span className="ml-auto text-xs text-muted-foreground">
                 {recentHistory.length} job{recentHistory.length === 1 ? "" : "s"} verified on Ritual Chain
               </span>
             </div>
             {recentHistory.length === 0 ? (
               <p className="py-4 text-center text-xs text-muted-foreground">
-                No on-chain job history yet for this agent. New activity appears here once the agent bids on or requests jobs.
+                No on chain job history yet for this agent. New activity appears here once the agent bids on or requests jobs.
               </p>
             ) : (
               <div className="overflow-x-auto">

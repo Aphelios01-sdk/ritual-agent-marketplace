@@ -77,21 +77,76 @@ const JOB_MARKET_ABI = [
   ] }], stateMutability: "view", type: "function" },
 ] as const
 
-const JOB_STATUS_NAMES = ["OPEN", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "DISPUTED", "REFUNDED", "CANCELLED"]
+const JOB_STATUS_NAMES = ["OPEN", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "DISPUTED", "REFUNDED", "CANCELLED"] as const
+
+// ── error helper ──
+function errMessage(e: unknown): string {
+  if (e && typeof e === "object") {
+    const v = e as { shortMessage?: string; message?: string; details?: string }
+    if (v.shortMessage) return v.shortMessage
+    if (v.details) return v.details
+    if (v.message) return v.message
+  }
+  if (typeof e === "string") return e
+  return String(e)
+}
+
+// ── types ──
+type AgentInfo = {
+  id: bigint
+  name: string
+  description: string
+  agentContract: `0x${string}`
+  bondAmount: bigint
+  totalEarnings: bigint
+  avgRating: bigint
+  jobCount: bigint
+  active: boolean
+}
+
+type SkillInfo = {
+  skillId: `0x${string}`
+  name: string
+  description: string
+  precompileAddr: `0x${string}`
+  configData: `0x${string}`
+  active: boolean
+}
+
+type JobInfo = {
+  id: bigint
+  requester: `0x${string}`
+  taskData: `0x${string}`
+  reward: bigint
+  bondRequired: bigint
+  status: number
+  provider: `0x${string}`
+  resultData: `0x${string}`
+  deadline: bigint
+  rating: number
+  acceptedAt: bigint
+}
+
+type BidInfo = {
+  provider: `0x${string}`
+  price: bigint
+  estBlocks: bigint
+  submittedAt: bigint
+}
 
 // ── helpers ──
-const json = (res: Record<string, any>, status = 200) => {
+const json = (res: Record<string, unknown>, status = 200) => {
   const body = JSON.stringify(res)
   return { status, headers: { "content-type": "application/json", "access-control-allow-origin": "*" }, body }
 }
-const agentInfoToObj = (a: any) => ({
+const agentInfoToObj = (a: AgentInfo) => ({
   id: String(a.id), name: a.name, description: a.description,
   contract: a.agentContract, bondAmount: a.bondAmount.toString(),
   totalEarnings: a.totalEarnings.toString(), avgRating: Number(a.avgRating) / 100,
   jobCount: Number(a.jobCount), active: a.active,
 })
-const skillToObj = (s: any) => ({ skillId: s.skillId, name: s.name, description: s.description, precompile: s.precompileAddr, active: s.active })
-const jobToObj = (j: any) => ({
+const skillToObj = (s: SkillInfo) => ({ skillId: s.skillId, name: s.name, description: s.description, precompile: s.precompileAddr, active: s.active })
+const jobToObj = (j: JobInfo) => ({
   id: String(j.id), requester: j.requester, provider: j.provider,
   taskData: j.taskData, reward: j.reward.toString(), bondRequired: j.bondRequired.toString(),
   status: JOB_STATUS_NAMES[Number(j.status)] || "UNKNOWN", rating: Number(j.rating),
@@ -111,7 +166,7 @@ async function handle(req: http.IncomingMessage, url: URL): Promise<{ status: nu
   }
 
   if (p === "/agents") {
-    const agents = await publicClient.readContract({ address: REGISTRY, abi: REGISTRY_ABI, functionName: "getActiveAgents" }) as any[]
+    const agents = await publicClient.readContract({ address: REGISTRY, abi: REGISTRY_ABI, functionName: "getActiveAgents" }) as AgentInfo[]
     return json({ count: agents.length, agents: agents.map(agentInfoToObj) })
   }
 
@@ -119,23 +174,23 @@ async function handle(req: http.IncomingMessage, url: URL): Promise<{ status: nu
   if (mAgent) {
     const id = BigInt(mAgent[1])
     const [agent, skills] = await Promise.all([
-      publicClient.readContract({ address: REGISTRY, abi: REGISTRY_ABI, functionName: "getAgent", args: [id] }) as Promise<any>,
-      publicClient.readContract({ address: REGISTRY, abi: REGISTRY_ABI, functionName: "getAgentSkills", args: [id] }) as Promise<any[]>,
+      publicClient.readContract({ address: REGISTRY, abi: REGISTRY_ABI, functionName: "getAgent", args: [id] }) as Promise<AgentInfo>,
+      publicClient.readContract({ address: REGISTRY, abi: REGISTRY_ABI, functionName: "getAgentSkills", args: [id] }) as Promise<SkillInfo[]>,
     ])
     return json({ ...agentInfoToObj(agent), skills: skills.map(skillToObj) })
   }
 
   const mJob = p.match(/^\/jobs\/(\d+)$/)
   if (mJob) {
-    const job = await publicClient.readContract({ address: JOB_MARKET_V2, abi: JOB_MARKET_ABI, functionName: "jobs", args: [BigInt(mJob[1])] }) as any
+    const job = await publicClient.readContract({ address: JOB_MARKET_V2, abi: JOB_MARKET_ABI, functionName: "jobs", args: [BigInt(mJob[1])] }) as JobInfo
     if (job.requester === "0x0000000000000000000000000000000000000000") return json({ error: "job not found" }, 404)
     return json({ ...jobToObj(job) })
   }
 
   const mBids = p.match(/^\/jobs\/(\d+)\/bids$/)
   if (mBids) {
-    const bids = await publicClient.readContract({ address: JOB_MARKET_V2, abi: JOB_MARKET_ABI, functionName: "getBids", args: [BigInt(mBids[1])] }) as any[]
-    return json({ bids: bids.map((b: any) => ({ provider: b.provider, price: b.price.toString(), estBlocks: Number(b.estBlocks), submittedAt: Number(b.submittedAt) })) })
+    const bids = await publicClient.readContract({ address: JOB_MARKET_V2, abi: JOB_MARKET_ABI, functionName: "getBids", args: [BigInt(mBids[1])] }) as BidInfo[]
+    return json({ bids: bids.map((b) => ({ provider: b.provider, price: b.price.toString(), estBlocks: Number(b.estBlocks), submittedAt: Number(b.submittedAt) })) })
   }
 
   const mProvJobs = p.match(/^\/jobs\/agent\/(0x[a-fA-F0-9]{40})$/)
@@ -195,8 +250,8 @@ const server = http.createServer(async (req, res) => {
     const out = await handle(req, url)
     res.writeHead(out.status, out.headers); res.end(out.body)
     console.log(`${method} ${url.pathname} ${ip} — ${out.status} ${Date.now() - started}ms`)
-  } catch (e: any) {
-    const msg = e?.shortMessage || e?.message || String(e)
+  } catch (e: unknown) {
+    const msg = errMessage(e)
     res.writeHead(500, { "content-type": "application/json", "access-control-allow-origin": "*" })
     res.end(JSON.stringify({ error: "server error", detail: msg }))
     console.error(`${method} ${url.pathname} ${ip} — 500 ${Date.now() - started}ms`, msg)

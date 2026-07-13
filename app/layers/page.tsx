@@ -16,7 +16,7 @@ export default function LayersPage() {
     <div className="min-h-[100dvh]">
       <LayerRail />
       <section className="container mx-auto max-w-[1400px] px-4 py-6">
-        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row-sm:items-end sm:justify-between">
           <div className="animate-fade-up">
             <div className="mb-1.5 inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.16em] text-primary">
               <Layers className="h-3 w-3" /> Architecture
@@ -30,7 +30,7 @@ export default function LayersPage() {
 
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {MARKET_LAYERS.map((l) => (
-            <Card key={l.id} className="surface-card border-border/60 transition-transform hover:-translate-y-0.5">
+            <Card key={l.id} className="surface-card border border-border/60 transition-transform hover:-translate-y-0.5">
               <CardContent className="p-3.5">
                 <div className="mb-1.5 flex items-center justify-between gap-2">
                   <span className="font-mono text-[10px] text-primary">

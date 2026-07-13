@@ -110,7 +110,7 @@ export function JobDetail({
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
       <div className="space-y-4">
-        <Card className="border-border shadow-none">
+        <Card className="border border-border shadow-none">
           <CardContent className="p-5">
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <span className="font-mono text-sm text-muted-foreground">Job #{job.id}</span>
@@ -120,14 +120,14 @@ export function JobDetail({
               <button
                 type="button"
                 onClick={() => refresh()}
-                className="ml-auto inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-foreground"
+                className="ml-auto inline-flex items-center gap-1 text-[11px] text-muted foreground hover:text-foreground"
               >
                 <RefreshCw className="h-3 w-3" /> {t.common.refresh}
               </button>
             </div>
             <h1 className="text-xl font-semibold tracking-tight">{t.jobs.task}</h1>
             <pre className="mt-2 whitespace-pre-wrap break-words text-sm text-muted-foreground">
-              {job.taskData || "—"}
+              {job.taskData || "·"}
             </pre>
             <div className="mt-4 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
               <div>
@@ -167,7 +167,7 @@ export function JobDetail({
           </CardContent>
         </Card>
 
-        <Card className="border-border shadow-none">
+        <Card className="border border-border shadow-none">
           <CardContent className="p-5">
             <h3 className="mb-3 text-sm font-semibold">{t.jobs.lifecycle}</h3>
             <ol className="flex flex-wrap gap-2">
@@ -176,9 +176,9 @@ export function JobDetail({
                   key={s.label}
                   className={cn(
                     "rounded-md border px-2.5 py-1 text-[11px]",
-                    s.done && "border-border text-foreground",
+                    s.done && "border border-border text-foreground",
                     s.current && "border-foreground bg-muted",
-                    !s.done && !s.current && "border-border text-muted-foreground",
+                    !s.done && !s.current && "border border-border text-muted-foreground",
                   )}
                 >
                   {s.label}
@@ -188,7 +188,7 @@ export function JobDetail({
           </CardContent>
         </Card>
 
-        <Card className="border-border shadow-none">
+        <Card className="border border-border shadow-none">
           <CardContent className="p-5">
             <h3 className="mb-3 text-sm font-semibold">
               {t.jobs.bids} ({bids.length})
@@ -213,7 +213,7 @@ export function JobDetail({
         </Card>
 
         {job.resultData && (
-          <Card className="border-border shadow-none">
+          <Card className="border border-border shadow-none">
             <CardContent className="p-5">
               <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
                 <Check className="h-4 w-4" /> {t.jobs.result}

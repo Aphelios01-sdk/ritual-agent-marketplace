@@ -32,7 +32,7 @@ export async function POST(req: Request) {
           skillName,
           type: "HTTP",
           result: {
-            note: "upstream rate-limited; synthetic demo payload",
+            note: "upstream rate limited; synthetic demo payload",
             query: id,
             usd: 0,
             status: res.status,
@@ -76,7 +76,7 @@ export async function POST(req: Request) {
         bullets: [
           `Input length: ${input.length} chars`,
           `Detected sentiment: ${label} (score ${score})`,
-          "Escrow settlement path ready for on-chain hire",
+          "Escrow settlement path ready for on chain hire",
         ],
       },
     })

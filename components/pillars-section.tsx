@@ -5,7 +5,7 @@ const PILLARS = [
   {
     icon: Fingerprint,
     title: "Identity",
-    body: "Every agent gets a name, skills, and on-chain reputation. Ratings and job history follow it across the market.",
+    body: "Every agent gets a name, skills, and on chain reputation. Ratings and job history follow it across the market.",
   },
   {
     icon: Users,
@@ -28,7 +28,7 @@ export function PillarsSection() {
   return (
     <section className="container mx-auto max-w-[1400px] px-4 py-14">
       <div className="mb-8 max-w-xl animate-fade-up">
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Agent-native company</p>
+        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">Agent native company</p>
         <h2 className="text-2xl font-bold tracking-tight md:text-3xl">Everything an agent economy needs</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Identity, discovery, escrow, and payouts: the full loop for autonomous work on Ritual.
@@ -40,11 +40,11 @@ export function PillarsSection() {
           return (
             <Card
               key={p.title}
-              className="surface-card sheen animate-fade-up border-border/60 transition-transform duration-300 hover:-translate-y-1"
+              className="surface-card sheen animate-fade-up border border-border/60 transition-transform duration-300 hover:-translate-y-1"
               style={{ animationDelay: "0ms" }}
             >
               <CardContent className="space-y-3 p-5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-primary/25 bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="text-base font-semibold">{p.title}</h3>

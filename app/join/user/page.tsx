@@ -49,7 +49,7 @@ export default function JoinUserPage() {
         <h1 className="text-3xl font-bold tracking-tight">{t.join.userTitle}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t.join.userDesc}</p>
 
-        <Card className="mt-8 border-border bg-card shadow-none">
+        <Card className="mt-8 border border-border bg-card shadow-none">
           <CardContent className="space-y-4 p-6">
             <h2 className="text-lg font-semibold">{t.join.mcpPath}</h2>
             <ol className="space-y-3">

@@ -48,7 +48,7 @@ export function RolesSection() {
         {ROLES.map((role) => {
           const Icon = role.icon
           return (
-            <Card key={role.badge} className="flex flex-col border-border bg-card shadow-none">
+            <Card key={role.badge} className="flex flex-col border border-border bg-card shadow-none">
               <CardContent className="flex flex-1 flex-col p-6">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground">

@@ -33,7 +33,7 @@ export function ActivityFeed({
   const t = useT()
   const p = t.activityPage
   const [events, setEvents] = useState<FeedEvent[]>([])
-  const [block, setBlock] = useState<string>("—")
+  const [block, setBlock] = useState<string>("·")
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState<string | null>(null)
 
@@ -46,7 +46,7 @@ export function ActivityFeed({
         const data = await res.json()
         if (dead) return
         setEvents((data.events || []).slice().reverse())
-        setBlock(data.block || "—")
+        setBlock(data.block || "·")
         setErr(null)
       } catch (e) {
         if (!dead) setErr(e instanceof Error ? e.message : "failed")

@@ -39,7 +39,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
 
         <div className="mb-8 animate-fade-up">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary">
+            <span className="rounded-full border border-border-primary/40 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary">
               {layer.short}, Level {layer.level}
             </span>
             <span className="rounded-full border border-border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -52,7 +52,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
-          <Card className="surface-card border-border/60 md:col-span-2">
+          <Card className="surface-card border border-border/60 md:col-span-2">
             <CardContent className="p-5">
               <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <Box className="h-4 w-4 text-primary" /> Contracts & endpoints
@@ -68,7 +68,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
             </CardContent>
           </Card>
 
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="space-y-4 p-5">
               <div>
                 <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Inputs</h3>
@@ -97,7 +97,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
         </div>
 
         <div className="mt-4 grid gap-4 md:grid-cols-2">
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-5">
               <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <GitBranch className="h-4 w-4 text-primary" /> Flows
@@ -111,7 +111,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
               </div>
             </CardContent>
           </Card>
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-5">
               <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold">
                 <Route className="h-4 w-4 text-primary" /> Deep links
@@ -127,8 +127,8 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
           </Card>
         </div>
 
-        {/* Adjacent layers. never stuck on one */}
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:justify-between">
+        {/* Adjacent layers. Never stuck on one */}
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row-sm:justify-between">
           {prev ? (
             <Link
               href={`/layers/${prev.id}`}

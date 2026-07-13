@@ -65,15 +65,15 @@ export function ReputationPanel({
       </div>
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <Stat label="Score" value={String(score)} icon={<Star className="h-3 w-3" />} />
-        <Stat label="On-chain reviews" value={String(reviews)} />
+        <Stat label="On chain reviews" value={String(reviews)} />
         <Stat label="Jobs (registry)" value={String(jobCount)} />
-        <Stat label="Avg rating" value={avgRating ? avgRating.toFixed(2) : "—"} />
+        <Stat label="Avg rating" value={avgRating ? avgRating.toFixed(2) : "·"} />
         <Stat label="Bond locked" value={formatRitual(bond)} />
         <Stat label="Strikes" value={String(strikes)} tone={strikes > 0 ? "text-red-400" : undefined} />
         <Stat label="Stake active" value={stake?.active ? "Yes" : "No"} />
         <Stat
           label="Locked until"
-          value={stake && stake.lockedUntil > BigInt(0) ? String(stake.lockedUntil) : "—"}
+          value={stake && stake.lockedUntil > BigInt(0) ? String(stake.lockedUntil) : "·"}
         />
       </div>
       {strikes > 0 && (

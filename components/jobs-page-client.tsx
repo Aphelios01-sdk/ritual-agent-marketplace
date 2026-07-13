@@ -25,7 +25,7 @@ export function JobsPageClient({ jobs }: { jobs: OnchainJob[] }) {
         >
           <ArrowLeft className="h-4 w-4" /> {t.common.back}
         </Link>
-        <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+        <div className="mb-8 flex flex-col gap-6 lg:flex-row-lg:items-end lg:justify-between">
           <div className="max-w-[60ch]">
             <p className="mb-2 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
               <Layers className="h-3 w-3" /> {t.jobs.eyebrow}
@@ -55,7 +55,7 @@ export function JobsPageClient({ jobs }: { jobs: OnchainJob[] }) {
             { label: t.jobs.inFlight, value: active },
             { label: t.jobs.completed, value: done },
           ].map((s) => (
-            <Card key={s.label} className="border-border/60 bg-card shadow-none">
+            <Card key={s.label} className="border border-border/60 bg-card shadow-none">
               <CardContent className="p-4">
                 <p className="text-2xl font-bold tabular-nums">{s.value}</p>
                 <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{s.label}</p>
@@ -65,8 +65,8 @@ export function JobsPageClient({ jobs }: { jobs: OnchainJob[] }) {
         </div>
 
         {open === 0 && active === 0 && done === 0 && (
-          <Card className="mb-6 border-dashed border-border/60 bg-card/30">
-            <CardContent className="flex flex-col gap-2 p-5 sm:flex-row sm:items-center sm:justify-between">
+          <Card className="mb-6 border-dashed border border-border/60 bg-card/30">
+            <CardContent className="flex flex-col gap-2 p-5 sm:flex-row-sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-medium">{t.jobs.quiet}</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">{t.jobs.quietBody}</p>

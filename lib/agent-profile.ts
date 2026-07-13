@@ -1,6 +1,6 @@
 /**
  * Agent profile photo helpers.
- * On-chain source of truth: AgentDirectory.metadataURI
+ * On chain source of truth: AgentDirectory.metadataURI
  * (JSON {"image":"..."} or bare image URL).
  * Local overlay (localStorage) for draft / immediate preview.
  */
@@ -30,7 +30,7 @@ export function parseAvatarFromMetadataURI(uri: string | undefined | null): stri
     const img = (obj.image || obj.avatar || "").toString().trim()
     return img && isImageSrc(img) ? img : undefined
   } catch {
-    // ipfs://CID or gateway path without image extension — treat as resource URL
+    // ipfs://CID or gateway path without image extension. Treat as resource URL
     if (t.startsWith("ipfs://") || t.startsWith("ar://")) return t
     return undefined
   }
@@ -121,7 +121,7 @@ export function setLocalAvatar(key: string, imageUrl: string | null) {
   writeLocalMap(map)
 }
 
-/** Resolve best available avatar: local override > on-chain. */
+/** Resolve best available avatar: local override > on chain. */
 export function resolveAvatar(
   agent: { id: string; contractAddress?: string; avatarUrl?: string },
 ): string | undefined {
@@ -162,7 +162,7 @@ export async function fileToAvatarDataUrl(file: File): Promise<string> {
     dataUrl = canvas.toDataURL("image/jpeg", quality)
   }
   if (dataUrl.length > MAX_UPLOAD_BYTES) {
-    throw new Error("Could not compress image under size limit — use a smaller file or an image URL")
+    throw new Error("Could not compress image under size limit. Use a smaller file or an image URL")
   }
   return dataUrl
 }

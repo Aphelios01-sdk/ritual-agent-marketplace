@@ -200,7 +200,7 @@ async function pollForJobs(wallet: ReturnType<typeof createWalletClient>) {
           console.log(`  bid tx: ${tx}`)
         }
       }
-    } catch (e) {
+    } catch {
       // Skip transient RPC errors
     }
   }

@@ -78,7 +78,7 @@ export function AnalyticsPageClient({ data }: { data: AnalyticsPayload }) {
               blue: "border-blue-500/25 bg-blue-500/10 text-blue-500",
             }[c.tone]
             return (
-              <Card key={c.label} className="surface-card animate-fade-up border-border/60" style={{ animationDelay: `${i * 60}ms` }}>
+              <Card key={c.label} className="surface-card animate-fade-up border border-border/60" style={{ animationDelay: `${i * 60}ms` }}>
                 <CardContent className="flex items-center gap-3.5 p-4">
                   <div className={cn("flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border", toneClass)}>
                     <Icon className="h-[18px] w-[18px]" />
@@ -96,7 +96,7 @@ export function AnalyticsPageClient({ data }: { data: AnalyticsPayload }) {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-2">
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-5">
               <h3 className="mb-4 font-semibold">{p.jobsByStatus}</h3>
               <div className="space-y-2.5">
@@ -116,7 +116,7 @@ export function AnalyticsPageClient({ data }: { data: AnalyticsPayload }) {
             </CardContent>
           </Card>
 
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-5">
               <h3 className="mb-4 font-semibold">{p.topAgents}</h3>
               <ol className="space-y-2">

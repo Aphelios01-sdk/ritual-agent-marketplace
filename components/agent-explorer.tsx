@@ -125,9 +125,9 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
 
   return (
     <div className="min-h-[calc(100dvh-3.5rem)]">
-      {/* Compact command header. fits above fold */}
+      {/* Compact command header. Fits above fold */}
       <div className="border-b border-border/50 bg-card/20">
-        <div className="container mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-4 md:flex-row md:items-center md:justify-between md:py-3.5">
+        <div className="container mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-4 md:flex-row-md:items-center md:justify-between md:py-3.5">
           <div className="min-w-0">
             <div className="mb-1 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-primary">
@@ -135,7 +135,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                 Live
               </span>
               <span className={cn("font-mono text-[10px] uppercase tracking-wider", onchain ? "text-primary" : "text-yellow-500")}>
-                {onchain ? "On-chain" : "RPC down"}
+                {onchain ? "On chain" : "RPC down"}
               </span>
               {chainInfo && (
                 <span className="font-mono text-[10px] text-muted-foreground">· chain {chainInfo.chainId}</span>
@@ -200,7 +200,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
         </div>
       </div>
 
-      {/* Workspace: tabs + panels. no long scroll stack */}
+      {/* Workspace: tabs + panels. No long scroll stack */}
       <div className="container mx-auto max-w-[1400px] px-4 py-4 md:py-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="inline-flex rounded-full border border-border/70 bg-card/40 p-0.5">
@@ -240,7 +240,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Search agents, skills…"
-                      className="w-full bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+                      className="w-full bg transparent text-xs outline-none placeholder:text-muted foreground"
                     />
                   </div>
                   <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -248,7 +248,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                     <select
                       value={sort}
                       onChange={(e) => setSort(e.target.value as SortKey)}
-                      className="cursor-pointer rounded-md border border-border bg-transparent px-2 py-1 text-xs text-foreground outline-none"
+                      className="cursor-pointer rounded-md border border-border bg transparent px-2 py-1 text-xs text-foreground outline-none"
                     >
                       <option value="jobs">Most jobs</option>
                       <option value="rating">Top rated</option>
@@ -265,7 +265,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                         "rounded-full border px-2.5 py-0.5 text-[11px] transition-colors",
                         category === c
                           ? "border-primary/60 bg-primary/10 text-primary"
-                          : "border-border text-muted-foreground hover:text-foreground",
+                          : "border border-border text-muted-foreground hover:text-foreground",
                       )}
                     >
                       {c === "all" ? "All" : c}
@@ -278,7 +278,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                     onClick={() => setSkillFilter(null)}
                     className={cn(
                       "rounded-full border px-2.5 py-0.5 text-[11px]",
-                      skillFilter === null ? "border-primary bg-primary text-primary-foreground" : "border-border text-muted-foreground",
+                      skillFilter === null ? "border-primary bg-primary text-primary-foreground" : "border border-border text-muted-foreground",
                     )}
                   >
                     All skills
@@ -292,7 +292,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                         "rounded-full border px-2.5 py-0.5 text-[11px]",
                         skillFilter === skill.skillId
                           ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border text-muted-foreground hover:border-primary/40",
+                          : "border border-border text-muted-foreground hover:border-primary/40",
                       )}
                     >
                       {skill.name}
@@ -306,7 +306,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
             {tab === "layers" && (
               <div className="animate-fade-in">
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm text-muted-foreground">Seven independent layers. open any without leaving the map.</p>
+                  <p className="text-sm text-muted-foreground">Seven independent layers. Open any without leaving the map.</p>
                   <Link href="/layers" className="text-xs font-medium text-primary hover:underline">Full map</Link>
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
@@ -316,7 +316,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                       href={`/layers/${l.id}`}
                       className="group surface-card flex items-start gap-3 rounded-xl border border-border/60 p-3 transition-all hover:-translate-y-0.5 hover:border-primary/40"
                     >
-                      <span className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded-lg border border-primary/25 bg-primary/10 font-mono text-[10px] font-bold text-primary">
+                      <span className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded-lg border border-border-primary/25 bg-primary/10 font-mono text-[10px] font-bold text-primary">
                         {l.short}
                         <span className="text-[8px] font-normal text-muted-foreground">L{l.level}</span>
                       </span>
@@ -343,9 +343,9 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                 ].map((r) => {
                   const Icon = r.icon
                   return (
-                    <Card key={r.href} className="surface-card border-border/60 transition-transform hover:-translate-y-0.5">
+                    <Card key={r.href} className="surface-card border border-border/60 transition-transform hover:-translate-y-0.5">
                       <CardContent className="flex h-full flex-col p-4">
-                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
+                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-border-primary/25 bg-primary/10 text-primary">
                           <Icon className="h-4 w-4" />
                         </div>
                         <h3 className="font-semibold">{r.title}</h3>
@@ -396,7 +396,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
 
           {/* Compact side rail */}
           <aside className="space-y-3 lg:sticky lg:top-[4.5rem] lg:self-start">
-            <Card className="surface-card border-border/60">
+            <Card className="surface-card border border-border/60">
               <CardContent className="p-3.5">
                 <div className="mb-2.5 flex items-center gap-2">
                   <Radio className="h-3.5 w-3.5 text-primary" />
@@ -442,7 +442,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
               </CardContent>
             </Card>
 
-            <Card className="surface-card border-border/60">
+            <Card className="surface-card border border-border/60">
               <CardContent className="space-y-2 p-3.5">
                 <p className="text-xs font-semibold">Quick links</p>
                 <div className="grid grid-cols-2 gap-1.5">
@@ -464,7 +464,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                 {agents[0] && (
                   <Link
                     href={`/agents/${agents[0].id}`}
-                    className="mt-1 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-2 py-1.5 text-[11px] transition-colors hover:border-primary/40"
+                    className="mt-1 flex items-center gap-2 rounded-lg border border-border-primary/20 bg-primary/5 px-2 py-1.5 text-[11px] transition-colors hover:border-primary/40"
                   >
                     <BadgeCheck className="h-3.5 w-3.5 text-primary" />
                     <span className="min-w-0 flex-1 truncate font-medium">{agents[0].name}</span>

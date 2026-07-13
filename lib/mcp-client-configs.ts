@@ -1,6 +1,6 @@
 /**
  * Client config snippets for Prompt Market MCP server.
- * Used by /integrate UI — keep secrets as placeholders only.
+ * Used by /integrate UI. keep secrets as placeholders only.
  */
 
 export type McpClientId =
@@ -47,31 +47,26 @@ export function cursorMcpJson(serverPath: string, agentKey?: string) {
 /** Hermes: ~/.hermes/config.yaml under mcp_servers */
 export function hermesYaml(serverPath: string, agentKey?: string) {
   const env = mcpEnv(agentKey)
-  return `# ~/.hermes/config.yaml — merge under mcp_servers
+  return `# ~/.hermes/config.yaml. merge under mcp_servers
 mcp_servers:
-  prompt-market:
+  prompt market:
     command: node
     args:
-      - ${serverPath}
-    env:
-      AGENT_PRIVATE_KEY: "${env.AGENT_PRIVATE_KEY}"
-      RITUAL_RPC_URL: "${env.RITUAL_RPC_URL}"
+      - ${serverPath} env: AGENT_PRIVATE_KEY: "${env.AGENT_PRIVATE_KEY}" RITUAL_RPC_URL: "${env.RITUAL_RPC_URL}"
 `
 }
 
 /** OpenClaw CLI add + config file shape (mcp.servers) */
 export function openclawAddCommand(serverPath: string, agentKey?: string) {
   const env = mcpEnv(agentKey)
-  return `# Add Prompt Market as OpenClaw-managed MCP server
+  return `# Add Prompt Market as OpenClaw managed MCP server
 openclaw mcp add prompt-market \\
   --command node \\
   --arg "${serverPath}" \\
   --env AGENT_PRIVATE_KEY=${env.AGENT_PRIVATE_KEY} \\
-  --env RITUAL_RPC_URL=${env.RITUAL_RPC_URL}
-
-# Probe
-openclaw mcp doctor prompt-market --probe
-openclaw mcp tools prompt-market
+  --env RITUAL_RPC_URL=${env.RITUAL_RPC_URL} # Probe
+openclaw mcp doctor prompt market --probe
+openclaw mcp tools prompt market
 `
 }
 
@@ -99,52 +94,36 @@ export function openclawJson(serverPath: string, agentKey?: string) {
 
 /**
  * Ritual / Prompt Market agent worker:
- * - EOA must match on-chain agent (register via pm_integrate)
+ * - EOA must match on chain agent (register via pm_integrate)
  * - Optional soul/memory for Sovereign or Persistent agent loops (docs.ritualfoundation.org)
  */
 export function ritualAgentYaml(serverPath: string, agentKey?: string) {
   const env = mcpEnv(agentKey)
-  return `# ritual-agent.yaml — worker for agents listed on Prompt Market
+  return `# ritual agent.yaml. worker for agents listed on Prompt Market
 # AGENT_PRIVATE_KEY must be the same EOA registered as agentContract.
 
 agent:
   name: "RitualAgent"
   chain_id: 1979
-  rpc: ${env.RITUAL_RPC_URL}
-  # Fund this address (faucet) for gas + stake + RitualWallet precompile fees
-  # address: derived from AGENT_PRIVATE_KEY
-
-mcp:
-  prompt-market:
-    command: node
-    args: ["${serverPath}"]
-    env:
-      AGENT_PRIVATE_KEY: "${env.AGENT_PRIVATE_KEY}"
-      RITUAL_RPC_URL: "${env.RITUAL_RPC_URL}"
-
-# Bootstrap on first run (AI client should call these tools):
-#   pm_status
-#   pm_integrate name="RitualAgent" stake_amount="0.1"
-#   pm_set_profile metadata_uri="https://…/avatar.png"
+  rpc: ${env.RITUAL_RPC_URL} # Fund this address (faucet) for gas + stake + RitualWallet precompile fees # address: derived from AGENT_PRIVATE_KEY mcp: prompt market: command: node args: ["${serverPath}"] env: AGENT_PRIVATE_KEY: "${env.AGENT_PRIVATE_KEY}" RITUAL_RPC_URL: "${env.RITUAL_RPC_URL}" # Bootstrap on first run (AI client should call these tools):
+# pm_status
+# pm_integrate name="RitualAgent" stake_amount="0.1"
+# pm_set_profile metadata_uri="https://…/avatar.png"
 # Loop (ASP):
-#   pm_list_jobs status=OPEN → pm_submit_bid → pm_start_processing → pm_submit_result
-
-# Optional: Ritual Sovereign / Persistent runtime (docs.ritualfoundation.org)
-# harness: openclaw | hermes | claude-code | crush
+# pm_list_jobs status=OPEN → pm_submit_bid → pm_start_processing → pm_submit_result # Optional: Ritual Sovereign / Persistent runtime (docs.ritualfoundation.org)
+# harness: openclaw | hermes | claude code | crush
 # precompile:
-#   sovereign: "0x000000000000000000000000000000000000080C"
-#   persistent: "0x0000000000000000000000000000000000000820"
+# sovereign: "0x000000000000000000000000000000000000080C"
+# persistent: "0x0000000000000000000000000000000000000820"
 `
 }
 
 export function ritualAgentBootstrapSh(serverPath: string) {
   return `#!/usr/bin/env bash
-# bootstrap-ritual-agent.sh — wire a marketplace agent to MCP
+# bootstrap-ritual-agent.sh. wire a marketplace agent to MCP
 set -euo pipefail
 export RITUAL_RPC_URL="\${RITUAL_RPC_URL:-https://rpc.ritualfoundation.org}"
-: "\${AGENT_PRIVATE_KEY:?set AGENT_PRIVATE_KEY to the agent EOA private key}"
-
-REPO="\$(cd "\$(dirname "$0")/.." && pwd)"
+: "\${AGENT_PRIVATE_KEY:?set AGENT_PRIVATE_KEY to the agent EOA private key}" REPO="\$(cd "\$(dirname "$0")/.." && pwd)"
 SERVER="\${SERVER:-${serverPath}}"
 # If relative, prefer repo mcp/server.mjs
 if [[ ! -f "\$SERVER" ]]; then
@@ -158,9 +137,7 @@ exec node "\$SERVER"
 
 export function mcporterAdd(serverPath: string, agentKey?: string) {
   const env = mcpEnv(agentKey)
-  return `mcporter config add prompt-market \\
-  --command node \\
-  --arg "${serverPath}" \\
+  return `mcporter config add prompt-market \\ --command node \\ --arg "${serverPath}" \\
   --env AGENT_PRIVATE_KEY=${env.AGENT_PRIVATE_KEY} \\
   --env RITUAL_RPC_URL=${env.RITUAL_RPC_URL}`
 }
@@ -169,7 +146,7 @@ export function cliSmoke() {
   return `export AGENT_PRIVATE_KEY=0x…
 export RITUAL_RPC_URL=https://rpc.ritualfoundation.org
 pnpm mcp
-# stdio MCP — attach from Hermes / OpenClaw / Claude / Cursor`
+# stdio MCP. Attach from Hermes / OpenClaw / Claude / Cursor`
 }
 
 export const CLIENT_TABS: { id: McpClientId; label: string; blurb: string }[] = [

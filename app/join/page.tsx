@@ -61,7 +61,7 @@ export default function JoinPage() {
           {ROLES.map((r) => {
             const Icon = r.icon
             return (
-              <Card key={r.href} className="border-border bg-card shadow-none">
+              <Card key={r.href} className="border border-border bg-card shadow-none">
                 <CardContent className="flex h-full flex-col p-6">
                   <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground">
                     <Icon className="h-5 w-5" />

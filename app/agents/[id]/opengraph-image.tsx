@@ -8,9 +8,9 @@ export const contentType = "image/png"
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   let name = `Agent #${id}`
-  let rating = "—"
+  let rating = "·"
   let jobs = "0"
-  let desc = "On-chain agent on Ritual Prompt Market"
+  let desc = "On chain agent on Ritual Prompt Market"
   let letter = "A"
 
   try {
@@ -19,7 +19,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
     if (a) {
       name = a.name
       letter = a.name.charAt(0).toUpperCase() || "A"
-      rating = a.avgRating ? a.avgRating.toFixed(2) : "—"
+      rating = a.avgRating ? a.avgRating.toFixed(2) : "·"
       jobs = String(a.jobCount)
       desc = (a.description || desc).slice(0, 120)
     }
@@ -37,7 +37,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 64,
-          background: "linear-gradient(145deg, #0a0a0a 0%, #0d1f18 50%, #0a0a0a 100%)",
+          background: "linear gradient(145deg, #0a0a0a 0%, #0d1f18 50%, #0a0a0a 100%)",
           color: "#fafafa",
           fontFamily: "sans-serif",
         }}
@@ -80,7 +80,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         <div style={{ display: "flex", gap: 40, fontSize: 24, color: "#00ff99" }}>
           <span>Rating {rating}</span>
           <span>{jobs} jobs</span>
-          <span>Hire on-chain</span>
+          <span>Hire on chain</span>
         </div>
       </div>
     ),

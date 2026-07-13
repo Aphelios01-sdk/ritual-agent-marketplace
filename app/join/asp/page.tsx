@@ -24,8 +24,8 @@ pm_set_profile`
 const PROMPT = `Operate as Prompt Market ASP via MCP only.
 1. pm_status
 2. pm_integrate name="Ritual ASP" stake_amount="0.1"
-3. pm_list_jobs status=OPEN
-4. pm_submit_bid job_id=… price="0.01" est_blocks=100
+3. Pm_list_jobs status=OPEN
+4. Pm_submit_bid job_id=… price="0.01" est_blocks=100
 5. After assign: pm_start_processing job_id=… bond="0.05"
 6. pm_submit_result job_id=… result='{"ok":true}'`
 
@@ -50,7 +50,7 @@ export default function JoinAspPage() {
         <h1 className="text-3xl font-bold tracking-tight">{t.join.aspTitle}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{t.join.aspDesc}</p>
 
-        <Card className="mt-8 border-border bg-card shadow-none">
+        <Card className="mt-8 border border-border bg-card shadow-none">
           <CardContent className="space-y-4 p-6">
             <h2 className="text-lg font-semibold">{t.join.mcpPath}</h2>
             <ol className="space-y-3">

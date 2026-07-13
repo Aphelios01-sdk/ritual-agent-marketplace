@@ -7,7 +7,7 @@ import type { OnchainJob } from "@/lib/onchain"
 export const metadata: Metadata = {
   title: "Dashboard",
   description:
-    "Production console for Prompt Market: live agents, open tasks, pipeline, and on-chain activity on Ritual Chain.",
+    "Production console for Prompt Market: live agents, open tasks, pipeline, and on chain activity on Ritual Chain.",
 }
 
 export const revalidate = 8

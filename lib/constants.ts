@@ -63,8 +63,8 @@ export interface SkillDefinition {
 const OFFICIAL_SKILLS: SkillDefinition[] = [
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000001" as const,
-    name: "fetch-token-price",
-    description: "Fetch real-time token price from CoinGecko",
+    name: "fetch token price",
+    description: "Fetch real time token price from CoinGecko",
     precompileType: "HTTP",
     config: { url: "https://api.coingecko.com/api/v3/simple/price", method: "GET", headers: "{}" },
     active: true,
@@ -72,7 +72,7 @@ const OFFICIAL_SKILLS: SkillDefinition[] = [
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000002" as const,
-    name: "sentiment-analysis",
+    name: "sentiment analysis",
     description: "Analyze sentiment of text data using LLM",
     precompileType: "LLM",
     config: { promptTemplate: "Analyze the sentiment of this text: {input}", model: "zai-org/GLM-4.7-FP8" },
@@ -81,7 +81,7 @@ const OFFICIAL_SKILLS: SkillDefinition[] = [
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000003" as const,
-    name: "defi-report",
+    name: "defi report",
     description: "Generate structured DeFi report from market data",
     precompileType: "LLM",
     config: { promptTemplate: "Generate a DeFi report based on this data: {input}", model: "zai-org/GLM-4.7-FP8" },
@@ -90,8 +90,8 @@ const OFFICIAL_SKILLS: SkillDefinition[] = [
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000004" as const,
-    name: "fetch-onchain-data",
-    description: "Fetch on-chain data from a given address or contract",
+    name: "fetch onchain data",
+    description: "Fetch on chain data from a given address or contract",
     precompileType: "HTTP",
     config: { url: "https://explorer.ritualfoundation.org/api", method: "GET", headers: "{}" },
     active: true,
@@ -102,7 +102,7 @@ const OFFICIAL_SKILLS: SkillDefinition[] = [
 export const COMMUNITY_SKILLS: SkillDefinition[] = [
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000011" as const,
-    name: "twitter-sentiment",
+    name: "twitter sentiment",
     description: "Fetch recent tweets for a keyword and analyze sentiment via LLM",
     precompileType: "HTTP",
     config: { url: "https://api.twitter.com/2/tweets/search/recent", method: "GET", headers: "{}" },
@@ -111,7 +111,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000012" as const,
-    name: "price-alert",
+    name: "price alert",
     description: "Monitor token price against a threshold and trigger alert if crossed",
     precompileType: "HTTP",
     config: { url: "https://api.coingecko.com/api/v3/simple/price", method: "GET", headers: "{}" },
@@ -120,7 +120,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000013" as const,
-    name: "nft-metadata",
+    name: "nft metadata",
     description: "Fetch NFT metadata (name, image, traits) from any contract address",
     precompileType: "HTTP",
     config: { url: "https://api.opensea.io/api/v2/chain/ethereum/contract/{address}/nfts", method: "GET", headers: "{}" },
@@ -129,8 +129,8 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000014" as const,
-    name: "code-review",
-    description: "Automated code review: submit source code and receive LLM-powered feedback",
+    name: "code review",
+    description: "Automated code review: submit source code and receive LLM powered feedback",
     precompileType: "LLM",
     config: { promptTemplate: "Review the following code for bugs, security issues, and style: {input}", model: "zai-org/GLM-4.7-FP8" },
     active: true,
@@ -138,7 +138,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000015" as const,
-    name: "translate-text",
+    name: "translate text",
     description: "Translate text between 50+ languages using LLM",
     precompileType: "LLM",
     config: { promptTemplate: "Translate the following text to {targetLang}: {input}", model: "zai-org/GLM-4.7-FP8" },
@@ -147,7 +147,7 @@ export const COMMUNITY_SKILLS: SkillDefinition[] = [
   },
   {
     skillId: "0x0000000000000000000000000000000000000000000000000000000000000016" as const,
-    name: "summarize-article",
+    name: "summarize article",
     description: "Summarize articles, docs, or long text into concise bullet points",
     precompileType: "LLM",
     config: { promptTemplate: "Summarize this article in 3-5 bullet points: {input}", model: "zai-org/GLM-4.7-FP8" },
@@ -243,7 +243,7 @@ export const MOCK_AGENTS: AgentInfo[] = [
   {
     id: "2",
     name: "Token Price Oracle",
-    description: "Fetches real-time token prices from CoinGecko & DexScreener via the HTTP precompile. Returns structured data.",
+    description: "Fetches real time token prices from CoinGecko & DexScreener via the HTTP precompile. Returns structured data.",
     contractAddress: "0x0000000000000000000000000000000000000002",
     skills: [BUILT_IN_SKILLS[0]],
     bondAmount: BigInt("50000000000000000000"), // 50 RITUAL
@@ -255,7 +255,7 @@ export const MOCK_AGENTS: AgentInfo[] = [
   {
     id: "3",
     name: "DeFi Report Generator",
-    description: "Generates detailed DeFi reports from on-chain data: TVL, APY, protocol volume, with LLM-driven insights.",
+    description: "Generates detailed DeFi reports from on chain data: TVL, APY, protocol volume, with LLM driven insights.",
     contractAddress: "0x0000000000000000000000000000000000000003",
     skills: [BUILT_IN_SKILLS[2], BUILT_IN_SKILLS[3]],
     bondAmount: BigInt("200000000000000000000"), // 200 RITUAL
@@ -266,8 +266,8 @@ export const MOCK_AGENTS: AgentInfo[] = [
   },
   {
     id: "4",
-    name: "On-Chain Data Scout",
-    description: "Fetches data from the Ritual Chain explorer and returns it as ready-to-use JSON for other agents.",
+    name: "On Chain Data Scout",
+    description: "Fetches data from the Ritual Chain explorer and returns it as ready to use JSON for other agents.",
     contractAddress: "0x0000000000000000000000000000000000000004",
     skills: [BUILT_IN_SKILLS[3]],
     bondAmount: BigInt("30000000000000000000"), // 30 RITUAL
@@ -307,7 +307,7 @@ export const MOCK_JOB_REQUESTS: JobRequestInfo[] = [
     id: "3",
     requester: "0x000000000000000000000000000000000000000c",
     requiredSkillIds: [BUILT_IN_SKILLS[2].skillId, BUILT_IN_SKILLS[3].skillId],
-    taskData: JSON.stringify({ query: "Generate DeFi report for top 5 L2s" }),
+    taskData: JSON.stringify({ query: "Generate DeFi report for top-5 L2s" }),
     reward: BigInt("200000000000000000"),
     status: "COMPLETED",
     provider: "0x0000000000000000000000000000000000000003",

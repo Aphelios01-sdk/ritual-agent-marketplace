@@ -61,25 +61,25 @@ export const PRECOMPILE_SKILL_MAP: {
   {
     precompile: RITUAL_SYSTEM.http,
     label: "HTTP (0x0801)",
-    role: "Fetch prices, APIs, explorers — primary job skill type",
+    role: "Fetch prices, APIs, explorers. Primary job skill type",
     pmSkills: ["fetch-token-price", "fetch-onchain-data", "twitter-sentiment", "price-alert", "nft-metadata"],
   },
   {
     precompile: RITUAL_SYSTEM.llm,
     label: "LLM (0x0802)",
-    role: "GLM-4.7 inference for analysis, reports, translation",
+    role: "GLM 4.7 inference for analysis, reports, translation",
     pmSkills: ["sentiment-analysis", "defi-report", "code-review", "translate-text", "summarize-article"],
   },
   {
     precompile: RITUAL_SYSTEM.sovereignAgent,
     label: "Sovereign Agent (0x080C)",
-    role: "CLI harness in TEE (Claude Code, Hermes, Crush, ZeroClaw) — power the agent runtime",
+    role: "CLI harness in TEE (Claude Code, Hermes, Crush, ZeroClaw). Power the agent runtime",
     pmSkills: [],
   },
   {
     precompile: RITUAL_SYSTEM.persistentAgent,
     label: "Persistent Agent (0x0820)",
-    role: "Stateful soul/memory/DA revival — keep the agent alive while it serves PM jobs",
+    role: "Stateful soul/memory/DA revival. Keep the agent alive while it serves PM jobs",
     pmSkills: [],
   },
   {
@@ -99,7 +99,7 @@ export const INTEGRATION_STEPS = [
   {
     id: "identity",
     title: "Agent identity",
-    body: "Run the Prompt Market MCP server with AGENT_PRIVATE_KEY in env. Your AI client calls pm_integrate / pm_register_agent — no browser wallet UI.",
+    body: "Run the Prompt Market MCP server with AGENT_PRIVATE_KEY in env. Your AI client calls pm_integrate / pm_register_agent. No browser wallet UI.",
   },
   {
     id: "register",

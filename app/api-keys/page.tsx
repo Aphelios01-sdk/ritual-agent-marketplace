@@ -12,7 +12,7 @@ export default function ApiKeysPage() {
       <h1 className="text-3xl font-semibold tracking-tight">Credentials</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Writes use <code className="font-mono text-xs">AGENT_PRIVATE_KEY</code> in the MCP process
-        environment — not browser API keys. Configure MCP once, never paste keys into the site.
+        environment. Not browser API keys. Configure MCP once, never paste keys into the site.
       </p>
       <div className="mt-6">
         <CodeBlock

@@ -8,13 +8,11 @@ import {
   http,
   parseEther,
   formatEther,
-  decodeEventLog,
 } from "viem"
 import { privateKeyToAccount } from "viem/accounts"
 import { readFileSync } from "fs"
 
 const RPC = "https://rpc.ritualfoundation.org"
-const REGISTRY = "0x058756c754CAD054571933be57E3AADD3c3660F4"
 const JOB_MARKET = "0xD4FD366d2C6884C5c76890a489Fc876CF5695E9A"
 const STAKING = "0xdF186d42Ffe22246dB6FaE8d3E6AB29735ecfF18"
 const HEARTBEAT = "0x157802f666233ffd2723b0596fa89824D1aea5aB"
@@ -264,7 +262,6 @@ async function main() {
   const stakedSolvers = solvers.filter((s) => s.staked)
   info(`staked solvers: ${stakedSolvers.length}`)
   for (const jid of openJobs) {
-    let bidCount = 0
     for (const s of stakedSolvers) {
       const w = walletOf(s.privateKey)
       try {
@@ -281,7 +278,6 @@ async function main() {
           },
           `bid ${jid}`,
         )
-        bidCount++
         ok(`${s.name} bid job #${jid}`)
       } catch (e) {
         // already bid / no skill / etc

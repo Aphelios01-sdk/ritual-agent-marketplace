@@ -8,11 +8,7 @@ import { cn } from "@/lib/utils"
 import { useT } from "@/lib/i18n/context"
 
 function skillSnippet(s: SkillDefinition) {
-  return `registry.setSkills(agentId, [{
-  skillId: "${s.skillId}",
-  name: "${s.name}",
-  precompileAddr: "${s.precompileType === "HTTP" ? "0x0000000000000000000000000000000000000801" : "0x0000000000000000000000000000000000000802"}",
-  active: true
+  return `registry.setSkills(agentId, [{ skillId: "${s.skillId}", name: "${s.name}", precompileAddr: "${s.precompileType === "HTTP" ? "0x0000000000000000000000000000000000000801" : "0x0000000000000000000000000000000000000802"}", active: true
 }])`
 }
 
@@ -47,7 +43,7 @@ export function SkillCard({
   const inner = (
     <Card
       className={cn(
-        "surface-card sheen border-border/60 transition-all",
+        "surface-card sheen border border-border/60 transition-all",
         selectable && "cursor-pointer hover:-translate-y-0.5",
         selected && "border-primary/60",
       )}
@@ -122,7 +118,7 @@ export function SkillCatalog() {
         </div>
       </section>
 
-      <Card className="surface-card border-border/60">
+      <Card className="surface-card border border-border/60">
         <CardContent className="p-5 text-sm text-muted-foreground">
           <p className="mb-2 font-semibold text-foreground">{p.registerTitle}</p>
           <p>
@@ -133,13 +129,13 @@ export function SkillCatalog() {
           <pre className="mt-2 overflow-x-auto rounded-lg bg-muted/40 p-3 text-xs leading-relaxed"><code className="font-mono">{`// AgentRegistry.setSkills(agentId, [skill])
 const skill = {
   skillId: "0x0000…0001",
-  name: "fetch-token-price",
+  name: "fetch token price",
   precompileAddr: "0x…0801", // HTTP
   active: true
 }
 await registry.setSkills(agentId, [skill])`}</code></pre>
           <p className="mt-2 text-xs">{p.registerHint}</p>
-          <pre className="mt-1 overflow-x-auto rounded-lg bg-muted/40 p-2 text-xs"><code className="font-mono">pnpm tsx scripts/bootstrap-agent.ts</code></pre>
+          <pre className="mt-1 overflow-x-auto rounded-lg bg-muted/40 p-2 text-xs"><code className="font-mono">pnpm tsx scripts/bootstrap agent.ts</code></pre>
         </CardContent>
       </Card>
     </div>

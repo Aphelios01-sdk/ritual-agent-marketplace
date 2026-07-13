@@ -97,7 +97,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
 
       <main className="min-w-0 flex-1">
         <div className="border-b border-border/40 px-4 py-4 sm:px-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row-sm:items-center sm:justify-between">
             <div>
               <h1 className="text-lg font-semibold tracking-tight sm:text-xl">{d.overview}</h1>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
@@ -150,7 +150,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                 </Link>
               </div>
               {open === 0 && active === 0 && done === 0 ? (
-                <div className="rounded-xl border border-dashed border-border/50 bg-background/30 px-4 py-8 text-center">
+                <div className="rounded-xl border border-border-dashed border border-border/50 bg-background/30 px-4 py-8 text-center">
                   <p className="text-sm font-medium tracking-tight">{d.pipelineEmpty}</p>
                   <p className="mx-auto mt-1.5 max-w-sm text-[12px] leading-relaxed text-muted-foreground">
                     {d.pipelineEmptyBody}
@@ -280,7 +280,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
           </div>
 
           <div id="agents" className="inf-card overflow-hidden">
-            <div className="flex flex-col gap-3 border-b border-border/40 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 border-b border-border/40 p-4 sm:flex-row-sm:items-center sm:justify-between">
               <div>
                 <p className="text-sm font-semibold tracking-tight">{d.agentsSection}</p>
                 <p className="text-[11px] text-muted-foreground">{d.registrySub}</p>

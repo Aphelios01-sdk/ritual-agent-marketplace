@@ -31,30 +31,24 @@ function isLocale(v: string | null | undefined): v is Locale {
   return v === "en" || v === "id" || v === "zh" || v === "ko"
 }
 
+function getInitialLocale(): Locale {
+  try {
+    const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
+    if (isLocale(stored)) return stored
+  } catch {
+    /* SSR / private mode - use default */
+  }
+  const nav = typeof navigator !== "undefined" ? navigator.language.toLowerCase() : "en"
+  if (nav.startsWith("id")) return "id"
+  if (nav.startsWith("zh")) return "zh"
+  if (nav.startsWith("ko")) return "ko"
+  return "en"
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE)
-  const [ready, setReady] = useState(false)
+  const [locale, setLocaleState] = useState<Locale>(getInitialLocale)
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(LOCALE_STORAGE_KEY)
-      if (isLocale(stored)) {
-        setLocaleState(stored)
-      } else {
-        const nav = typeof navigator !== "undefined" ? navigator.language.toLowerCase() : "en"
-        if (nav.startsWith("id")) setLocaleState("id")
-        else if (nav.startsWith("zh")) setLocaleState("zh")
-        else if (nav.startsWith("ko")) setLocaleState("ko")
-        else setLocaleState("en")
-      }
-    } catch {
-      /* SSR / private mode */
-    }
-    setReady(true)
-  }, [])
-
-  useEffect(() => {
-    if (!ready) return
     try {
       localStorage.setItem(LOCALE_STORAGE_KEY, locale)
       document.documentElement.lang =
@@ -62,7 +56,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
-  }, [locale, ready])
+  }, [locale])
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l)

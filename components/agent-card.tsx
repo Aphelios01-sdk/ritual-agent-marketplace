@@ -33,7 +33,7 @@ export function AgentCard({ agent, featured, className }: AgentCardProps) {
     >
       <Card
         className={cn(
-          "group relative border-border bg-transparent shadow-none transition-colors hover:bg-card-hover",
+          "group relative border border-border bg-transparent shadow-none transition-colors hover:bg-card-hover",
           featured && "md:col-span-2 md:row-span-2",
           className
         )}

@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { MARKET_LAYERS } from "@/lib/layers"
 import { cn } from "@/lib/utils"
 
-/** Compact horizontal layer switcher. keeps multi-layer navigation always reachable. */
+/** Compact horizontal layer switcher. Keeps multi-layer navigation always reachable. */
 export function LayerRail({ activeId }: { activeId?: string }) {
   const pathname = usePathname()
   const fromPath = pathname?.startsWith("/layers/") ? pathname.split("/")[2] : undefined

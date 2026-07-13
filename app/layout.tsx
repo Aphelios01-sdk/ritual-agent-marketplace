@@ -14,11 +14,11 @@ const SITE_URL =
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Prompt Market — Autonomous agent marketplace on Ritual Chain",
+    default: "Prompt Market. Autonomous agent marketplace on Ritual Chain",
     template: "%s · Prompt Market",
   },
   description:
-    "On-chain agent-to-agent marketplace on Ritual Chain (1979). Deploy agents, post tasks, bid, settle escrowed RIT, and resolve disputes.",
+    "On chain agent to agent marketplace on Ritual Chain (1979). Deploy agents, post tasks, bid, settle escrowed RIT, and resolve disputes.",
   keywords: [
     "Prompt Market",
     "Ritual Chain",
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     "AI agents",
     "escrow",
     "JobMarketV2",
-    "on-chain agents",
+    "on chain agents",
   ],
   authors: [{ name: "Prompt Market" }],
   openGraph: {
@@ -35,14 +35,14 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: SITE_URL,
     siteName: "Prompt Market",
-    title: "Prompt Market — Autonomous agent marketplace on Ritual Chain",
+    title: "Prompt Market. Autonomous agent marketplace on Ritual Chain",
     description:
       "Deploy agents, post tasks, bid, and settle escrowed RIT on Ritual Chain.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Prompt Market — Ritual agent marketplace",
-    description: "Agent-to-agent jobs with on-chain escrow on Ritual Chain.",
+    title: "Prompt Market. Ritual agent marketplace",
+    description: "Agent to agent jobs with on chain escrow on Ritual Chain.",
   },
   robots: {
     index: true,

@@ -65,7 +65,7 @@ export const MCP_TOOLS_BY_SURFACE: Record<string, McpToolRef[]> = {
     {
       name: "pm_rate",
       role: "user",
-      desc: "Rate provider 1–5",
+      desc: "Rate provider 1 to-5",
       example: `pm_rate job_id="JOB_ID" rating=5`,
     },
     {
@@ -150,7 +150,7 @@ export const MCP_TOOLS_BY_SURFACE: Record<string, McpToolRef[]> = {
       name: "pm_status",
       role: "asp",
       desc: "Webhook registration via MCP env + custom tooling",
-      example: `pm_status  # then configure webhook off-chain / future pm_register_webhook`,
+      example: `pm_status  # then configure webhook off chain / future pm_register_webhook`,
     },
   ],
   templates: [
@@ -165,7 +165,7 @@ export const MCP_TOOLS_BY_SURFACE: Record<string, McpToolRef[]> = {
     {
       name: "pm_post_job",
       role: "asp",
-      desc: "Delegate sub-work as a new job via MCP",
+      desc: "Delegate sub work as a new job via MCP",
       example: `pm_post_job task="Subtask for parent job #N" reward="0.02"`,
     },
   ],

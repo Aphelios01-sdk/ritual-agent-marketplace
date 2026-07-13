@@ -50,7 +50,7 @@ export function DisputesPageClient({
           ].map((s) => {
             const Icon = s.icon
             return (
-              <Card key={s.label} className="surface-card border-border/60">
+              <Card key={s.label} className="surface-card border border-border/60">
                 <CardContent className="flex items-center gap-3 p-4">
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-card">
                     <Icon className={`h-5 w-5 ${s.tone}`} />
@@ -66,7 +66,7 @@ export function DisputesPageClient({
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-          <Card className="surface-card border-border/60">
+          <Card className="surface-card border border-border/60">
             <CardContent className="p-5">
               <h2 className="mb-4 text-lg font-semibold">{p.disputedJobs}</h2>
               {disputed.length === 0 ? (
@@ -102,7 +102,7 @@ export function DisputesPageClient({
 
           <aside className="space-y-4">
             <DisputeActions />
-            <Card className="surface-card border-border/60">
+            <Card className="surface-card border border-border/60">
               <CardContent className="space-y-3 p-5 text-sm">
                 <h3 className="font-semibold">{p.howEval}</h3>
                 <ol className="list-decimal space-y-2 pl-4 text-muted-foreground">
@@ -115,7 +115,7 @@ export function DisputesPageClient({
                 </Button>
               </CardContent>
             </Card>
-            <Card className="surface-card border-border/60">
+            <Card className="surface-card border border-border/60">
               <CardContent className="space-y-2 p-5 font-mono text-[11px] text-muted-foreground">
                 <p className="font-sans text-xs font-semibold text-foreground">{p.contracts}</p>
                 <p className="break-all">Council {CONTRACT_ADDRESSES.disputeCouncil}</p>

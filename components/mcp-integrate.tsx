@@ -26,13 +26,13 @@ import { useT } from "@/lib/i18n/context"
 
 const TOOLS = [
   { name: "pm_status", desc: "Chain block, signer, registration, stake" },
-  { name: "pm_skill_catalog", desc: "Built-in HTTP/LLM skill IDs" },
+  { name: "pm_skill_catalog", desc: "Built in HTTP/LLM skill IDs" },
   { name: "pm_list_agents", desc: "Browse registry" },
   { name: "pm_list_jobs", desc: "Open / active jobs" },
   { name: "pm_post_job", desc: "USER: post job + escrow" },
   { name: "pm_list_bids", desc: "USER: list bids" },
   { name: "pm_assign_job", desc: "USER: assign bid" },
-  { name: "pm_rate", desc: "USER: rate provider 1–5" },
+  { name: "pm_rate", desc: "USER: rate provider 1 to-5" },
   { name: "pm_dispute_job", desc: "USER: open dispute" },
   { name: "pm_integrate", desc: "ASP: register + skills + stake + heartbeat" },
   { name: "pm_submit_bid", desc: "ASP: bid on job" },
@@ -72,7 +72,7 @@ export function McpIntegrate() {
     [serverPath, key],
   )
 
-  const integratePrompt = `You have Prompt Market MCP (prompt-market). Operate as a Ritual chain agent:
+  const integratePrompt = `You have Prompt Market MCP (prompt market). Operate as a Ritual chain agent:
 1. pm_status
 2. If not registered: pm_integrate name="Ritual Agent" stake_amount="0.1"
 3. pm_list_jobs status=OPEN
@@ -90,7 +90,7 @@ export function McpIntegrate() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-border">
+      <Card className="border border-border">
         <CardContent className="space-y-4 p-5 md:p-6">
           <div>
             <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
@@ -166,7 +166,7 @@ export function McpIntegrate() {
         </CardContent>
       </Card>
 
-      <Card className="border-border">
+      <Card className="border border-border">
         <CardContent className="space-y-4 p-5 md:p-6">
           <h4 className="font-semibold">{t.mcp.pathsKey}</h4>
           <label className="block text-sm">
@@ -174,7 +174,7 @@ export function McpIntegrate() {
             <input
               value={repoPath}
               onChange={(e) => setRepoPath(e.target.value)}
-              className="w-full rounded-lg border border-border bg-transparent px-3 py-2 font-mono text-xs outline-none ring-ring focus-visible:ring-2"
+              className="w-full rounded-lg border border-border bg transparent px-3 py-2 font-mono text-xs outline-none ring ring focus visible:ring-2"
               placeholder="/home/you/ritual-agent-marketplace"
             />
           </label>
@@ -183,7 +183,7 @@ export function McpIntegrate() {
             <input
               value={agentKey}
               onChange={(e) => setAgentKey(e.target.value)}
-              className="w-full rounded-lg border border-border bg-transparent px-3 py-2 font-mono text-xs outline-none ring-ring focus-visible:ring-2"
+              className="w-full rounded-lg border border-border bg transparent px-3 py-2 font-mono text-xs outline-none ring ring focus visible:ring-2"
               placeholder="0xYOUR_AGENT_KEY"
             />
           </label>
@@ -198,7 +198,7 @@ cd ritual-agent-marketplace && pnpm install
         </CardContent>
       </Card>
 
-      <Card className="border-border">
+      <Card className="border border-border">
         <CardContent className="space-y-4 p-5 md:p-6">
           <h4 className="font-semibold">{t.mcp.clientConfig}</h4>
           <div className="flex flex-wrap gap-1.5">
@@ -211,7 +211,7 @@ cd ritual-agent-marketplace && pnpm install
                   "rounded-md border px-2.5 py-1 text-xs transition-colors",
                   tab === t.id
                     ? "border-foreground bg-muted text-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground",
+                    : "border border-border text-muted-foreground hover:text-foreground",
                 )}
                 title={t.blurb}
               >
@@ -282,7 +282,7 @@ cd ritual-agent-marketplace && pnpm install
                 <a href={RITUAL_DOCS.home} target="_blank" rel="noreferrer" className="underline-offset-4 hover:underline">
                   Ritual docs
                 </a>
-                : same EOA as on-chain <code className="font-mono">agentContract</code>, MCP for marketplace
+                : same EOA as on chain <code className="font-mono">agentContract</code>, MCP for marketplace
                 settlement, optional Sovereign/Persistent harness (OpenClaw, Hermes, Claude Code, Crush).
               </p>
               <CodeBlock title="ritual-agent.yaml" lang="yaml" code={snippets.ritual} />
@@ -330,7 +330,7 @@ cd ritual-agent-marketplace && pnpm install
           {tab === "cursor" && (
             <div className="space-y-2">
               <p className="text-xs text-muted-foreground">
-                Cursor / Grok MCP settings — merge under <code className="font-mono">mcpServers</code>.
+                Cursor / Grok MCP settings. Merge under <code className="font-mono">mcpServers</code>.
               </p>
               <CodeBlock title="mcp.json" lang="json" code={snippets.cursor} />
               <Button type="button" size="sm" variant="outline" className="gap-1.5" onClick={() => copy("cursor", snippets.cursor)}>
@@ -358,7 +358,7 @@ cd ritual-agent-marketplace && pnpm install
         </CardContent>
       </Card>
 
-      <Card className="border-border">
+      <Card className="border border-border">
         <CardContent className="space-y-3 p-5 md:p-6">
           <div className="flex items-center gap-2">
             <Terminal className="h-4 w-4 text-muted-foreground" />
@@ -372,14 +372,14 @@ cd ritual-agent-marketplace && pnpm install
         </CardContent>
       </Card>
 
-      <Card className="border-border">
+      <Card className="border border-border">
         <CardContent className="p-5 md:p-6">
           <h4 className="mb-3 font-semibold">{t.mcp.tools}</h4>
           <ul className="divide-y divide-border rounded-lg border border-border">
             {TOOLS.map((t) => (
               <li
                 key={t.name}
-                className="flex flex-col gap-0.5 px-3 py-2.5 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-0.5 px-3 py-2.5 sm:flex-row-sm:items-center sm:justify-between"
               >
                 <code className="font-mono text-xs font-medium">{t.name}</code>
                 <span className="text-xs text-muted-foreground">{t.desc}</span>

@@ -226,7 +226,7 @@ export function RitualAgentConnect() {
   const funded = balance > BigInt(0)
 
   return (
-    <Card className="surface-card border-border">
+    <Card className="surface-card border border-border">
       <CardContent className="space-y-5 p-5 md:p-6">
         <div>
           <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
@@ -256,8 +256,8 @@ export function RitualAgentConnect() {
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-[11px] transition-colors",
                   active && "border-foreground bg-muted text-foreground",
-                  done && !active && "border-border text-foreground",
-                  !active && !done && "border-border text-muted-foreground",
+                  done && !active && "border border-border text-foreground",
+                  !active && !done && "border border-border text-muted-foreground",
                 )}
               >
                 {done ? <Check className="h-3 w-3" /> : <Icon className="h-3 w-3" />}
@@ -289,7 +289,7 @@ export function RitualAgentConnect() {
         {step === 0 && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Choose how to sign. Private keys stay in your extension or in this browser session —
+              Choose how to sign. Private keys stay in your extension or in this browser session . 
               never pasted into a form.
             </p>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -306,7 +306,7 @@ export function RitualAgentConnect() {
                 <p className="text-sm font-medium">Browser wallet</p>
                 <p className="mt-1 text-xs text-muted-foreground">
                   {browserAvailable
-                    ? "MetaMask / Rabby / injected — approve connection and switch to Ritual (1979)."
+                    ? "MetaMask / Rabby / injected. Approve connection and switch to Ritual (1979)."
                     : "No extension detected. Install a wallet or use session agent."}
                 </p>
               </button>
@@ -319,7 +319,7 @@ export function RitualAgentConnect() {
                 <Wallet className="mb-2 h-4 w-4 text-muted-foreground" />
                 <p className="text-sm font-medium">Session agent</p>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Auto wallet for this browser. Fund the address, then register — no extension needed.
+                  Auto wallet for this browser. Fund the address, then register. No extension needed.
                 </p>
               </button>
             </div>
@@ -388,7 +388,7 @@ export function RitualAgentConnect() {
               <input
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2"
+                className="w-full rounded-lg border border-border bg transparent px-3 py-2 text-sm outline-none ring ring focus visible:ring-2"
               />
             </label>
             <label className="block text-sm">
@@ -414,7 +414,7 @@ export function RitualAgentConnect() {
             <div className="flex flex-wrap gap-2">
               <Button type="button" size="sm" onClick={onRegister} disabled={busy || !wallet}>
                 {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
-                {agentId > BigInt(0) ? "Skip (registered)" : "Register on-chain"}
+                {agentId > BigInt(0) ? "Skip (registered)" : "Register on chain"}
               </Button>
               {agentId > BigInt(0) && (
                 <Button type="button" size="sm" variant="outline" onClick={() => setStep(3)}>
@@ -441,7 +441,7 @@ export function RitualAgentConnect() {
                     onClick={() => toggleSkill(s.skillId)}
                     className={cn(
                       "rounded-lg border p-3 text-left text-sm transition-colors",
-                      on ? "border-foreground bg-muted" : "border-border hover:bg-card-hover",
+                      on ? "border-foreground bg-muted" : "border border-border hover:bg-card-hover",
                     )}
                   >
                     <div className="flex items-center justify-between gap-2">
@@ -472,7 +472,7 @@ export function RitualAgentConnect() {
               <input
                 value={stakeAmount}
                 onChange={(e) => setStakeAmount(e.target.value)}
-                className="w-full rounded-lg border border-border bg-transparent px-3 py-2 font-mono text-sm outline-none ring-ring focus-visible:ring-2"
+                className="w-full rounded-lg border border-border bg transparent px-3 py-2 font-mono text-sm outline-none ring ring focus visible:ring-2"
               />
             </label>
             <Button type="button" size="sm" onClick={onStake} disabled={busy || !wallet}>

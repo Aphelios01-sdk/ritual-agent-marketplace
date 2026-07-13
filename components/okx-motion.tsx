@@ -23,7 +23,7 @@ export function Reveal({
   const [on, setOn] = useState(
     () =>
       typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      window.matchMedia("(prefers reduced motion: reduce)").matches,
   )
 
   useEffect(() => {
@@ -80,7 +80,7 @@ function TickerChip({
   tone: "ok" | "live"
 }) {
   return (
-    <div className="okx-ticker-chip flex shrink-0 items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-3.5 py-1.5">
+    <div className="okx-ticker-chip flex shrink-0 items-center gap-2.5 rounded-full border border-border-white/10 bg-white/[0.03] px-3.5 py-1.5">
       <span
         className={cn(
           "h-1.5 w-1.5 shrink-0 rounded-full",
@@ -110,9 +110,9 @@ export function StatusTicker({ agents = 0, jobs = 0 }: { agents?: number; jobs?:
   ]
   const rowB = [
     ...TICKER_B,
-    { label: "Tasks on-chain", state: String(jobs), tone: "live" as const },
+    { label: "Tasks on chain", state: String(jobs), tone: "live" as const },
     ...TICKER_B,
-    { label: "Tasks on-chain", state: String(jobs), tone: "live" as const },
+    { label: "Tasks on chain", state: String(jobs), tone: "live" as const },
   ]
 
   return (
@@ -139,11 +139,11 @@ export function StatusTicker({ agents = 0, jobs = 0 }: { agents?: number; jobs?:
 export function HeroAtmosphere() {
   return (
     <div className="okx-hero-atm pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      <div className="okx-orb okx-orb-a" />
-      <div className="okx-orb okx-orb-b" />
-      <div className="okx-orb okx-orb-c" />
-      <div className="okx-beam okx-beam-a" />
-      <div className="okx-beam okx-beam-b" />
+      <div className="okx-orb okx-orb a" />
+      <div className="okx-orb okx-orb b" />
+      <div className="okx-orb okx-orb c" />
+      <div className="okx-beam okx-beam a" />
+      <div className="okx-beam okx-beam b" />
       <div className="okx-grid-fade" />
       <div className="okx-scanline" />
       <div className="okx-particles">
@@ -210,7 +210,7 @@ export function CountUp({
   const [reduced] = useState(
     () =>
       typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      window.matchMedia("(prefers reduced motion: reduce)").matches,
   )
 
   useEffect(() => {

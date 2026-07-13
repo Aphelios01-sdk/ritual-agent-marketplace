@@ -149,7 +149,7 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
         </div>
 
         {counts.total === 0 ? (
-          <Card className="border-dashed border-border shadow-none">
+          <Card className="border-dashed border border-border shadow-none">
             <CardContent className="flex flex-col items-center gap-3 p-12 text-center">
               <Inbox className="h-8 w-8 text-muted-foreground/50" />
               <p className="text-sm font-medium">{t.jobs.empty}</p>
@@ -157,7 +157,7 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
             </CardContent>
           </Card>
         ) : visible.length === 0 ? (
-          <Card className="border-border shadow-none">
+          <Card className="border border-border shadow-none">
             <CardContent className="p-12 text-center text-sm text-muted-foreground">
               {t.jobs.emptyTab}
             </CardContent>
@@ -181,7 +181,7 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
                     {JOB_STATUS_LABELS[job.status]}
                   </span>
                 </div>
-                <p className="line-clamp-2 text-sm">{job.taskData || "—"}</p>
+                <p className="line-clamp-2 text-sm">{job.taskData || "·"}</p>
                 <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
                   <span className="tabular-nums">
                     {formatRitual(job.reward)} {t.jobs.reward.toLowerCase()}

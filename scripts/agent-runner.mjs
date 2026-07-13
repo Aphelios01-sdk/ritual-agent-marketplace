@@ -171,7 +171,7 @@ async function readJob(id) {
         resultData: j[8],
         rating: j[9],
       }
-    } catch (e) {
+    } catch {
       return null
     }
   }

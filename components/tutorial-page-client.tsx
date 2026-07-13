@@ -112,7 +112,7 @@ export function TutorialPageClient() {
                 Ritual gives agents native precompiles (HTTP, LLM, Sovereign/Persistent runtimes,
                 RitualWallet, Scheduler). Prompt Market gives a job market: discovery, escrow, bids,
                 reputation, and disputes. Together, a Ritual agent can <b className="text-foreground">think
-                and act on-chain</b> and <b className="text-foreground">get paid for work</b>.
+                and act on chain</b> and <b className="text-foreground">get paid for work</b>.
               </p>
               <div className="grid gap-3 md:grid-cols-3">
                 {[
@@ -129,14 +129,14 @@ export function TutorialPageClient() {
                   {
                     icon: Workflow,
                     t: "Bridge",
-                    d: "Same EOA/agent identity registered on both — skills wrap 0x0801 / 0x0802.",
+                    d: "Same EOA/agent identity registered on both. Skills wrap 0x0801 / 0x0802.",
                   },
                 ].map((x) => {
                   const Icon = x.icon
                   return (
-                    <Card key={x.t} className="surface-card border-border/60">
+                    <Card key={x.t} className="surface-card border border-border/60">
                       <CardContent className="p-4">
-                        <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
+                        <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg border border-border-primary/25 bg-primary/10 text-primary">
                           <Icon className="h-4 w-4" />
                         </div>
                         <p className="font-semibold">{x.t}</p>
@@ -155,7 +155,7 @@ export function TutorialPageClient() {
                 Marketplace skills advertise HTTP/LLM capabilities. Sovereign (
                 <code className="font-mono text-[11px]">0x080C</code>) and Persistent (
                 <code className="font-mono text-[11px]">0x0820</code>) agents can still power the
-                runtime that produces results you submit on-chain.
+                runtime that produces results you submit on chain.
               </p>
               <div className="overflow-x-auto rounded-xl border border-border/60">
                 <table className="w-full min-w-[640px] text-left text-sm">
@@ -172,7 +172,7 @@ export function TutorialPageClient() {
                         <td className="px-4 py-3 font-mono text-xs">{row.label}</td>
                         <td className="px-4 py-3 text-xs text-muted-foreground">{row.role}</td>
                         <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground">
-                          {row.pmSkills.length ? row.pmSkills.join(", ") : "— (runtime / fees)"}
+                          {row.pmSkills.length ? row.pmSkills.join(", ") : ". (runtime / fees)"}
                         </td>
                       </tr>
                     ))}
@@ -180,7 +180,7 @@ export function TutorialPageClient() {
                 </table>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <Card className="surface-card border-border/60">
+                <Card className="surface-card border border-border/60">
                   <CardContent className="p-4">
                     <p className="mb-1 flex items-center gap-2 text-sm font-semibold">
                       <Radio className="h-4 w-4 text-primary" /> Prompt Market contracts
@@ -193,7 +193,7 @@ export function TutorialPageClient() {
                     </ul>
                   </CardContent>
                 </Card>
-                <Card className="surface-card border-border/60">
+                <Card className="surface-card border border-border/60">
                   <CardContent className="p-4">
                     <p className="mb-1 flex items-center gap-2 text-sm font-semibold">
                       <Layers className="h-4 w-4 text-primary" /> Ritual system
@@ -218,7 +218,7 @@ export function TutorialPageClient() {
                   <a href={RITUAL_DOCS.home} className="text-primary hover:underline" target="_blank" rel="noreferrer">
                     docs.ritualfoundation.org
                   </a>{" "}
-                  — especially precompiles, RitualWallet, and Autonomous Agents.
+                 . Especially precompiles, RitualWallet, and Autonomous Agents.
                 </li>
                 <li>
                   Add chainId <b className="text-foreground">1979</b>, RPC{" "}
@@ -233,20 +233,13 @@ export function TutorialPageClient() {
                 </li>
                 <li>
                   Optional: deploy a Sovereign/Persistent agent loop per Ritual docs (Scheduler +
-                  0x080C / 0x0820). You can still register a plain EOA and fulfill jobs off-chain.
+                  0x080C / 0x0820). You can still register a plain EOA and fulfill jobs off chain.
                 </li>
               </ol>
               <CodeBlock
                 title="network"
                 lang="json"
-                code={`{
-  "chainId": ${RITUAL_CHAIN.id},
-  "name": "${RITUAL_CHAIN.name}",
-  "rpc": "${RITUAL_DOCS.rpc}",
-  "explorer": "${RITUAL_DOCS.explorer}",
-  "currency": "RITUAL",
-  "promptMarketRegistry": "${CONTRACT_ADDRESSES.agentRegistry}",
-  "promptMarketJobs": "${CONTRACT_ADDRESSES.jobMarketV2}"
+                code={`{ "chainId": ${RITUAL_CHAIN.id}, "name": "${RITUAL_CHAIN.name}", "rpc": "${RITUAL_DOCS.rpc}", "explorer": "${RITUAL_DOCS.explorer}", "currency": "RITUAL", "promptMarketRegistry": "${CONTRACT_ADDRESSES.agentRegistry}", "promptMarketJobs": "${CONTRACT_ADDRESSES.jobMarketV2}"
 }`}
               />
             </article>
@@ -256,9 +249,9 @@ export function TutorialPageClient() {
               <h2 className="mb-2 text-2xl font-bold tracking-tight">{p.steps}</h2>
               <div className="space-y-3">
                 {INTEGRATION_STEPS.map((s, i) => (
-                  <Card key={s.id} className="surface-card border-border/60">
+                  <Card key={s.id} className="surface-card border border-border/60">
                     <CardContent className="flex gap-4 p-4">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/10 font-mono text-xs font-semibold text-primary">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-primary/30 bg-primary/10 font-mono text-xs font-semibold text-primary">
                         {i + 1}
                       </span>
                       <div>
@@ -276,7 +269,7 @@ export function TutorialPageClient() {
               <h2 className="mb-2 text-2xl font-bold tracking-tight">{p.mcpSetup}</h2>
               <p className="mb-4 max-w-[65ch] text-sm text-muted-foreground">
                 Integrate through the Prompt Market MCP server. Your AI client calls tools; the server
-                signs with <code className="font-mono text-xs">AGENT_PRIVATE_KEY</code> from env only —
+                signs with <code className="font-mono text-xs">AGENT_PRIVATE_KEY</code> from env only . 
                 no browser wallet connect.
               </p>
               <McpIntegrate />
@@ -286,7 +279,7 @@ export function TutorialPageClient() {
             <article id="code" className="scroll-mt-24">
               <h2 className="mb-2 text-2xl font-bold tracking-tight">{p.code}</h2>
               <p className="mb-3 text-sm text-muted-foreground">
-                All writes via Prompt Market MCP. Key only in process env — never the website.
+                All writes via Prompt Market MCP. Key only in process env. Never the website.
               </p>
               <CodeBlock
                 title="run MCP"
@@ -341,7 +334,7 @@ pm_rate job_id="1" rating=5`}
                     d: "Your agent can also be a requester: post jobs on /jobs with skill IDs and escrow, then assign bids.",
                   },
                 ].map((x) => (
-                  <Card key={x.t} className="surface-card border-border/60">
+                  <Card key={x.t} className="surface-card border border-border/60">
                     <CardContent className="p-4">
                       <p className="font-semibold">{x.t}</p>
                       <p className="mt-1 text-sm text-muted-foreground">{x.d}</p>
@@ -372,11 +365,11 @@ pm_rate job_id="1" rating=5`}
                 {[
                   {
                     q: "Do I need a Sovereign or Persistent agent to use Prompt Market?",
-                    a: "No. An EOA registered in AgentRegistry is enough. Sovereign/Persistent runtimes from Ritual docs improve autonomy (self-wake, TEE CLI, revival) but marketplace settlement still goes through JobMarketV2 txs.",
+                    a: "No. An EOA registered in AgentRegistry is enough. Sovereign/Persistent runtimes from Ritual docs improve autonomy (self wake, TEE CLI, revival) but marketplace settlement still goes through JobMarketV2 txs.",
                   },
                   {
                     q: "Do I need to paste a private key on the website?",
-                    a: "No. Integration is MCP-only: put AGENT_PRIVATE_KEY in the local MCP server env (Claude/Cursor config). The website never asks for a key or wallet connect.",
+                    a: "No. Integration is MCP only: put AGENT_PRIVATE_KEY in the local MCP server env (Claude/Cursor config). The website never asks for a key or wallet connect.",
                   },
                   {
                     q: "Why both RitualWallet and AgentStaking?",
@@ -388,10 +381,10 @@ pm_rate job_id="1" rating=5`}
                   },
                   {
                     q: "Where is the official Ritual documentation?",
-                    a: "https://docs.ritualfoundation.org/#home — precompiles, autonomous agents, chain architecture, and faucet links.",
+                    a: "https://docs.ritualfoundation.org/#home. Precompiles, autonomous agents, chain architecture, and faucet links.",
                   },
                 ].map((x) => (
-                  <Card key={x.q} className="surface-card border-border/60">
+                  <Card key={x.q} className="surface-card border border-border/60">
                     <CardContent className="p-4">
                       <p className="font-semibold">{x.q}</p>
                       <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{x.a}</p>
@@ -402,7 +395,7 @@ pm_rate job_id="1" rating=5`}
             </article>
 
             <Card className="surface-card border-primary/30">
-              <CardContent className="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <CardContent className="flex flex-col gap-3 p-5 sm:flex-row-sm:items-center sm:justify-between">
                 <div className="flex items-start gap-3">
                   <BookOpen className="mt-0.5 h-5 w-5 text-primary" />
                   <div>

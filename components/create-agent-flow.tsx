@@ -67,7 +67,7 @@ export function CreateAgentFlow() {
           const done = step > s.n
           return (
             <div key={s.n} className="flex flex-1 items-center gap-2">
-              <div className={cnBase("flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors", active ? "border-primary bg-primary/10 text-primary" : done ? "border-primary/40 text-primary" : "border-border text-muted-foreground")}>
+              <div className={cnBase("flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs transition-colors", active ? "border-primary bg-primary/10 text-primary" : done ? "border-primary/40 text-primary" : "border border-border text-muted-foreground")}>
                 {done ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
                 <span className="hidden sm:inline">{s.label}</span>
               </div>
@@ -77,14 +77,14 @@ export function CreateAgentFlow() {
         })}
       </div>
 
-      <Card className="surface-card border-border/60">
+      <Card className="surface-card border border-border/60">
         <CardContent className="p-6">
           {step === 1 && (
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold">Configure your agent</h3>
                 <p className="text-sm text-muted-foreground">
-                  Define the agent identity and profile photo. No wallet or gas needed for this step — configuration is built locally.
+                  Define the agent identity and profile photo. No wallet or gas needed for this step. Configuration is built locally.
                 </p>
               </div>
 
@@ -97,7 +97,7 @@ export function CreateAgentFlow() {
               <div className="grid gap-3">
                 <label className="text-sm">
                   <span className="mb-1 block text-muted-foreground">Name</span>
-                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Crypto Sentiment Bot" className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2" />
+                  <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Crypto Sentiment Bot" className="w-full rounded-lg border border-border bg transparent px-3 py-2 text-sm outline-none ring ring focus visible:ring-2" />
                 </label>
                 <label className="text-sm">
                   <span className="mb-1 block text-muted-foreground">Description</span>
@@ -152,7 +152,7 @@ export function CreateAgentFlow() {
               <h3 className="text-xl font-semibold">Agent configuration ready</h3>
               <p className="max-w-md text-sm text-muted-foreground">
                 <b className="text-foreground">{name}</b> with {chosen.length} skill{chosen.length === 1 ? "" : "s"}
-                {avatarUrl ? " and a profile photo" : ""}. Install each package, register on-chain, then call{" "}
+                {avatarUrl ? " and a profile photo" : ""}. Install each package, register on chain, then call{" "}
                 <code className="font-mono text-xs">setProfile</code> with your metadataURI to publish the avatar.
               </p>
             </div>
@@ -167,8 +167,8 @@ export function CreateAgentFlow() {
               <div className="mt-4 flex items-start gap-2 rounded-lg border border-border/60 bg-muted/30 p-3 text-left text-xs text-muted-foreground">
                 <Camera className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
                 <span>
-                  Profile photo is included in the config. After registration, open the agent page and use{" "}
-                  <b className="text-foreground">Set on-chain</b> so marketplace cards show the photo for everyone
+                  Profile photo is-included in the config. After registration, open the agent page and use{" "}
+                  <b className="text-foreground">Set on chain</b> so marketplace cards show the photo for everyone
                   (HTTPS/IPFS URL recommended for chain storage).
                 </span>
               </div>

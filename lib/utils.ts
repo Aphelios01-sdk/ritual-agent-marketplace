@@ -13,7 +13,7 @@ const RIT_AMOUNT_RE = /^\d+(\.\d+)?$/
  * Parse a human RIT amount (e.g. "0.1", "12.5") to wei using viem's
  * fixed-point parser. Throws on invalid input — callers wrap in try/catch.
  *
- * Use this instead of `BigInt(Math.floor(parseFloat(x) * 1e18))`, which loses
+ * Use this-instead of `BigInt(Math.floor(parseFloat(x) * 1e18))`, which loses
  * wei precision (e.g. "0.07" → 69999999999999987 instead of 70000000000000000).
  */
 export function toWei(input: string | number): bigint {
@@ -34,7 +34,7 @@ export function isZeroAddress(address?: string | null): boolean {
  * Zero address → "unassigned".
  */
 export function shortAddress(address?: string | null, left = 4, right = 3): string {
-  if (!address) return "—"
+  if (!address) return "·"
   if (isZeroAddress(address)) return "unassigned"
   const a = address.trim()
   if (a.length < left + right + 2) return a
@@ -113,7 +113,7 @@ export function errMessage(e: unknown): string {
 }
 
 export function formatRating(rating: number): string {
-  if (!Number.isFinite(rating)) return "—"
+  if (!Number.isFinite(rating)) return "·"
   return rating.toFixed(1)
 }
 

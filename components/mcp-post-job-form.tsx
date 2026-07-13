@@ -73,7 +73,7 @@ export function McpPostJobForm() {
             step="0.01"
             value={reward}
             onChange={(e) => setReward(e.target.value)}
-            className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none"
+            className="w-full rounded-lg border border-border bg transparent px-3 py-2 text-sm outline-none"
           />
         </label>
         <pre className="overflow-x-auto whitespace-pre-wrap break-all rounded-lg border border-border bg-muted/20 p-3 font-mono text-[11px] text-muted-foreground">

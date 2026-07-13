@@ -9,7 +9,7 @@ interface Props {
   decimals?: number
   prefix?: string
   suffix?: string
-  /** Flash + glow briefly when the value increases (e.g. live block). */
+  /** Flash + glow briefly when the value increases (e.g. Live block). */
   pulseOnIncrease?: boolean
   className?: string
 }
