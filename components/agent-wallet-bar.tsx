@@ -78,13 +78,13 @@ export function AgentWalletBar() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex items-center gap-1.5 rounded-full border border-border/70 bg-card/60 px-2.5 py-1 transition-colors hover:border-[#00ff99]/30"
+        className="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 transition-colors hover:bg-muted"
       >
-        <Wallet className="h-3.5 w-3.5 text-[#00ff99]" />
+        <Wallet className="h-3.5 w-3.5 text-muted-foreground" />
         <span className="font-mono text-[11px] text-muted-foreground">
           {shortAddress(wallet.address)}
         </span>
-        <span className="text-[10px] tabular-nums text-[#00ff99]/80">
+        <span className="text-[10px] tabular-nums text-muted-foreground">
           {formatRitual(balance)}
         </span>
       </button>

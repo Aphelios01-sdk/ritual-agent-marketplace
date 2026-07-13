@@ -56,9 +56,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}>
       <body className="min-h-full bg-background text-foreground">
-        <div className="inf-ambient" aria-hidden />
         <Header />
-        <main>{children}</main>
+        <main className="min-h-[70vh]">{children}</main>
         <SiteFooter />
       </body>
     </html>

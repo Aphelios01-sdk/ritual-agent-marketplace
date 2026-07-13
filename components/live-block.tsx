@@ -35,13 +35,13 @@ export function LiveBlock({
               <span
                 className={cn(
                   "absolute inline-flex h-full w-full animate-ping rounded-full opacity-60",
-                  online ? "bg-[#00ff99]" : "bg-chart-3",
+                  online ? "bg-success" : "bg-muted-foreground",
                 )}
               />
               <span
                 className={cn(
                   "relative inline-flex h-2 w-2 rounded-full",
-                  online ? "bg-[#00ff99]" : "bg-chart-3",
+                  online ? "bg-success" : "bg-muted-foreground",
                 )}
               />
             </span>
@@ -59,7 +59,7 @@ export function LiveBlock({
           {showDelta && delta > 0 && (
             <span
               key={`${value}-${delta}`}
-              className="live-block-delta font-mono font-medium text-[#00ff99]"
+              className="live-block-delta font-mono font-medium text-foreground"
             >
               +{delta}
             </span>
@@ -82,7 +82,7 @@ export function LiveBlock({
           <span
             className={cn(
               "h-1.5 w-1.5 shrink-0 rounded-full",
-              online ? "bg-[#00ff99] shadow-[0_0_8px_#00ff99]" : "bg-chart-3",
+              online ? "bg-success" : "bg-muted-foreground",
             )}
           />
         )}
@@ -99,7 +99,7 @@ export function LiveBlock({
           <span className="text-muted-foreground">n/a</span>
         )}
         {showDelta && delta > 0 && (
-          <span key={`${value}-${delta}`} className="live-block-delta text-[#00ff99]">
+          <span key={`${value}-${delta}`} className="live-block-delta text-foreground">
             +{delta}
           </span>
         )}
@@ -111,20 +111,12 @@ export function LiveBlock({
   return (
     <span className={cn("inline-flex items-center gap-1.5 font-mono tabular-nums", className)}>
       {showDot && (
-        <span className="relative flex h-1.5 w-1.5">
-          <span
-            className={cn(
-              "absolute inline-flex h-full w-full animate-ping rounded-full opacity-75",
-              online ? "bg-[#00ff99]" : "bg-chart-3",
-            )}
-          />
-          <span
-            className={cn(
-              "relative inline-flex h-1.5 w-1.5 rounded-full",
-              online ? "bg-[#00ff99]" : "bg-chart-3",
-            )}
-          />
-        </span>
+        <span
+          className={cn(
+            "h-1.5 w-1.5 shrink-0 rounded-full",
+            online ? "bg-success" : "bg-muted-foreground",
+          )}
+        />
       )}
       {showLabel && <span className="text-muted-foreground">block</span>}
       {value > 0 ? (
@@ -133,7 +125,7 @@ export function LiveBlock({
         "n/a"
       )}
       {showDelta && delta > 0 && (
-        <span key={`${value}-${delta}`} className="live-block-delta text-[11px] font-medium text-[#00ff99]">
+        <span key={`${value}-${delta}`} className="live-block-delta text-[11px] font-medium text-foreground">
           +{delta}
         </span>
       )}

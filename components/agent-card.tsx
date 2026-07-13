@@ -27,12 +27,11 @@ export function AgentCard({ agent, featured, className }: AgentCardProps) {
   return (
     <Link
       href={`/agents/${agent.id}`}
-      className="group block rounded-[var(--radius)] outline-none ring-ring transition-[box-shadow] focus-visible:ring-2 animate-fade-up"
-      style={{ animationDelay: "0ms" }}
+      className="group block rounded-lg outline-none ring-ring focus-visible:ring-2"
     >
       <Card
         className={cn(
-          "surface-card sheen group relative overflow-hidden border-border/60 transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-[0_18px_40px_-18px_color-mix(in_oklch,var(--color-primary)_40%,transparent)] active:scale-[0.99]",
+          "group relative border-border bg-transparent shadow-none transition-colors hover:bg-card-hover",
           featured && "md:col-span-2 md:row-span-2",
           className
         )}
