@@ -22,6 +22,7 @@ import {
   cliSmoke,
 } from "@/lib/mcp-client-configs"
 import { cn } from "@/lib/utils"
+import { useT } from "@/lib/i18n/context"
 
 const TOOLS = [
   { name: "pm_status", desc: "Chain block, signer, registration, stake" },
@@ -47,6 +48,7 @@ const TOOLS = [
  * MCP integrate surface — client configs for Hermes, OpenClaw, Ritual agents, etc.
  */
 export function McpIntegrate() {
+  const t = useT()
   const [tab, setTab] = useState<McpClientId>("hermes")
   const [repoPath, setRepoPath] = useState("/path/to/ritual-agent-marketplace")
   const [agentKey, setAgentKey] = useState("0xYOUR_AGENT_KEY")
@@ -92,17 +94,10 @@ export function McpIntegrate() {
         <CardContent className="space-y-4 p-5 md:p-6">
           <div>
             <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-              MCP bridge
+              MCP
             </p>
-            <h3 className="text-lg font-semibold">Integrate via Prompt Market MCP</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Wire <strong className="font-medium text-foreground">Hermes</strong>,{" "}
-              <strong className="font-medium text-foreground">OpenClaw</strong>, or a{" "}
-              <strong className="font-medium text-foreground">Ritual / Prompt Market agent</strong> to{" "}
-              <code className="font-mono text-xs">mcp/server.mjs</code>. Signing uses{" "}
-              <code className="font-mono text-xs">AGENT_PRIVATE_KEY</code> in the MCP process env only —
-              never the website.
-            </p>
+            <h3 className="text-lg font-semibold">{t.mcp.integrateTitle}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{t.mcp.integrateBody}</p>
           </div>
 
           <ol className="space-y-3 text-sm">
@@ -173,9 +168,9 @@ export function McpIntegrate() {
 
       <Card className="border-border">
         <CardContent className="space-y-4 p-5 md:p-6">
-          <h4 className="font-semibold">Paths & key placeholder</h4>
+          <h4 className="font-semibold">{t.mcp.pathsKey}</h4>
           <label className="block text-sm">
-            <span className="mb-1 block text-muted-foreground">Repo absolute path</span>
+            <span className="mb-1 block text-muted-foreground">{t.mcp.repoPath}</span>
             <input
               value={repoPath}
               onChange={(e) => setRepoPath(e.target.value)}
@@ -184,9 +179,7 @@ export function McpIntegrate() {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1 block text-muted-foreground">
-              AGENT_PRIVATE_KEY placeholder (never paste a real key into production forms you do not control)
-            </span>
+            <span className="mb-1 block text-muted-foreground">{t.mcp.keyPlaceholder}</span>
             <input
               value={agentKey}
               onChange={(e) => setAgentKey(e.target.value)}
@@ -207,7 +200,7 @@ cd ritual-agent-marketplace && pnpm install
 
       <Card className="border-border">
         <CardContent className="space-y-4 p-5 md:p-6">
-          <h4 className="font-semibold">Client config</h4>
+          <h4 className="font-semibold">{t.mcp.clientConfig}</h4>
           <div className="flex flex-wrap gap-1.5">
             {CLIENT_TABS.map((t) => (
               <button
@@ -240,7 +233,7 @@ cd ritual-agent-marketplace && pnpm install
               <CodeBlock title="~/.hermes/config.yaml" lang="yaml" code={snippets.hermes} />
               <Button type="button" size="sm" variant="outline" className="gap-1.5" onClick={() => copy("hermes", snippets.hermes)}>
                 {copied === "hermes" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                Copy Hermes config
+                {copied === "hermes" ? t.common.copied : t.common.copy}
               </Button>
             </div>
           )}
@@ -369,19 +362,19 @@ cd ritual-agent-marketplace && pnpm install
         <CardContent className="space-y-3 p-5 md:p-6">
           <div className="flex items-center gap-2">
             <Terminal className="h-4 w-4 text-muted-foreground" />
-            <h4 className="font-semibold">Example agent prompt</h4>
+            <h4 className="font-semibold">{t.mcp.examplePrompt}</h4>
           </div>
           <CodeBlock title="prompt" lang="text" code={integratePrompt} />
           <Button type="button" size="sm" variant="outline" className="gap-1.5" onClick={() => copy("prompt", integratePrompt)}>
             {copied === "prompt" ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            Copy prompt
+            {copied === "prompt" ? t.common.copied : t.common.copy}
           </Button>
         </CardContent>
       </Card>
 
       <Card className="border-border">
         <CardContent className="p-5 md:p-6">
-          <h4 className="mb-3 font-semibold">MCP tools</h4>
+          <h4 className="mb-3 font-semibold">{t.mcp.tools}</h4>
           <ul className="divide-y divide-border rounded-lg border border-border">
             {TOOLS.map((t) => (
               <li
@@ -393,13 +386,7 @@ cd ritual-agent-marketplace && pnpm install
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Write tools need{" "}
-            <Badge variant="secondary" className="mx-0.5 font-mono text-[10px]">
-              AGENT_PRIVATE_KEY
-            </Badge>{" "}
-            in MCP env. Read tools work without it.
-          </p>
+          <p className="mt-3 text-xs text-muted-foreground">{t.mcp.writeKeyNote}</p>
         </CardContent>
       </Card>
     </div>

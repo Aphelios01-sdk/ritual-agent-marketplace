@@ -10,6 +10,7 @@ import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
 import { BlockDeadline } from "@/components/block-deadline"
 import { McpPostJobForm } from "@/components/mcp-post-job-form"
 import { McpActionPanel } from "@/components/mcp-action-panel"
+import { useT } from "@/lib/i18n/context"
 
 const EXPLORER = "https://explorer.ritualfoundation.org"
 const POLL_MS = 4_000
@@ -27,6 +28,7 @@ const STATUS_COLOR: Record<JobStatus, string> = {
 type Tab = "available" | "active" | "done" | "all"
 
 export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
+  const t = useT()
   const [jobs, setJobs] = useState<OnchainJob[]>(initialJobs)
   const [tab, setTab] = useState<Tab>("available")
   const [live, setLive] = useState(true)
@@ -92,17 +94,17 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
   }, [jobs, tab])
 
   const tabs: { id: Tab; label: string; n: number }[] = [
-    { id: "available", label: "Available", n: counts.open },
-    { id: "active", label: "In progress", n: counts.active },
-    { id: "done", label: "Done", n: counts.done },
-    { id: "all", label: "All", n: counts.total },
+    { id: "available", label: t.jobs.available, n: counts.open },
+    { id: "active", label: t.jobs.active, n: counts.active },
+    { id: "done", label: t.jobs.done, n: counts.done },
+    { id: "all", label: t.jobs.all, n: counts.total },
   ]
 
   return (
     <div className="grid gap-6 lg:grid-cols-[340px_1fr]">
       <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
         <McpPostJobForm />
-        <McpActionPanel surface="jobs" compact title="Job MCP tools" />
+        <McpActionPanel surface="jobs" compact title={t.mcp.jobTools} />
       </div>
 
       <div className="min-w-0">
@@ -125,12 +127,12 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
             ))}
           </div>
           <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
-            <span className={cn("inline-flex items-center gap-1", live ? "text-success" : "text-muted-foreground")}>
-              <span className={cn("h-1.5 w-1.5 rounded-full", live ? "bg-success" : "bg-muted-foreground")} />
-              {live ? "live" : "offline"}
+            <span className={cn("inline-flex items-center gap-1", live ? "text-primary" : "text-muted-foreground")}>
+              <span className={cn("h-1.5 w-1.5 rounded-full", live ? "bg-primary" : "bg-muted-foreground")} />
+              {live ? t.common.live : t.common.offline}
             </span>
             {lastTs && (
-              <span className="hidden sm:inline">updated {new Date(lastTs).toLocaleTimeString()}</span>
+              <span className="hidden sm:inline">{new Date(lastTs).toLocaleTimeString()}</span>
             )}
             <button
               type="button"
@@ -141,7 +143,7 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
               className="inline-flex items-center gap-1 rounded-md border border-border px-2 py-1 hover:bg-muted"
             >
               <RefreshCw className={cn("h-3 w-3", refreshing && "animate-spin")} />
-              Refresh
+              {t.common.refresh}
             </button>
           </div>
         </div>
@@ -150,16 +152,14 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
           <Card className="border-dashed border-border shadow-none">
             <CardContent className="flex flex-col items-center gap-3 p-12 text-center">
               <Inbox className="h-8 w-8 text-muted-foreground/50" />
-              <p className="text-sm font-medium">No jobs on-chain yet</p>
-              <p className="max-w-sm text-xs text-muted-foreground">
-                Copy a <code className="font-mono">pm_post_job</code> call from the left panel and run it via MCP.
-              </p>
+              <p className="text-sm font-medium">{t.jobs.empty}</p>
+              <p className="max-w-sm text-xs text-muted-foreground">{t.jobs.emptyHint}</p>
             </CardContent>
           </Card>
         ) : visible.length === 0 ? (
           <Card className="border-border shadow-none">
             <CardContent className="p-12 text-center text-sm text-muted-foreground">
-              No jobs in this tab.
+              {t.jobs.emptyTab}
             </CardContent>
           </Card>
         ) : (
@@ -183,7 +183,9 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
                 </div>
                 <p className="line-clamp-2 text-sm">{job.taskData || "—"}</p>
                 <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
-                  <span className="tabular-nums">{formatRitual(job.reward)} reward</span>
+                  <span className="tabular-nums">
+                    {formatRitual(job.reward)} {t.jobs.reward.toLowerCase()}
+                  </span>
                   <span className="font-mono" title={job.requester}>
                     req {shortAddress(job.requester)}
                   </span>
@@ -200,7 +202,7 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
         )}
 
         <p className="mt-4 text-[11px] text-muted-foreground">
-          Market{" "}
+          {t.common.market}{" "}
           <a
             href={`${EXPLORER}/address/${CONTRACT_ADDRESSES.jobMarketV2}`}
             target="_blank"

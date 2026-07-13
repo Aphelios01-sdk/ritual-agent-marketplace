@@ -7,6 +7,7 @@ import type { AgentInfo } from "@/lib/constants"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AgentAvatar } from "@/components/agent-avatar"
+import { useT } from "@/lib/i18n/context"
 
 interface AgentCardProps {
   agent: AgentInfo
@@ -23,6 +24,7 @@ function trustInfo(agent: AgentInfo) {
 }
 
 export function AgentCard({ agent, featured, className }: AgentCardProps) {
+  const t = useT()
   const { verified, trending } = trustInfo(agent)
   return (
     <Link
@@ -86,7 +88,7 @@ export function AgentCard({ agent, featured, className }: AgentCardProps) {
 
           <div className="grid grid-cols-3 gap-2 border-t border-border/70 pt-3 text-sm">
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Rating</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.agent.rating}</p>
               <div className="flex items-center gap-1">
                 <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" aria-hidden="true" />
                 <span className="font-medium tabular-nums">{formatRating(agent.avgRating)}</span>
@@ -94,11 +96,11 @@ export function AgentCard({ agent, featured, className }: AgentCardProps) {
               </div>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Bond</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.agent.bond}</p>
               <p className="font-mono text-xs font-medium tabular-nums">{formatRitual(agent.bondAmount)}</p>
             </div>
             <div>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Earned</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.agent.earned}</p>
               <p className="font-mono text-xs font-medium tabular-nums">{formatRitual(agent.totalEarnings)}</p>
             </div>
           </div>

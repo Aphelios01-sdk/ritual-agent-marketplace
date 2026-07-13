@@ -163,7 +163,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
                   <tr className="border-b border-border text-[11px] text-muted-foreground">
                     <th className="px-4 py-2.5 font-medium">{t.landing.agents}</th>
                     <th className="px-4 py-2.5 font-medium">{t.landing.jobs}</th>
-                    <th className="px-4 py-2.5 font-medium">Rating</th>
+                    <th className="px-4 py-2.5 font-medium">{t.landing.rating}</th>
                     <th className="hidden px-4 py-2.5 font-medium sm:table-cell">{t.nav.skills}</th>
                     <th className="px-4 py-2.5" />
                   </tr>

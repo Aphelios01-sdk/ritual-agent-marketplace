@@ -1,65 +1,54 @@
+"use client"
+
 import Link from "next/link"
 import { ArrowRight, UserRound, Bot, Scale, Terminal } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-
-const ROLES = [
-  {
-    href: "/join/user",
-    icon: UserRound,
-    badge: "User",
-    title: "Task requester",
-    points: [
-      "MCP only: pm_post_job, pm_assign_job, pm_rate.",
-      "Escrow and matching stay on-chain.",
-      "No browser wallet write path.",
-    ],
-    cta: "User MCP path",
-  },
-  {
-    href: "/join/asp",
-    icon: Bot,
-    badge: "ASP",
-    title: "Agent service provider",
-    points: [
-      "MCP only: pm_integrate, pm_submit_bid, pm_submit_result.",
-      "Skills wrap Ritual HTTP / LLM precompiles.",
-      "Earn escrowed RITUAL on delivery.",
-    ],
-    cta: "ASP MCP path",
-  },
-  {
-    href: "/join/evaluator",
-    icon: Scale,
-    badge: "Evaluator",
-    title: "Dispute arbitrator",
-    points: [
-      "MCP only: pm_stake_verifier, pm_vote_dispute.",
-      "Slashable votes keep the market fair.",
-      "No manual dispute UI writes.",
-    ],
-    cta: "Evaluator MCP path",
-  },
-]
+import { useT } from "@/lib/i18n/context"
 
 export function RolesSection() {
+  const t = useT()
+  const ROLES = [
+    {
+      href: "/join/user",
+      icon: UserRound,
+      badge: t.join.user,
+      title: t.rolesSection.userTitle,
+      points: [t.join.userBody, t.mcp.only, t.join.note],
+      cta: t.join.user,
+    },
+    {
+      href: "/join/asp",
+      icon: Bot,
+      badge: t.join.asp,
+      title: t.rolesSection.aspTitle,
+      points: [t.join.aspBody, t.mcp.only, t.join.note],
+      cta: t.join.asp,
+    },
+    {
+      href: "/join/evaluator",
+      icon: Scale,
+      badge: t.join.evaluator,
+      title: t.rolesSection.evalTitle,
+      points: [t.join.evaluatorBody, t.mcp.only, t.join.note],
+      cta: t.join.evaluator,
+    },
+  ]
+
   return (
     <section className="container mx-auto max-w-[1100px] px-4 py-14">
       <div className="mb-8 max-w-xl">
         <p className="mb-2 inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
-          <Terminal className="h-3 w-3" /> Three roles · MCP only
+          <Terminal className="h-3 w-3" /> {t.rolesSection.badge}
         </p>
-        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">One autonomous workflow</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          User, ASP, and Evaluator — all actions go through the Prompt Market MCP server. The site is
-          discovery only.
-        </p>
+        <h2 className="text-2xl font-bold tracking-tight md:text-3xl">{t.rolesSection.title}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{t.rolesSection.body}</p>
       </div>
       <div className="grid gap-4 lg:grid-cols-3">
         {ROLES.map((role) => {
           const Icon = role.icon
           return (
-            <Card key={role.badge} className="flex flex-col border-border bg-transparent shadow-none">
+            <Card key={role.badge} className="flex flex-col border-border bg-card shadow-none">
               <CardContent className="flex flex-1 flex-col p-6">
                 <div className="mb-4 flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground">
@@ -75,12 +64,12 @@ export function RolesSection() {
                 <ul className="mb-6 flex-1 space-y-2 text-sm text-muted-foreground">
                   {role.points.map((pt) => (
                     <li key={pt} className="flex gap-2">
-                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-muted-foreground" />
+                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
                       <span>{pt}</span>
                     </li>
                   ))}
                 </ul>
-                <Button asChild variant="outline" className="w-full justify-between rounded-md">
+                <Button asChild variant="outline" className="w-full justify-between rounded-full">
                   <Link href={role.href}>
                     {role.cta}
                     <ArrowRight className="h-4 w-4" />
@@ -93,7 +82,7 @@ export function RolesSection() {
       </div>
       <div className="mt-6 text-center">
         <Link href="/integrate" className="text-sm text-muted-foreground underline-offset-4 hover:underline">
-          MCP setup →
+          {t.rolesSection.mcpSetup}
         </Link>
       </div>
     </section>

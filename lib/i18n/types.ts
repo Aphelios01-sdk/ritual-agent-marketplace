@@ -66,6 +66,7 @@ export type Messages = {
     createOne: string
     jobs: string
     view: string
+    rating: string
   }
   join: {
     badge: string
@@ -85,6 +86,15 @@ export type Messages = {
     path: string
     note: string
     docs: string
+    mcpPath: string
+    setup: string
+    agentPrompt: string
+    userTitle: string
+    userDesc: string
+    aspTitle: string
+    aspDesc: string
+    evalTitle: string
+    evalDesc: string
   }
   common: {
     back: string
@@ -92,6 +102,10 @@ export type Messages = {
     copied: string
     loading: string
     language: string
+    refresh: string
+    live: string
+    offline: string
+    market: string
   }
   mcp: {
     badge: string
@@ -99,9 +113,47 @@ export type Messages = {
     setup: string
     actionsTitle: string
     actionsBody: string
+    integrateTitle: string
+    integrateBody: string
+    clientConfig: string
+    tools: string
+    examplePrompt: string
+    pathsKey: string
+    repoPath: string
+    keyPlaceholder: string
+    install: string
+    hermesHint: string
+    openclawHint: string
+    ritualHint: string
+    checklist: string
+    checklistFund: string
+    checklistIntegrate: string
+    checklistProfile: string
+    checklistLoop: string
+    writeKeyNote: string
+    jobTools: string
+    copyMcp: string
+    copiedMcp: string
+    postJobTitle: string
+    postJobHint: string
+    requiredSkill: string
+    promptTask: string
+    rewardRitual: string
+    taskPlaceholder: string
+    taskDefault: string
   }
   jobs: {
     title: string
+    eyebrow: string
+    body: string
+    postAsUser: string
+    bidAsAsp: string
+    openForBids: string
+    inFlight: string
+    completed: string
+    quiet: string
+    quietBody: string
+    scrollPost: string
     postMcp: string
     available: string
     active: string
@@ -109,6 +161,51 @@ export type Messages = {
     all: string
     empty: string
     emptyHint: string
+    emptyTab: string
     reward: string
+    bond: string
+    requester: string
+    provider: string
+    unassigned: string
+    task: string
+    lifecycle: string
+    bids: string
+    noBids: string
+    result: string
+    jobActions: string
+    jobActionsBody: string
+  }
+  bondPage: {
+    eyebrow: string
+    title: string
+    body: string
+    toolsTitle: string
+  }
+  createPage: {
+    eyebrow: string
+    title: string
+    body: string
+    toolsTitle: string
+    fullConfig: string
+  }
+  agent: {
+    rating: string
+    bond: string
+    earned: string
+  }
+  rolesSection: {
+    badge: string
+    title: string
+    body: string
+    userTitle: string
+    aspTitle: string
+    evalTitle: string
+    mcpSetup: string
+  }
+  dashboard: {
+    agents: string
+    jobs: string
+    skills: string
+    jobsByStatus: string
   }
 }

@@ -6,15 +6,21 @@ import { Button } from "@/components/ui/button"
 import { BUILT_IN_SKILLS } from "@/lib/constants"
 import { buildPostJobMcp } from "@/components/mcp-action-panel"
 import Link from "next/link"
+import { useT } from "@/lib/i18n/context"
 
 /** Form that only generates MCP tool calls — never signs on-chain from the browser. */
 export function McpPostJobForm() {
+  const t = useT()
   const [prompt, setPrompt] = useState("")
   const [reward, setReward] = useState("0.1")
   const [skillId, setSkillId] = useState<string>(BUILT_IN_SKILLS[0].skillId)
   const [copied, setCopied] = useState(false)
 
-  const example = buildPostJobMcp({ task: prompt || "Your task here", reward, skillId })
+  const example = buildPostJobMcp({
+    task: prompt || t.mcp.taskDefault,
+    reward,
+    skillId,
+  })
 
   const copy = async () => {
     await navigator.clipboard.writeText(example)
@@ -23,23 +29,20 @@ export function McpPostJobForm() {
   }
 
   return (
-    <div className="rounded-lg border border-border p-5">
+    <div className="rounded-lg border border-border bg-card p-5">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Plus className="h-4 w-4 text-muted-foreground" />
-          <h3 className="font-semibold">Post a job (MCP)</h3>
+          <h3 className="font-semibold">{t.mcp.postJobTitle}</h3>
         </div>
         <Link href="/integrate" className="text-xs text-muted-foreground hover:text-foreground">
-          Setup MCP
+          {t.mcp.setup}
         </Link>
       </div>
-      <p className="mb-3 text-[11px] text-muted-foreground">
-        Build the tool call, copy it, run via your AI client + <code className="font-mono">pnpm mcp</code>.
-        No browser signing.
-      </p>
+      <p className="mb-3 text-[11px] text-muted-foreground">{t.mcp.postJobHint}</p>
       <div className="space-y-3">
         <label className="block text-sm">
-          <span className="mb-1 block text-muted-foreground">Required skill</span>
+          <span className="mb-1 block text-muted-foreground">{t.mcp.requiredSkill}</span>
           <select
             value={skillId}
             onChange={(e) => setSkillId(e.target.value)}
@@ -53,17 +56,17 @@ export function McpPostJobForm() {
           </select>
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block text-muted-foreground">Prompt / task</span>
+          <span className="mb-1 block text-muted-foreground">{t.mcp.promptTask}</span>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={3}
-            placeholder="e.g. Analyze BTC sentiment from the last 24h"
+            placeholder={t.mcp.taskPlaceholder}
             className="w-full resize-none rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none"
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1 block text-muted-foreground">Reward (RITUAL)</span>
+          <span className="mb-1 block text-muted-foreground">{t.mcp.rewardRitual}</span>
           <input
             type="number"
             min="0"
@@ -78,7 +81,7 @@ export function McpPostJobForm() {
         </pre>
         <Button type="button" onClick={copy} className="w-full gap-1.5" disabled={!prompt.trim()}>
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-          {copied ? "Copied MCP call" : "Copy MCP call"}
+          {copied ? t.mcp.copiedMcp : t.mcp.copyMcp}
         </Button>
       </div>
     </div>
