@@ -1,0 +1,483 @@
+"use client"
+
+import { useCallback, useEffect, useState } from "react"
+import Link from "next/link"
+import {
+  ArrowRight,
+  Check,
+  Copy,
+  ExternalLink,
+  Loader2,
+  KeyRound,
+  Wallet,
+  Shield,
+  Cpu,
+  HeartPulse,
+  Sparkles,
+} from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import {
+  getAgentWallet,
+  importAgentWallet,
+  getBalance,
+  registerAgent,
+  readAgentId,
+  setAgentSkills,
+  stakeBond,
+  pingHeartbeat,
+  waitTx,
+  type AgentWallet,
+} from "@/lib/agent-wallet"
+import {
+  RITUAL_DOCS,
+  PROMPT_MARKET,
+  DEFAULT_CONNECT_SKILL_IDS,
+  MIN_RECOMMENDED_STAKE,
+  MIN_RECOMMENDED_GAS,
+  skillsToRegistryInput,
+} from "@/lib/ritual-bridge"
+import { BUILT_IN_SKILLS } from "@/lib/constants"
+import { formatRitual, shortAddress, toWei, errMessage, cn } from "@/lib/utils"
+
+type Step = 0 | 1 | 2 | 3 | 4 | 5
+
+const STEP_META: { n: Step; label: string; icon: typeof Wallet }[] = [
+  { n: 0, label: "Identity", icon: KeyRound },
+  { n: 1, label: "Fund", icon: Wallet },
+  { n: 2, label: "Register", icon: Sparkles },
+  { n: 3, label: "Skills", icon: Cpu },
+  { n: 4, label: "Bond", icon: Shield },
+  { n: 5, label: "Live", icon: HeartPulse },
+]
+
+/**
+ * Wizard: connect a Ritual-funded agent wallet to Prompt Market on-chain modules.
+ */
+export function RitualAgentConnect() {
+  const [step, setStep] = useState<Step>(0)
+  const [wallet, setWallet] = useState<AgentWallet | null>(null)
+  const [balance, setBalance] = useState<bigint>(BigInt(0))
+  const [agentId, setAgentId] = useState<bigint>(BigInt(0))
+  const [name, setName] = useState("")
+  const [description, setDescription] = useState(
+    "Ritual Chain agent serving jobs on Prompt Market via HTTP/LLM precompiles.",
+  )
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([...DEFAULT_CONNECT_SKILL_IDS])
+  const [stakeAmount, setStakeAmount] = useState(MIN_RECOMMENDED_STAKE)
+  const [busy, setBusy] = useState(false)
+  const [log, setLog] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
+  const [importPk, setImportPk] = useState("")
+  const [copied, setCopied] = useState(false)
+
+  const pushLog = (line: string) => setLog((prev) => [...prev.slice(-12), line])
+
+  const refresh = useCallback(async (w: AgentWallet) => {
+    const [bal, id] = await Promise.all([getBalance(w.address), readAgentId(w.address)])
+    setBalance(bal)
+    setAgentId(id)
+    if (id > BigInt(0) && !name) {
+      setName(`RitualAgent-${w.address.slice(2, 8)}`)
+    }
+  }, [name])
+
+  useEffect(() => {
+    try {
+      const w = getAgentWallet()
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- hydrate local agent wallet
+      setWallet(w)
+      if (!name) setName(`RitualAgent-${w.address.slice(2, 8)}`)
+      refresh(w)
+    } catch {
+      /* SSR */
+    }
+  }, [refresh, name])
+
+  const doImport = () => {
+    setError(null)
+    try {
+      const pk = importPk.trim() as `0x${string}`
+      const w = importAgentWallet(pk)
+      setWallet(w)
+      setName(`RitualAgent-${w.address.slice(2, 8)}`)
+      setImportPk("")
+      pushLog(`Imported wallet ${w.address}`)
+      refresh(w)
+    } catch (e) {
+      setError(errMessage(e) || "Invalid private key")
+    }
+  }
+
+  const copyAddr = async () => {
+    if (!wallet) return
+    try {
+      await navigator.clipboard.writeText(wallet.address)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 1500)
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const run = async (fn: () => Promise<void>) => {
+    setBusy(true)
+    setError(null)
+    try {
+      await fn()
+    } catch (e) {
+      setError(errMessage(e) || "Transaction failed")
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const onRegister = () =>
+    run(async () => {
+      if (!wallet) return
+      if (agentId > BigInt(0)) {
+        pushLog(`Already registered as agent #${agentId}`)
+        setStep(3)
+        return
+      }
+      if (!name.trim()) throw new Error("Name required")
+      pushLog("registerAgent…")
+      const hash = await registerAgent(wallet, name.trim(), description.trim())
+      pushLog(`tx ${hash}`)
+      await waitTx(hash)
+      const id = await readAgentId(wallet.address)
+      setAgentId(id)
+      pushLog(`Registered agent #${id}`)
+      setStep(3)
+    })
+
+  const onSkills = () =>
+    run(async () => {
+      if (!wallet) return
+      let id = agentId
+      if (id === BigInt(0)) {
+        id = await readAgentId(wallet.address)
+        setAgentId(id)
+      }
+      if (id === BigInt(0)) throw new Error("Register the agent first")
+      const defs = BUILT_IN_SKILLS.filter((s) => selectedSkills.includes(s.skillId))
+      if (defs.length === 0) throw new Error("Select at least one skill")
+      const skills = skillsToRegistryInput(defs)
+      pushLog(`setSkills (${skills.length})…`)
+      const hash = await setAgentSkills(wallet, id, skills)
+      pushLog(`tx ${hash}`)
+      await waitTx(hash)
+      pushLog("Skills installed")
+      setStep(4)
+    })
+
+  const onStake = () =>
+    run(async () => {
+      if (!wallet) return
+      const wei = toWei(stakeAmount)
+      if (wei <= BigInt(0)) throw new Error("Stake amount must be > 0")
+      pushLog(`stake ${stakeAmount} RITUAL…`)
+      const hash = await stakeBond(wallet, wei)
+      pushLog(`tx ${hash}`)
+      await waitTx(hash)
+      await refresh(wallet)
+      pushLog("Bond posted")
+      setStep(5)
+    })
+
+  const onHeartbeat = () =>
+    run(async () => {
+      if (!wallet) return
+      pushLog("ping heartbeat…")
+      const hash = await pingHeartbeat(wallet)
+      pushLog(`tx ${hash}`)
+      await waitTx(hash)
+      pushLog("Agent is live on Prompt Market")
+    })
+
+  const toggleSkill = (sid: string) =>
+    setSelectedSkills((prev) =>
+      prev.includes(sid) ? prev.filter((x) => x !== sid) : [...prev, sid],
+    )
+
+  const funded = balance > BigInt(0)
+
+  return (
+    <Card className="surface-card border-primary/25">
+      <CardContent className="space-y-5 p-5 md:p-6">
+        <div>
+          <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+            Interactive bridge
+          </p>
+          <h3 className="text-lg font-semibold">Connect Ritual agent → Prompt Market</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Import or use the local agent wallet, register on-chain, install skills that wrap Ritual
+            precompiles, stake, and go live. Official primitives:{" "}
+            <a href={RITUAL_DOCS.docs} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+              docs.ritualfoundation.org
+            </a>
+            .
+          </p>
+        </div>
+
+        {/* Stepper */}
+        <div className="flex flex-wrap gap-1.5">
+          {STEP_META.map((s) => {
+            const Icon = s.icon
+            const active = step === s.n
+            const done = step > s.n
+            return (
+              <button
+                key={s.n}
+                type="button"
+                onClick={() => setStep(s.n)}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] transition-colors",
+                  active && "border-primary bg-primary/10 text-primary",
+                  done && !active && "border-primary/40 text-primary",
+                  !active && !done && "border-border text-muted-foreground",
+                )}
+              >
+                {done ? <Check className="h-3 w-3" /> : <Icon className="h-3 w-3" />}
+                {s.label}
+              </button>
+            )
+          })}
+        </div>
+
+        {wallet && (
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-xs">
+            <span className="text-muted-foreground">Agent</span>
+            <code className="font-mono text-foreground">{shortAddress(wallet.address, 6)}</code>
+            <button type="button" onClick={copyAddr} className="text-muted-foreground hover:text-foreground" aria-label="Copy">
+              {copied ? <Check className="h-3.5 w-3.5 text-success" /> : <Copy className="h-3.5 w-3.5" />}
+            </button>
+            <span className="text-muted-foreground">·</span>
+            <span className="tabular-nums">{formatRitual(balance)} RITUAL</span>
+            {agentId > BigInt(0) && (
+              <Badge variant="secondary" className="text-[10px]">
+                #{agentId.toString()}
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Step panels */}
+        {step === 0 && (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Use the same EOA that owns your Ritual agent (or a dedicated agent key). Prompt Market
+              stores the key only in <code className="font-mono text-xs">localStorage</code> and signs
+              locally — no MetaMask required.
+            </p>
+            <label className="block text-sm">
+              <span className="mb-1 block text-muted-foreground">Import private key (optional)</span>
+              <input
+                value={importPk}
+                onChange={(e) => setImportPk(e.target.value)}
+                placeholder="0x…"
+                className="w-full rounded-lg border border-border bg-transparent px-3 py-2 font-mono text-xs outline-none ring-ring focus-visible:ring-2"
+              />
+            </label>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" size="sm" onClick={doImport} disabled={!importPk.trim()}>
+                Import key
+              </Button>
+              <Button type="button" size="sm" variant="outline" onClick={() => setStep(1)}>
+                Continue with current wallet <ArrowRight className="ml-1 h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div className="space-y-3 text-sm">
+            <p className="text-muted-foreground">
+              Fund this address on Ritual Chain (chainId 1979)
+              for gas + stake. Also deposit into{" "}
+              <a href={RITUAL_DOCS.docs} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                RitualWallet
+              </a>{" "}
+              if you will call HTTP/LLM precompiles from contracts.
+            </p>
+            <ul className="list-inside list-disc space-y-1 text-muted-foreground">
+              <li>
+                Faucet:{" "}
+                <a href={RITUAL_DOCS.faucet} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+                  faucet.ritualfoundation.org
+                </a>
+              </li>
+              <li>Recommended gas float: ≥ {MIN_RECOMMENDED_GAS} RITUAL</li>
+              <li>Recommended stake: ≥ {MIN_RECOMMENDED_STAKE} RITUAL</li>
+              <li>
+                Explorer:{" "}
+                <a
+                  href={`${RITUAL_DOCS.explorer}/address/${wallet?.address ?? ""}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-0.5 text-primary hover:underline"
+                >
+                  view address <ExternalLink className="h-3 w-3" />
+                </a>
+              </li>
+            </ul>
+            <p className={cn("font-mono text-xs", funded ? "text-success" : "text-chart-3")}>
+              Balance: {formatRitual(balance)} RITUAL {funded ? "(ready)" : "(fund me)"}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" size="sm" variant="outline" onClick={() => wallet && refresh(wallet)} disabled={busy}>
+                Refresh balance
+              </Button>
+              <Button type="button" size="sm" onClick={() => setStep(2)} disabled={!wallet}>
+                Next: Register <ArrowRight className="ml-1 h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="space-y-3">
+            <label className="block text-sm">
+              <span className="mb-1 block text-muted-foreground">Agent name</span>
+              <input
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2"
+              />
+            </label>
+            <label className="block text-sm">
+              <span className="mb-1 block text-muted-foreground">Description</span>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="w-full resize-none rounded-lg border border-border bg-transparent px-3 py-2 text-sm outline-none ring-ring focus-visible:ring-2"
+              />
+            </label>
+            <p className="text-xs text-muted-foreground">
+              Registry: <code className="font-mono">{shortAddress(PROMPT_MARKET.registry, 6)}</code>
+              {agentId > BigInt(0) && (
+                <span className="ml-2 text-success">Already registered as #{agentId.toString()}</span>
+              )}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" size="sm" onClick={onRegister} disabled={busy || !wallet}>
+                {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+                {agentId > BigInt(0) ? "Skip (registered)" : "Register on-chain"}
+              </Button>
+              {agentId > BigInt(0) && (
+                <Button type="button" size="sm" variant="outline" onClick={() => setStep(3)}>
+                  Next: Skills
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Select skills to advertise. Each skill points at Ritual HTTP (
+              <code className="font-mono text-[10px]">0x0801</code>) or LLM (
+              <code className="font-mono text-[10px]">0x0802</code>) so open jobs can match your agent.
+            </p>
+            <div className="grid max-h-64 gap-2 overflow-y-auto sm:grid-cols-2">
+              {BUILT_IN_SKILLS.map((s) => {
+                const on = selectedSkills.includes(s.skillId)
+                return (
+                  <button
+                    key={s.skillId}
+                    type="button"
+                    onClick={() => toggleSkill(s.skillId)}
+                    className={cn(
+                      "rounded-lg border p-3 text-left text-sm transition-colors",
+                      on ? "border-primary/50 bg-primary/10" : "border-border/60 hover:border-border",
+                    )}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{s.name}</span>
+                      <Badge variant="secondary" className="text-[9px]">
+                        {s.precompileType}
+                      </Badge>
+                    </div>
+                    <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">{s.description}</p>
+                  </button>
+                )
+              })}
+            </div>
+            <Button type="button" size="sm" onClick={onSkills} disabled={busy || selectedSkills.length === 0}>
+              {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+              Install {selectedSkills.length} skill(s)
+            </Button>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Post a slashable bond on AgentStaking. Active stake is required to bid on jobs.
+            </p>
+            <label className="block text-sm">
+              <span className="mb-1 block text-muted-foreground">Stake amount (RITUAL)</span>
+              <input
+                value={stakeAmount}
+                onChange={(e) => setStakeAmount(e.target.value)}
+                className="w-full rounded-lg border border-border bg-transparent px-3 py-2 font-mono text-sm outline-none ring-ring focus-visible:ring-2"
+              />
+            </label>
+            <Button type="button" size="sm" onClick={onStake} disabled={busy}>
+              {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+              Stake bond
+            </Button>
+          </div>
+        )}
+
+        {step === 5 && (
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Ping marketplace heartbeat and open the job board. Keep your Ritual Sovereign/Persistent
+              agent runtime running if you fulfill jobs with TEE harnesses — Prompt Market still needs
+              bid / startProcessing / submitResult txs from this wallet.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" size="sm" onClick={onHeartbeat} disabled={busy}>
+                {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <HeartPulse className="h-3.5 w-3.5" />}
+                Ping heartbeat
+              </Button>
+              <Button type="button" size="sm" variant="outline" asChild>
+                <Link href="/jobs">Open job board</Link>
+              </Button>
+              {agentId > BigInt(0) && (
+                <Button type="button" size="sm" variant="outline" asChild>
+                  <Link href={`/agents/${agentId.toString()}`}>View agent profile</Link>
+                </Button>
+              )}
+              <Button type="button" size="sm" variant="ghost" asChild>
+                <Link href="/create">Set profile photo</Link>
+              </Button>
+            </div>
+            <div className="rounded-lg border border-success/30 bg-success/5 p-3 text-xs text-muted-foreground">
+              <p className="font-medium text-success">Integration complete checklist</p>
+              <ul className="mt-1 list-inside list-disc space-y-0.5">
+                <li>Agent listed in AgentRegistry</li>
+                <li>Skills advertise HTTP/LLM capabilities</li>
+                <li>Bond posted (slashable quality guarantee)</li>
+                <li>Heartbeat proves liveness</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {error && <p className="text-xs text-destructive">{error}</p>}
+        {log.length > 0 && (
+          <div className="max-h-28 overflow-y-auto rounded-lg border border-border/50 bg-background/60 p-2 font-mono text-[10px] text-muted-foreground">
+            {log.map((l, i) => (
+              <div key={`${i}-${l}`}>{l}</div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}

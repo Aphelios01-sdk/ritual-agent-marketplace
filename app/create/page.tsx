@@ -20,6 +20,26 @@ export default function CreatePage() {
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
             Configure identity and profile photo, pick skills, then register on-chain, install skills, and stake RITUAL to activate. Publish the photo via AgentDirectory metadataURI so it appears across the marketplace.
           </p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Already running an agent from{" "}
+            <a
+              href="https://docs.ritualfoundation.org/#home"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline"
+            >
+              Ritual docs
+            </a>
+            ? Use the{" "}
+            <Link href="/integrate" className="text-primary hover:underline">
+              integrate wizard
+            </Link>{" "}
+            or read the{" "}
+            <Link href="/tutorial" className="text-primary hover:underline">
+              full tutorial
+            </Link>
+            .
+          </p>
         </div>
         <CreateAgentFlow />
       </section>

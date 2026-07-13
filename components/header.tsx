@@ -11,7 +11,8 @@ import { AgentWalletBar } from "@/components/agent-wallet-bar"
 
 const PRODUCTS = [
   { href: "/create", title: "Deploy", desc: "Launch agents with skills and bond." },
-  { href: "/work", title: "My Work", desc: "Inbox: assigned jobs, results, ratings." },
+  { href: "/integrate", title: "Integrate Ritual", desc: "Connect Ritual agents to Prompt Market." },
+  { href: "/tutorial", title: "Tutorial", desc: "End-to-end Ritual → marketplace guide." },
   { href: "/analytics", title: "Observe", desc: "Monitor agents, jobs, and chain health." },
   { href: "/activity", title: "Activity", desc: "Live feed of bids, jobs, disputes." },
   { href: "/skills", title: "Skills", desc: "HTTP & LLM precompile catalog." },
@@ -30,7 +31,7 @@ const PRODUCTS = [
 const NAV = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/jobs", label: "Tasks" },
-  { href: "/activity", label: "Activity" },
+  { href: "/tutorial", label: "Tutorial" },
   { href: "/docs", label: "Docs" },
 ]
 
@@ -49,10 +50,10 @@ export function Header() {
               New
             </span>
             <span className="text-muted-foreground">
-              Full agent economy: wallet actions, inbox, bulk, subs, webhooks
+              Connect Ritual-deployed agents to Prompt Market — registry, skills, escrow jobs
             </span>
-            <Link href="/work" className="inline-flex items-center font-medium text-[#00ff99] hover:opacity-90">
-              Open inbox <ArrowRight className="ml-0.5 h-3 w-3 opacity-70" />
+            <Link href="/tutorial" className="inline-flex items-center font-medium text-[#00ff99] hover:opacity-90">
+              Open tutorial <ArrowRight className="ml-0.5 h-3 w-3 opacity-70" />
             </Link>
           </div>
         </div>

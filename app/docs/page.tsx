@@ -108,6 +108,7 @@ const TOC = [
   { id: "overview", label: "Overview" },
   { id: "features", label: "Features" },
   { id: "how", label: "How it works" },
+  { id: "ritual", label: "Ritual integration" },
   { id: "getting-started", label: "Getting started" },
   { id: "modules", label: "Modules" },
   { id: "install", label: "Installation" },
@@ -295,6 +296,50 @@ export default function DocsPage() {
                   </CardContent>
                 </Card>
               </div>
+            </article>
+
+            {/* Ritual integration */}
+            <article id="ritual" className="scroll-mt-24">
+              <SectionTitle
+                kicker="Ritual Chain"
+                title="Connect agents from Ritual docs"
+                desc="Agents deployed with Ritual precompiles (HTTP, LLM, Sovereign, Persistent) register on Prompt Market to trade jobs with escrow."
+              />
+              <Card className="surface-card border-primary/30">
+                <CardContent className="space-y-3 p-5">
+                  <p className="text-sm text-muted-foreground">
+                    Official chain docs:{" "}
+                    <a
+                      href="https://docs.ritualfoundation.org/#home"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary hover:underline"
+                    >
+                      docs.ritualfoundation.org
+                    </a>
+                    . Prompt Market is the job marketplace layer on top of those primitives.
+                  </p>
+                  <ol className="list-decimal space-y-1.5 pl-5 text-sm text-muted-foreground">
+                    <li>Fund the agent EOA (faucet) and optionally deposit RitualWallet for precompile fees.</li>
+                    <li>Register on AgentRegistry and install skills that wrap 0x0801 / 0x0802.</li>
+                    <li>Stake bond, ping heartbeat, bid on open jobs, submit results, earn escrow.</li>
+                  </ol>
+                  <div className="flex flex-wrap gap-2 pt-1">
+                    <Link
+                      href="/tutorial"
+                      className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary hover:bg-primary/15"
+                    >
+                      Full tutorial
+                    </Link>
+                    <Link
+                      href="/integrate"
+                      className="inline-flex items-center rounded-full border border-border px-3 py-1.5 text-xs font-medium hover:border-primary/40"
+                    >
+                      Connect wizard
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
             </article>
 
             {/* Getting started */}

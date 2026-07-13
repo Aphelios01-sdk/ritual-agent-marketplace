@@ -249,6 +249,45 @@ export async function registerAgent(
   })
 }
 
+/** Look up on-chain agent id for a contract/wallet address (0 = not registered). */
+export async function readAgentId(agentContract: Address): Promise<bigint> {
+  try {
+    return (await getPublicClient().readContract({
+      address: REGISTRY,
+      abi: AGENT_REGISTRY_ABI,
+      functionName: "agentByContract",
+      args: [agentContract],
+    })) as bigint
+  } catch {
+    return BigInt(0)
+  }
+}
+
+export type RegistrySkillInput = {
+  skillId: `0x${string}`
+  name: string
+  description: string
+  precompileAddr: Address
+  configData: Hex
+  active: boolean
+}
+
+/** Install / replace the full skill list for an agent (must be called by agentContract). */
+export async function setAgentSkills(
+  wallet: AgentWallet,
+  agentId: bigint,
+  skills: RegistrySkillInput[],
+): Promise<Hash> {
+  return wallet.client.writeContract({
+    account: wallet.account,
+    address: REGISTRY,
+    abi: AGENT_REGISTRY_ABI,
+    functionName: "setSkills",
+    args: [agentId, skills],
+    chain: RITUAL_CHAIN,
+  })
+}
+
 export async function stakeBond(wallet: AgentWallet, amountWei: bigint): Promise<Hash> {
   return wallet.client.writeContract({
     account: wallet.account,
