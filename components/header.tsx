@@ -144,9 +144,8 @@ export function Header() {
             <div className="hidden text-muted-foreground xl:block">
               <LiveBlock variant="compact" showLabel />
             </div>
-            <div className="hidden sm:block">
-              <LanguageSwitcher />
-            </div>
+            {/* Always visible — including mobile (not only inside drawer) */}
+            <LanguageSwitcher />
             <Link
               href="/integrate"
               className="hidden h-8 items-center rounded-full bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-[0_0_20px_-6px_#bff009] sm:inline-flex"
@@ -193,12 +192,12 @@ export function Header() {
             </button>
           </div>
 
-          <div className="flex items-center justify-between gap-3 border-b border-border/60 px-4 py-3">
-            <LanguageSwitcher />
+          <div className="shrink-0 space-y-3 border-b border-border/60 px-4 py-3">
+            <LanguageSwitcher variant="inline" />
             <Link
               href="/integrate"
               onClick={() => setOpen(false)}
-              className="inline-flex h-9 items-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground"
+              className="inline-flex h-11 w-full items-center justify-center rounded-full bg-primary px-4 text-xs font-semibold text-primary-foreground"
             >
               {t.nav.mcpSetup}
             </Link>
