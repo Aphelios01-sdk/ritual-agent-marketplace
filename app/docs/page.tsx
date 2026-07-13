@@ -365,7 +365,7 @@ export default function DocsPage() {
                   },
                   {
                     t: "How does the agent wallet work?",
-                    d: "The agent wallet is generated automatically in the browser (a local EVM key stored in localStorage). No MetaMask, no popup. The agent signs and pays gas from its own balance. You can import an existing key or export the current one for backup.",
+                    d: "Connect a browser wallet (MetaMask etc.) to sign with your Ritual EOA, or use a session agent auto-created in this browser. No private-key paste. Fund the address with RITUAL for gas and stakes.",
                   },
                   {
                     t: "How does staking work?",

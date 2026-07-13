@@ -1,6 +1,7 @@
 /**
- * Agent-native wallet — local signing, no window.ethereum, no server relay.
- * Private key generated once, stored in localStorage.
+ * Agent wallet helpers.
+ * - local: ephemeral key in localStorage (no browser extension)
+ * - browser: injected wallet (MetaMask etc.) via window.ethereum — no private key import
  */
 "use client"
 
@@ -8,17 +9,19 @@ import {
   createWalletClient,
   createPublicClient,
   http,
+  custom,
   type Address,
   type Hash,
   type WalletClient,
   type PublicClient,
+  type Account,
   encodeFunctionData,
   keccak256,
   toBytes,
   stringToHex,
   type Hex,
 } from "viem"
-import { privateKeyToAccount, generatePrivateKey, type PrivateKeyAccount } from "viem/accounts"
+import { privateKeyToAccount, generatePrivateKey } from "viem/accounts"
 import { RITUAL_CHAIN, CONTRACT_ADDRESSES } from "./constants"
 import { JOB_MARKET_V2_ABI, AGENT_STAKING_ABI, AGENT_HEARTBEAT_ABI } from "./contract-abi-v2"
 import { AGENT_REGISTRY_ABI } from "./contract-abi"
@@ -46,22 +49,39 @@ const DIRECTORY = CONTRACT_ADDRESSES.agentDirectory as Address
 
 const PK_KEY = "agent_pk"
 const API_KEYS_KEY = "pm_api_keys"
+const RITUAL_CHAIN_ID_HEX = `0x${RITUAL_CHAIN.id.toString(16)}` // 1979 → 0x7bb
+
+export type WalletSource = "local" | "browser"
 
 export interface AgentWallet {
   address: Address
   client: WalletClient
-  account: PrivateKeyAccount
-  privateKey: `0x${string}`
+  /** Local: PrivateKeyAccount. Browser: address for JSON-RPC account. */
+  account: Account | Address
+  privateKey?: `0x${string}`
+  source: WalletSource
 }
 
-function makeWallet(pk: `0x${string}`): AgentWallet {
+type EthereumProvider = {
+  request: (args: { method: string; params?: unknown[] }) => Promise<unknown>
+  on?: (event: string, handler: (...args: unknown[]) => void) => void
+  removeListener?: (event: string, handler: (...args: unknown[]) => void) => void
+}
+
+function getInjectedProvider(): EthereumProvider | null {
+  if (typeof window === "undefined") return null
+  const eth = (window as unknown as { ethereum?: EthereumProvider }).ethereum
+  return eth ?? null
+}
+
+function makeLocalWallet(pk: `0x${string}`): AgentWallet {
   const account = privateKeyToAccount(pk)
   const client = createWalletClient({
     account,
     chain: RITUAL_CHAIN,
     transport: http(RITUAL_CHAIN.rpcUrls.default.http[0]),
   })
-  return { address: account.address, client, account, privateKey: pk }
+  return { address: account.address, client, account, privateKey: pk, source: "local" }
 }
 
 export function getPublicClient(): PublicClient {
@@ -71,6 +91,7 @@ export function getPublicClient(): PublicClient {
   })
 }
 
+/** Session agent: auto-generated local key (never paste a key). */
 export function getAgentWallet(): AgentWallet {
   if (typeof window === "undefined") {
     throw new Error("getAgentWallet() must be called in the browser")
@@ -82,13 +103,14 @@ export function getAgentWallet(): AgentWallet {
     localStorage.setItem(PK_KEY, pk)
   }
 
-  return makeWallet(pk)
+  return makeLocalWallet(pk)
 }
 
+/** @deprecated Prefer connectBrowserWallet — kept for advanced tooling only. */
 export function importAgentWallet(pk: `0x${string}`): AgentWallet {
   if (!pk.startsWith("0x") || pk.length !== 66) throw new Error("Invalid private key format")
   localStorage.setItem(PK_KEY, pk)
-  return makeWallet(pk)
+  return makeLocalWallet(pk)
 }
 
 export function exportPrivateKey(): `0x${string}` | null {
@@ -98,6 +120,91 @@ export function exportPrivateKey(): `0x${string}` | null {
 
 export function clearAgentWallet() {
   if (typeof window !== "undefined") localStorage.removeItem(PK_KEY)
+}
+
+export function hasBrowserWallet(): boolean {
+  return Boolean(getInjectedProvider())
+}
+
+/** Switch / add Ritual Chain (1979) on the injected provider. */
+export async function ensureRitualChain(provider?: EthereumProvider): Promise<void> {
+  const eth = provider ?? getInjectedProvider()
+  if (!eth) throw new Error("No browser wallet detected")
+
+  try {
+    await eth.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: RITUAL_CHAIN_ID_HEX }],
+    })
+  } catch (e) {
+    const err = e as { code?: number; message?: string }
+    // 4902 = chain not added
+    if (err.code === 4902 || /unrecognized chain|not added/i.test(err.message || "")) {
+      await eth.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: RITUAL_CHAIN_ID_HEX,
+            chainName: RITUAL_CHAIN.name,
+            nativeCurrency: RITUAL_CHAIN.nativeCurrency,
+            rpcUrls: [...RITUAL_CHAIN.rpcUrls.default.http],
+            blockExplorerUrls: [RITUAL_CHAIN.blockExplorers.default.url],
+          },
+        ],
+      })
+      return
+    }
+    throw e
+  }
+}
+
+/**
+ * Connect injected browser wallet (MetaMask, Rabby, etc.).
+ * User signs in the extension — private key never leaves the wallet.
+ */
+export async function connectBrowserWallet(): Promise<AgentWallet> {
+  const eth = getInjectedProvider()
+  if (!eth) {
+    throw new Error("No browser wallet found. Install MetaMask (or similar) and unlock it.")
+  }
+
+  await ensureRitualChain(eth)
+
+  const accounts = (await eth.request({
+    method: "eth_requestAccounts",
+  })) as string[]
+  const address = (accounts[0] || "").toLowerCase() as Address
+  if (!address || !address.startsWith("0x")) {
+    throw new Error("Wallet returned no account")
+  }
+
+  const client = createWalletClient({
+    account: address,
+    chain: RITUAL_CHAIN,
+    transport: custom(eth),
+  })
+
+  return { address, client, account: address, source: "browser" }
+}
+
+/** Reconnect silently if already authorized; otherwise null. */
+export async function tryReconnectBrowserWallet(): Promise<AgentWallet | null> {
+  const eth = getInjectedProvider()
+  if (!eth) return null
+  try {
+    const accounts = (await eth.request({ method: "eth_accounts" })) as string[]
+    if (!accounts?.[0]) return null
+    await ensureRitualChain(eth)
+    const address = accounts[0].toLowerCase() as Address
+    const client = createWalletClient({
+      account: address,
+      chain: RITUAL_CHAIN,
+      transport: custom(eth),
+    })
+    return { address, client, account: address, source: "browser" }
+  } catch {
+    return null
+  }
 }
 
 export function toBytesUtf8(text: string): Hex {

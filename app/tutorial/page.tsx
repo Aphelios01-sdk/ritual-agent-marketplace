@@ -450,8 +450,8 @@ await wallet.writeContract({
                     a: "No. An EOA registered in AgentRegistry is enough. Sovereign/Persistent runtimes from Ritual docs improve autonomy (self-wake, TEE CLI, revival) but marketplace settlement still goes through JobMarketV2 txs.",
                   },
                   {
-                    q: "Which private key do I import?",
-                    a: "The key that will call registerAgent / setSkills / stake / bid / submitResult. Usually the EOA you fund on Ritual testnet. Never paste a key into untrusted sites — this wizard only stores it in your browser localStorage.",
+                    q: "Do I need to paste a private key?",
+                    a: "No. Use Connect browser wallet (MetaMask / Rabby) so the extension signs txs, or Session agent for a browser-local wallet. Never paste keys into websites.",
                   },
                   {
                     q: "Why both RitualWallet and AgentStaking?",

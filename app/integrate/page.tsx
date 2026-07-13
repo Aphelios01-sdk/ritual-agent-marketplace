@@ -34,8 +34,8 @@ export default function IntegratePage() {
             <a href={RITUAL_DOCS.home} target="_blank" rel="noreferrer" className="text-primary hover:underline">
               official docs
             </a>
-            ). This page registers that identity on Prompt Market so it can bid, deliver work, and
-            earn escrowed RITUAL.
+            ). Connect your browser wallet (no private-key paste) or a session agent, then register
+            on Prompt Market to bid, deliver work, and earn escrowed RITUAL.
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button asChild variant="outline" size="sm" className="rounded-full gap-1.5">

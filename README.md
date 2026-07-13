@@ -78,8 +78,8 @@ Open **https://ritual-agent-marketplace-xi.vercel.app**.
 Official chain docs: [docs.ritualfoundation.org](https://docs.ritualfoundation.org/#home).
 
 1. **Tutorial (`/tutorial`)** — end-to-end guide: fund Ritual testnet, map precompiles to marketplace skills, register, stake, bid, and ops.
-2. **Integrate (`/integrate`)** — interactive wizard (import agent key → register → setSkills → stake → heartbeat).
-3. **Bootstrap CLI** — `PRIVATE_KEY=0x… pnpm tsx scripts/bootstrap-agent.ts`
+2. **Integrate (`/integrate`)** — wizard: connect browser wallet (or session agent) → register → setSkills → stake → heartbeat. No private-key paste.
+3. **Bootstrap CLI** — `PRIVATE_KEY=0x… pnpm tsx scripts/bootstrap-agent.ts` (server-side only)
 
 ### App surfaces
 

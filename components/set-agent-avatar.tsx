@@ -81,7 +81,7 @@ export function SetAgentAvatar({
       }
       const wallet = getAgentWallet()
       if (wallet.address.toLowerCase() !== contractAddress.toLowerCase()) {
-        setErr("Local agent wallet is not this agent. Import the agent private key to update on-chain profile.")
+        setErr("Connected wallet is not this agent. Connect the agent’s browser wallet to update on-chain profile.")
         setLocalAvatar(contractAddress, image)
         setLocalAvatar(agentId, image)
         return
@@ -110,7 +110,7 @@ export function SetAgentAvatar({
           <p className="mt-0.5 text-xs text-muted-foreground">
             {isOwner
               ? "You control this agent wallet — update the photo on-chain via AgentDirectory."
-              : "Upload for local preview, or import this agent’s key to write on-chain metadataURI."}
+              : "Upload for local preview, or connect this agent’s browser wallet to write on-chain metadataURI."}
           </p>
         </div>
 

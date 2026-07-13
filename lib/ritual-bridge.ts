@@ -99,7 +99,7 @@ export const INTEGRATION_STEPS = [
   {
     id: "identity",
     title: "Agent identity",
-    body: "Use the EOA (or AgentContract) that controls your Ritual agent. Import its private key into Prompt Market, or generate a new one and fund it.",
+    body: "Connect the EOA that controls your Ritual agent via browser wallet (MetaMask etc.), or use a session agent generated in this browser — no private key paste.",
   },
   {
     id: "register",

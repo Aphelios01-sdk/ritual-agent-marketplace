@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Wallet, Copy, Check, RefreshCw, Download } from "lucide-react"
+import { Wallet, Copy, Check, RefreshCw, Plug } from "lucide-react"
 import {
   getAgentWallet,
   clearAgentWallet,
-  importAgentWallet,
+  connectBrowserWallet,
+  tryReconnectBrowserWallet,
   getBalance,
-  exportPrivateKey,
   type AgentWallet,
 } from "@/lib/agent-wallet"
 import { Button } from "@/components/ui/button"
@@ -18,21 +18,30 @@ export function AgentWalletBar() {
   const [balance, setBalance] = useState<bigint>(BigInt(0))
   const [copied, setCopied] = useState(false)
   const [open, setOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
 
-  const refresh = () => {
+  const apply = (w: AgentWallet) => {
+    setWallet(w)
+    getBalance(w.address).then(setBalance).catch(() => setBalance(BigInt(0)))
+  }
+
+  const refresh = async () => {
     try {
-      const w = getAgentWallet()
-      setWallet(w)
-      getBalance(w.address).then(setBalance).catch(() => setBalance(BigInt(0)))
+      const browser = await tryReconnectBrowserWallet()
+      if (browser) {
+        apply(browser)
+        return
+      }
+      apply(getAgentWallet())
     } catch {
       /* SSR */
     }
   }
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only hydration from browser localStorage; deferred to avoid hydration mismatch.
-    refresh()
-    const t = setInterval(refresh, 15_000)
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- mount-only hydration
+    void refresh()
+    const t = setInterval(() => void refresh(), 15_000)
     return () => clearInterval(t)
   }, [])
 
@@ -48,29 +57,21 @@ export function AgentWalletBar() {
     }
   }
 
-  const reset = () => {
-    if (!confirm("Generate a new agent wallet? Current local key will be cleared.")) return
-    clearAgentWallet()
-    refresh()
-  }
-
-  const doImport = () => {
-    const pk = prompt("Paste private key (0x…)")
-    if (!pk) return
+  const connectBrowser = async () => {
+    setBusy(true)
     try {
-      importAgentWallet(pk as `0x${string}`)
-      refresh()
+      const w = await connectBrowserWallet()
+      apply(w)
     } catch (e) {
-      alert(errMessage(e) || "Invalid key")
+      alert(errMessage(e) || "Could not connect wallet")
+    } finally {
+      setBusy(false)
     }
   }
 
-  const doExport = () => {
-    const pk = exportPrivateKey()
-    if (!pk) return
-    if (confirm("Copy private key to clipboard? Keep it secret.")) {
-      navigator.clipboard.writeText(pk)
-    }
+  const useSession = () => {
+    clearAgentWallet()
+    apply(getAgentWallet())
   }
 
   return (
@@ -96,26 +97,32 @@ export function AgentWalletBar() {
             aria-label="Close"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-border/50 bg-card/95 p-3 shadow-2xl backdrop-blur-xl">
+          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-lg border border-border bg-background p-3 shadow-lg">
             <p className="mb-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-              Local agent wallet
+              {wallet.source === "browser" ? "Browser wallet" : "Session agent"}
             </p>
             <p className="break-all font-mono text-[11px]">{wallet.address}</p>
-            <p className="mt-1 text-xs text-[#00ff99]">{formatRitual(balance)}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{formatRitual(balance)} RITUAL</p>
             <div className="mt-3 flex flex-wrap gap-1">
-              <Button size="sm" variant="outline" className="h-7 gap-1 rounded-full text-[11px]" onClick={copy}>
+              <Button size="sm" variant="outline" className="h-7 gap-1 text-[11px]" onClick={copy}>
                 {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />} Copy
               </Button>
-              <Button size="sm" variant="outline" className="h-7 gap-1 rounded-full text-[11px]" onClick={doImport}>
-                <Download className="h-3 w-3" /> Import
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 gap-1 text-[11px]"
+                onClick={connectBrowser}
+                disabled={busy}
+              >
+                <Plug className="h-3 w-3" /> Connect
               </Button>
-              <Button size="sm" variant="outline" className="h-7 gap-1 rounded-full text-[11px]" onClick={doExport}>
-                Export
-              </Button>
-              <Button size="sm" variant="outline" className="h-7 gap-1 rounded-full text-[11px]" onClick={reset}>
-                <RefreshCw className="h-3 w-3" /> New
+              <Button size="sm" variant="outline" className="h-7 gap-1 text-[11px]" onClick={useSession}>
+                <RefreshCw className="h-3 w-3" /> Session
               </Button>
             </div>
+            <p className="mt-2 text-[10px] text-muted-foreground">
+              No private key paste. Sign with your extension or a session agent.
+            </p>
           </div>
         </>
       )}
