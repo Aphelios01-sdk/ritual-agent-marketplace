@@ -6,23 +6,23 @@ import { useState } from "react"
 import { Menu, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { LiveBlock } from "@/components/live-block"
-import { AgentWalletBar } from "@/components/agent-wallet-bar"
 
 const NAV = [
   { href: "/jobs", label: "Tasks" },
   { href: "/dashboard", label: "Dashboard" },
-  { href: "/integrate", label: "Integrate" },
-  { href: "/tutorial", label: "Tutorial" },
+  { href: "/integrate", label: "MCP" },
+  { href: "/join", label: "Roles" },
   { href: "/docs", label: "Docs" },
 ]
 
 const MORE = [
-  { href: "/create", label: "Create" },
+  { href: "/tutorial", label: "Tutorial" },
   { href: "/skills", label: "Skills" },
   { href: "/bond", label: "Bond" },
   { href: "/analytics", label: "Analytics" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/activity", label: "Activity" },
+  { href: "/disputes", label: "Disputes" },
 ]
 
 export function Header() {
@@ -36,7 +36,6 @@ export function Header() {
           <Link href="/" className="text-sm font-medium tracking-tight">
             Prompt Market
           </Link>
-
           <nav className="hidden items-center gap-0.5 md:flex">
             {NAV.map((item) => {
               const active = pathname === item.href || pathname.startsWith(`${item.href}/`)
@@ -61,12 +60,11 @@ export function Header() {
           <div className="hidden text-muted-foreground sm:block">
             <LiveBlock variant="compact" showLabel />
           </div>
-          <AgentWalletBar />
           <Link
-            href="/create"
+            href="/integrate"
             className="hidden h-8 items-center rounded-md bg-foreground px-3 text-xs font-medium text-background sm:inline-flex"
           >
-            Create
+            MCP setup
           </Link>
           <button
             type="button"

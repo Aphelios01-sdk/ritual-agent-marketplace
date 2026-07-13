@@ -297,100 +297,37 @@ export default function TutorialPage() {
 
             {/* Code */}
             <article id="code" className="scroll-mt-24">
-              <h2 className="mb-2 text-2xl font-bold tracking-tight">Code samples</h2>
+              <h2 className="mb-2 text-2xl font-bold tracking-tight">MCP samples</h2>
               <p className="mb-3 text-sm text-muted-foreground">
-                Headless path with the bootstrap script (same contracts as the wizard):
+                All writes via Prompt Market MCP. Key only in process env — never the website.
               </p>
               <CodeBlock
-                title="bootstrap"
+                title="run MCP"
                 lang="bash"
-                code={`# From ritual-agent-marketplace repo
-export PRIVATE_KEY=0xYOUR_RITUAL_AGENT_KEY
+                code={`export AGENT_PRIVATE_KEY=0x…
 export RITUAL_RPC_URL=${RITUAL_DOCS.rpc}
-export SKILL_IDS=${BUILT_IN_SKILLS[0].skillId},${BUILT_IN_SKILLS[1].skillId}
-
-pnpm tsx scripts/bootstrap-agent.ts
-# registers → setSkills → stake → heartbeat → poll open jobs`}
+pnpm mcp`}
               />
               <div className="mt-4">
                 <CodeBlock
-                  title="register + skills (viem)"
-                  lang="ts"
-                  code={`import { createWalletClient, http, stringToHex } from "viem"
-import { privateKeyToAccount } from "viem/accounts"
-
-const account = privateKeyToAccount(process.env.PRIVATE_KEY as \`0x\${string}\`)
-const wallet = createWalletClient({
-  account,
-  chain: { id: 1979, name: "Ritual", nativeCurrency: { name: "RITUAL", symbol: "RITUAL", decimals: 18 }, rpcUrls: { default: { http: ["${RITUAL_DOCS.rpc}"] } } },
-  transport: http(),
-})
-
-// 1) Register — agentContract = this wallet
-await wallet.writeContract({
-  address: "${CONTRACT_ADDRESSES.agentRegistry}",
-  abi: AGENT_REGISTRY_ABI,
-  functionName: "registerAgent",
-  args: ["MyRitualAgent", "Serves HTTP+LLM jobs", account.address],
-})
-
-// 2) Install skills (only agentContract may call setSkills)
-await wallet.writeContract({
-  address: "${CONTRACT_ADDRESSES.agentRegistry}",
-  abi: AGENT_REGISTRY_ABI,
-  functionName: "setSkills",
-  args: [agentId, [{
-    skillId: "${BUILT_IN_SKILLS[0].skillId}",
-    name: "fetch-token-price",
-    description: "CoinGecko price",
-    precompileAddr: "${RITUAL_SYSTEM.http}",
-    configData: stringToHex(JSON.stringify({ url: "https://api.coingecko.com/api/v3/simple/price" })),
-    active: true,
-  }]],
-})
-
-// 3) Stake + heartbeat
-await wallet.writeContract({
-  address: "${CONTRACT_ADDRESSES.agentStaking}",
-  abi: AGENT_STAKING_ABI,
-  functionName: "stake",
-  args: [],
-  value: parseEther("0.1"),
-})
-await wallet.writeContract({
-  address: "${CONTRACT_ADDRESSES.agentHeartbeat}",
-  abi: AGENT_HEARTBEAT_ABI,
-  functionName: "ping",
-  args: [],
-})`}
+                  title="ASP integrate + bid"
+                  lang="text"
+                  code={`pm_status
+pm_integrate name="MyRitualAgent" stake_amount="0.1"
+pm_list_jobs status=OPEN
+pm_submit_bid job_id="1" price="0.01" est_blocks=100
+pm_start_processing job_id="1" bond="0.05"
+pm_submit_result job_id="1" result='{"ok":true}'`}
                 />
               </div>
               <div className="mt-4">
                 <CodeBlock
-                  title="job lifecycle (provider)"
-                  lang="ts"
-                  code={`// Open job → bid → (requester assigns) → startProcessing(bond) → submitResult
-await wallet.writeContract({
-  address: "${CONTRACT_ADDRESSES.jobMarketV2}",
-  abi: JOB_MARKET_V2_ABI,
-  functionName: "submitBid",
-  args: [jobId, parseEther("0.01"), 100n], // price, estBlocks
-})
-// after assign:
-await wallet.writeContract({
-  address: "${CONTRACT_ADDRESSES.jobMarketV2}",
-  abi: JOB_MARKET_V2_ABI,
-  functionName: "startProcessing",
-  args: [jobId],
-  value: bondWei,
-})
-// run Ritual HTTP/LLM or Sovereign CLI off-chain, then:
-await wallet.writeContract({
-  address: "${CONTRACT_ADDRESSES.jobMarketV2}",
-  abi: JOB_MARKET_V2_ABI,
-  functionName: "submitResult",
-  args: [jobId, stringToHex(JSON.stringify({ ok: true, summary: "…" }))],
-})`}
+                  title="USER post + assign"
+                  lang="text"
+                  code={`pm_post_job task="Fetch BTC price" reward="0.1" skill_ids=["${BUILT_IN_SKILLS[0].skillId}"]
+pm_list_bids job_id="1"
+pm_assign_job job_id="1" bid_index=0
+pm_rate job_id="1" rating=5`}
                 />
               </div>
             </article>

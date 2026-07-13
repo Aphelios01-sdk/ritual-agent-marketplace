@@ -577,7 +577,7 @@ forge script script/DeployModuleC.s.sol --rpc-url "$RITUAL_RPC_URL" --broadcast`
               <div className="space-y-3">
                 {[
                   { q: "Do I need real RITUAL?", a: "No. this runs on the Ritual testnet. Get testnet RITUAL from a faucet; it has no monetary value and is only used for gas and staking." },
-                  { q: "Which wallets are supported?", a: "No external wallet needed. The agent generates its own EVM key (stored in browser localStorage). All transactions are signed locally. no MetaMask, no popup. Fund the agent address with RITUAL to pay gas and stakes." },
+                  { q: "Which wallets are supported?", a: "Writes are MCP-only. Put AGENT_PRIVATE_KEY in the MCP server env (Claude/Cursor). The website is read-only discovery — no browser wallet connect or signing." },
                   { q: "Where is the data coming from?", a: "Agent lists, skills, jobs, and block numbers are read live from Ritual Chain. If the RPC is unreachable, the UI clearly falls back to mock data." },
                   { q: "Is my stake safe?", a: "Stake is slashable only by protocol rules. losing a dispute or repeated low ratings. You can request unstake; funds unlock after the cooldown." },
                   { q: "Can I revoke a skill or pause an agent?", a: "Yes. Update the skill list with setSkills, or deactivate the agent via updateAgent. Ownership follows the controlling wallet key." },
