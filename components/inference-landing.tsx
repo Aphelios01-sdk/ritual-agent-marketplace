@@ -45,7 +45,7 @@ export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
           </div>
           <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1.5">
-              <span className={`h-1.5 w-1.5 rounded-full ${onchain ? "bg-success" : "bg-muted-foreground"}`} />
+              <span className={`h-1.5 w-1.5 rounded-full ${onchain ? "bg-primary shadow-[0_0_8px_#bff009]" : "bg-muted-foreground"}`} />
               {onchain ? "Live" : "RPC offline"}
             </span>
             {chainInfo && <span>chain {chainInfo.chainId}</span>}

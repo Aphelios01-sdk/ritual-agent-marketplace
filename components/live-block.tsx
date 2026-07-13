@@ -82,7 +82,7 @@ export function LiveBlock({
           <span
             className={cn(
               "h-1.5 w-1.5 shrink-0 rounded-full",
-              online ? "bg-success" : "bg-muted-foreground",
+              online ? "bg-primary shadow-[0_0_8px_#bff009]" : "bg-muted-foreground",
             )}
           />
         )}
@@ -99,7 +99,7 @@ export function LiveBlock({
           <span className="text-muted-foreground">n/a</span>
         )}
         {showDelta && delta > 0 && (
-          <span key={`${value}-${delta}`} className="live-block-delta text-foreground">
+          <span key={`${value}-${delta}`} className="live-block-delta text-primary">
             +{delta}
           </span>
         )}
@@ -114,7 +114,7 @@ export function LiveBlock({
         <span
           className={cn(
             "h-1.5 w-1.5 shrink-0 rounded-full",
-            online ? "bg-success" : "bg-muted-foreground",
+            online ? "bg-primary shadow-[0_0_8px_#bff009]" : "bg-muted-foreground",
           )}
         />
       )}
@@ -125,7 +125,7 @@ export function LiveBlock({
         "n/a"
       )}
       {showDelta && delta > 0 && (
-        <span key={`${value}-${delta}`} className="live-block-delta text-[11px] font-medium text-foreground">
+        <span key={`${value}-${delta}`} className="live-block-delta text-[11px] font-medium text-primary">
           +{delta}
         </span>
       )}

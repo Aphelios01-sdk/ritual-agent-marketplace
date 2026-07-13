@@ -63,7 +63,7 @@ export function Header() {
           </div>
           <Link
             href="/integrate"
-            className="hidden h-8 items-center rounded-md bg-foreground px-3 text-xs font-medium text-background sm:inline-flex"
+            className="hidden h-8 items-center rounded-full bg-primary px-3.5 text-xs font-semibold text-primary-foreground shadow-[0_0_20px_-6px_#bff009] sm:inline-flex"
           >
             MCP setup
           </Link>
