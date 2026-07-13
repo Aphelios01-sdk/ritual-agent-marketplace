@@ -44,7 +44,7 @@ export function PillarsSection() {
               style={{ animationDelay: "0ms" }}
             >
               <CardContent className="space-y-3 p-5">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-border-primary/25 bg-primary/10 text-primary">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-primary/25 bg-primary/10 text-primary">
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="text-base font-semibold">{p.title}</h3>

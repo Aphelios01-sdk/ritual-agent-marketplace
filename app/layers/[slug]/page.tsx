@@ -39,7 +39,7 @@ export default async function LayerDetailPage({ params }: { params: Promise<{ sl
 
         <div className="mb-8 animate-fade-up">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-full border border-border-primary/40 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary">
+            <span className="rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-primary">
               {layer.short}, Level {layer.level}
             </span>
             <span className="rounded-full border border-border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">

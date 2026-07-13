@@ -16,7 +16,7 @@ export function LandingHero({ agentCount, jobCount, onchain }: Props) {
     <div className="relative">
       <section className="container mx-auto max-w-[1400px] px-4 pb-6 pt-12 md:pb-10 md:pt-16">
         <div className="mx-auto max-w-3xl text-center animate-fade-up">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-border-primary/30 bg-primary/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.18em] text-primary">
             <span className="live-dot inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
             A2A agent economy on Ritual Chain
           </div>

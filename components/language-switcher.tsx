@@ -41,7 +41,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1.5 max-h-[min(70dvh,20rem)] min-w-[10.5rem] overflow-y-auto overflow-x-hidden rounded-lg border border-border bg-card py-1 shadow-xl shadow-black/40">
+        <div className="absolute right-0 top-full z-[70] mt-1.5 max-h-[min(50dvh,18rem)] min-w-[10.5rem] overflow-y-auto overflow-x-hidden rounded-lg border border-border bg-card py-1 shadow-xl shadow-black/40">
           <p className="px-3 py-1.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
             {t.common.language}
           </p>

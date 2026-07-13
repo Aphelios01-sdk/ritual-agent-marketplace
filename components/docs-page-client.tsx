@@ -203,7 +203,7 @@ export function DocsPageClient() {
                   return (
                     <Card key={x.t} className="surface-card border border-border/60">
                       <CardContent className="p-5">
-                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-border-primary/25 bg-primary/10 text-primary">
+                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
                           <Icon className="h-[18px] w-[18px]" />
                         </div>
                         <p className="font-semibold">{x.t}</p>
@@ -228,7 +228,7 @@ export function DocsPageClient() {
                   return (
                     <Card key={f.title} className="surface-card sheen border border-border/60 transition-transform duration-300 hover:-translate-y-1">
                       <CardContent className="p-5">
-                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-border-primary/25 bg-primary/10 text-primary">
+                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
                           <Icon className="h-[18px] w-[18px]" />
                         </div>
                         <p className="font-semibold">{f.title}</p>
@@ -252,7 +252,7 @@ export function DocsPageClient() {
                   <ol className="space-y-4">
                     {LIFECYCLE.map((l) => (
                       <li key={l.step} className="flex gap-4">
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-border-primary/30 bg-primary/10 font-mono text-xs font-semibold text-primary">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/10 font-mono text-xs font-semibold text-primary">
                           {l.step}
                         </span>
                         <div className="min-w-0">

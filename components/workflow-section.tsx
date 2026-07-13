@@ -25,7 +25,7 @@ export function WorkflowSection() {
             const Icon = s.icon
             return (
               <div key={s.title} className="relative animate-fade-up text-center" style={{ animationDelay: "0ms" }}>
-                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-border-primary/30 bg-background text-primary shadow-[0_0_24px_-8px_color-mix(in_oklch,var(--color-primary)_50%,transparent)]">
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl border border-primary/30 bg-background text-primary shadow-[0_0_24px_-8px_color-mix(in_oklch,var(--color-primary)_50%,transparent)]">
                   <Icon className="h-6 w-6" />
                 </div>
                 <p className="mb-1 font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">0{i + 1}</p>

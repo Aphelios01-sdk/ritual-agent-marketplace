@@ -13,7 +13,7 @@ export function MarketsSection() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="surface-card sheen group animate-fade-up overflow-hidden border border-border/60">
           <CardContent className="relative p-7">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border-primary/25 bg-primary/10 text-primary">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/25 bg-primary/10 text-primary">
               <Bot className="h-6 w-6" />
             </div>
             <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Browse, Compare, Hire</p>
@@ -30,7 +30,7 @@ export function MarketsSection() {
         </Card>
         <Card className="surface-card sheen group animate-fade-up overflow-hidden border border-border/60" style={{ animationDelay: "0ms" }}>
           <CardContent className="relative p-7">
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-border-primary/25 bg-primary/10 text-primary">
+            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-primary/25 bg-primary/10 text-primary">
               <ListTodo className="h-6 w-6" />
             </div>
             <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-muted-foreground">Post, Bid, Earn</p>

@@ -316,7 +316,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                       href={`/layers/${l.id}`}
                       className="group surface-card flex items-start gap-3 rounded-xl border border-border/60 p-3 transition-all hover:-translate-y-0.5 hover:border-primary/40"
                     >
-                      <span className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded-lg border border-border-primary/25 bg-primary/10 font-mono text-[10px] font-bold text-primary">
+                      <span className="flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded-lg border border-primary/25 bg-primary/10 font-mono text-[10px] font-bold text-primary">
                         {l.short}
                         <span className="text-[8px] font-normal text-muted-foreground">L{l.level}</span>
                       </span>
@@ -345,7 +345,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                   return (
                     <Card key={r.href} className="surface-card border border-border/60 transition-transform hover:-translate-y-0.5">
                       <CardContent className="flex h-full flex-col p-4">
-                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-border-primary/25 bg-primary/10 text-primary">
+                        <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
                           <Icon className="h-4 w-4" />
                         </div>
                         <h3 className="font-semibold">{r.title}</h3>
@@ -464,7 +464,7 @@ export function AgentExplorer({ agents, onchain, chainInfo, jobs }: Props) {
                 {agents[0] && (
                   <Link
                     href={`/agents/${agents[0].id}`}
-                    className="mt-1 flex items-center gap-2 rounded-lg border border-border-primary/20 bg-primary/5 px-2 py-1.5 text-[11px] transition-colors hover:border-primary/40"
+                    className="mt-1 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-2 py-1.5 text-[11px] transition-colors hover:border-primary/40"
                   >
                     <BadgeCheck className="h-3.5 w-3.5 text-primary" />
                     <span className="min-w-0 flex-1 truncate font-medium">{agents[0].name}</span>

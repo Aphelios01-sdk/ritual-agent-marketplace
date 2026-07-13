@@ -41,7 +41,7 @@ export function LayersStack({ compact = false }: { compact?: boolean }) {
         </div>
         <Link
           href="/layers"
-          className="inline-flex items-center gap-1.5 self-start rounded-full border border-border-primary/40 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+          className="inline-flex items-center gap-1.5 self-start rounded-full border border-primary/40 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
         >
           Open layer map <ArrowRight className="h-3.5 w-3.5" />
         </Link>

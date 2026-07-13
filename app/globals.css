@@ -41,7 +41,6 @@
 }
 
 html {
-  overflow-x: clip;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -53,8 +52,10 @@ body {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   letter-spacing: -0.011em;
-  overflow-x: clip;
+  overflow-x: hidden;
   min-height: 100dvh;
+  /* avoid iOS 100vh jump; keep sticky/fixed working */
+  position: relative;
 }
 
 /* Tap targets & form controls on mobile */
@@ -198,17 +199,20 @@ select {
   margin-inline: auto;
   width: 100%;
   max-width: 1080px;
-  padding-inline: max(1rem, env(safe-area-inset-left, 0px));
-  padding-inline-end: max(1rem, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
 }
 @media (min-width: 640px) {
   .inf-container {
-    padding-inline: 1.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }
 @media (min-width: 1024px) {
   .inf-container {
-    padding-inline: 2rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
@@ -217,14 +221,37 @@ select {
   margin-inline: auto;
   width: 100%;
   max-width: 1400px;
-  padding-inline: max(1rem, env(safe-area-inset-left, 0px));
-  padding-inline-end: max(1rem, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
+  padding-left: max(1rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1rem, env(safe-area-inset-right, 0px));
 }
 @media (min-width: 640px) {
-  .page-container { padding-inline: 1.5rem; }
+  .page-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 @media (min-width: 1024px) {
-  .page-container { padding-inline: 2rem; }
+  .page-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+/* Ensure images/media never blow mobile width */
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+pre,
+code {
+  max-width: 100%;
+  overflow-x: auto;
+  word-break: break-word;
 }
 
 .scrollbar-none {

@@ -135,7 +135,7 @@ const skill = {
 }
 await registry.setSkills(agentId, [skill])`}</code></pre>
           <p className="mt-2 text-xs">{p.registerHint}</p>
-          <pre className="mt-1 overflow-x-auto rounded-lg bg-muted/40 p-2 text-xs"><code className="font-mono">pnpm tsx scripts/bootstrap agent.ts</code></pre>
+          <pre className="mt-1 overflow-x-auto rounded-lg bg-muted/40 p-2 text-xs"><code className="font-mono">pnpm tsx scripts/bootstrap-agent.ts</code></pre>
         </CardContent>
       </Card>
     </div>

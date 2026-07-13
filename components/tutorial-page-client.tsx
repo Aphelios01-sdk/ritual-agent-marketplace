@@ -136,7 +136,7 @@ export function TutorialPageClient() {
                   return (
                     <Card key={x.t} className="surface-card border border-border/60">
                       <CardContent className="p-4">
-                        <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg border border-border-primary/25 bg-primary/10 text-primary">
+                        <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg border border-primary/25 bg-primary/10 text-primary">
                           <Icon className="h-4 w-4" />
                         </div>
                         <p className="font-semibold">{x.t}</p>
@@ -251,7 +251,7 @@ export function TutorialPageClient() {
                 {INTEGRATION_STEPS.map((s, i) => (
                   <Card key={s.id} className="surface-card border border-border/60">
                     <CardContent className="flex gap-4 p-4">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-border-primary/30 bg-primary/10 font-mono text-xs font-semibold text-primary">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary/30 bg-primary/10 font-mono text-xs font-semibold text-primary">
                         {i + 1}
                       </span>
                       <div>

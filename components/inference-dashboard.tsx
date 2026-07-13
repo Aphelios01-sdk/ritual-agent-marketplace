@@ -148,19 +148,21 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
             {kpis.map((k) => {
               const Icon = k.icon
               return (
-                <div key={k.label} className="inf-card p-4">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[11px] text-muted-foreground">{k.label}</p>
-                    <Icon className="h-3.5 w-3.5 text-muted-foreground/70" />
+                <div key={k.label} className="inf-card min-w-0 p-3 sm:p-4">
+                  <div className="flex items-center justify-between gap-1">
+                    <p className="truncate text-[11px] text-muted-foreground">{k.label}</p>
+                    <Icon className="h-3.5 w-3.5 shrink-0 text-muted-foreground/70" />
                   </div>
-                  <p className="mt-2 text-2xl font-semibold tracking-tight tabular-nums">
+                  <p className="mt-2 text-xl font-semibold tracking-tight tabular-nums sm:text-2xl">
                     <AnimatedNumber value={k.value} decimals={0} />
                   </p>
-                  <p className="mt-1 text-[11px] text-muted-foreground">{k.sub}</p>
+                  <p className="mt-1 truncate text-[11px] text-muted-foreground">{k.sub}</p>
                 </div>
               )
             })}
-            <LiveBlock initialBlock={initialBlock} variant="card" />
+            <div className="col-span-2 min-w-0 sm:col-span-1 xl:col-span-1">
+              <LiveBlock initialBlock={initialBlock} variant="card" />
+            </div>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-5">

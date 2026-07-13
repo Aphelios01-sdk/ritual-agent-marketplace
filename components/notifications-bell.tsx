@@ -76,7 +76,7 @@ export function NotificationsBell() {
             aria-label="Close"
             onClick={() => setOpen(false)}
           />
-          <div className="absolute right-0 top-full z-50 mt-2 w-[320px] overflow-hidden rounded-2xl border border-border/50 bg-card/95 shadow-2xl shadow-black/40 backdrop-blur-xl">
+          <div className="absolute right-0 top-full z-50 mt-2 w-[min(320px,calc(100vw-1.5rem))] overflow-hidden rounded-2xl border border-border/50 bg-card/95 shadow-2xl shadow-black/40 backdrop-blur-xl">
             <div className="flex items-center justify-between border-b border-border/40 px-3 py-2">
               <p className="text-xs font-semibold">Live activity</p>
               <Link
