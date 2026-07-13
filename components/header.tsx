@@ -30,10 +30,11 @@ export function Header() {
   const pathname = usePathname()
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/85 backdrop-blur-md">
       <div className="inf-container flex h-12 items-center justify-between gap-4">
         <div className="flex items-center gap-6">
-          <Link href="/" className="text-sm font-medium tracking-tight">
+          <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-tight">
+            <span className="inline-block h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_#bff009]" />
             Prompt Market
           </Link>
           <nav className="hidden items-center gap-0.5 md:flex">

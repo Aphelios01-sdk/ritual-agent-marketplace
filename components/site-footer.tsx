@@ -10,10 +10,13 @@ const LINKS = [
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border">
+    <footer className="border-t border-border/80">
       <div className="inf-container flex flex-col gap-4 py-8 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">Prompt Market</span>
+          <span className="inline-flex items-center gap-2 font-medium text-foreground">
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            Prompt Market
+          </span>
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="hover:text-foreground">
               {l.label}

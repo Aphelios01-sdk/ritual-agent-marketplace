@@ -35,13 +35,13 @@ export function LiveBlock({
               <span
                 className={cn(
                   "absolute inline-flex h-full w-full animate-ping rounded-full opacity-60",
-                  online ? "bg-success" : "bg-muted-foreground",
+                  online ? "bg-primary" : "bg-muted-foreground",
                 )}
               />
               <span
                 className={cn(
                   "relative inline-flex h-2 w-2 rounded-full",
-                  online ? "bg-success" : "bg-muted-foreground",
+                  online ? "bg-primary" : "bg-muted-foreground",
                 )}
               />
             </span>
@@ -59,7 +59,7 @@ export function LiveBlock({
           {showDelta && delta > 0 && (
             <span
               key={`${value}-${delta}`}
-              className="live-block-delta font-mono font-medium text-foreground"
+              className="live-block-delta font-mono font-medium text-primary"
             >
               +{delta}
             </span>
