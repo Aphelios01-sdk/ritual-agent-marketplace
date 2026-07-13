@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Activity, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useT } from "@/lib/i18n/context"
 
 export type FeedEvent = {
   name: string
@@ -29,6 +30,8 @@ export function ActivityFeed({
   pollMs?: number
   className?: string
 }) {
+  const t = useT()
+  const p = t.activityPage
   const [events, setEvents] = useState<FeedEvent[]>([])
   const [block, setBlock] = useState<string>("—")
   const [loading, setLoading] = useState(true)
@@ -64,14 +67,16 @@ export function ActivityFeed({
       <div className="flex items-center justify-between border-b border-border/40 px-4 py-3">
         <div className="flex items-center gap-2">
           <Activity className="h-4 w-4 text-[#00ff99]" />
-          <p className="text-sm font-semibold">Network feed</p>
+          <p className="text-sm font-semibold">{p.feedTitle}</p>
           <span className="okx-pulse-dot h-1.5 w-1.5 rounded-full bg-[#00ff99]" />
         </div>
-        <span className="font-mono text-[10px] text-muted-foreground">block {block}</span>
+        <span className="font-mono text-[10px] text-muted-foreground">
+          {p.block} {block}
+        </span>
       </div>
       {loading && (
         <div className="flex items-center justify-center gap-2 py-10 text-xs text-muted-foreground">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" /> Loading events…
+          <Loader2 className="h-3.5 w-3.5 animate-spin" /> {p.loading}
         </div>
       )}
       {err && !loading && (
@@ -105,9 +110,7 @@ export function ActivityFeed({
           </li>
         ))}
         {!loading && events.length === 0 && (
-          <li className="px-4 py-10 text-center text-xs text-muted-foreground">
-            No on-chain events in recent window
-          </li>
+          <li className="px-4 py-10 text-center text-xs text-muted-foreground">{p.empty}</li>
         )}
       </ul>
     </div>

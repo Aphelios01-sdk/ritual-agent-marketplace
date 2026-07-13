@@ -13,7 +13,7 @@ import { BlockDeadline } from "@/components/block-deadline"
 import { LiveBlock } from "@/components/live-block"
 import { useLiveBlock } from "@/hooks/use-live-block"
 import { AnimatedNumber } from "@/components/ui/animated-number"
-
+import { useT } from "@/lib/i18n/context"
 
 interface Props {
   agents: AgentInfo[]
@@ -22,17 +22,9 @@ interface Props {
   onchain: boolean
 }
 
-const SIDE = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/jobs", label: "Tasks", icon: Briefcase },
-  { href: "/#agents", label: "Agents", icon: Bot },
-  { href: "/layers", label: "Layers", icon: Layers },
-  { href: "/analytics", label: "Observe", icon: Activity },
-  { href: "/skills", label: "Skills", icon: Zap },
-  { href: "/docs", label: "Docs", icon: BookOpen },
-]
-
 export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) {
+  const t = useT()
+  const d = t.dashboard
   const [q, setQ] = useState("")
   const initialBlock = chainInfo ? Number(chainInfo.block) : 0
   const live = useLiveBlock(initialBlock, 2000)
@@ -52,18 +44,28 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
 
   const recentJobs = useMemo(() => [...jobs].slice(0, 7), [jobs])
 
+  const SIDE = [
+    { href: "/dashboard", label: d.overview, icon: LayoutDashboard },
+    { href: "/jobs", label: d.tasksNav, icon: Briefcase },
+    { href: "/#agents", label: d.agentsNav, icon: Bot },
+    { href: "/layers", label: d.layersNav, icon: Layers },
+    { href: "/analytics", label: d.observe, icon: Activity },
+    { href: "/skills", label: d.skillsNav, icon: Zap },
+    { href: "/docs", label: d.docsNav, icon: BookOpen },
+  ]
+
   const kpis = [
-    { label: "Requests", value: jobs.length, sub: `${open} open`, icon: Briefcase, live: false },
-    { label: "Agents", value: agents.length, sub: onchain ? "on-chain" : "offline", icon: Bot, live: false },
-    { label: "Pipeline", value: active, sub: `${done} completed`, icon: Clock, live: false },
+    { label: d.requests, value: jobs.length, sub: `${open} ${d.open.toLowerCase()}`, icon: Briefcase },
+    { label: d.agents, value: agents.length, sub: onchain ? d.onchain : d.offline, icon: Bot },
+    { label: d.pipeline, value: active, sub: `${done} ${d.completed}`, icon: Clock },
   ]
 
   return (
     <div className="flex min-h-[calc(100dvh-3.5rem)]">
       <aside className="hidden w-[220px] shrink-0 border-r border-border/40 bg-card/20 md:flex md:flex-col">
         <div className="border-b border-border/40 px-4 py-4">
-          <p className="text-[11px] text-muted-foreground">Workspace</p>
-          <p className="mt-0.5 text-sm font-semibold tracking-tight">Production, Ritual</p>
+          <p className="text-[11px] text-muted-foreground">{d.workspace}</p>
+          <p className="mt-0.5 text-sm font-semibold tracking-tight">{d.production}</p>
         </div>
         <nav className="flex flex-1 flex-col gap-0.5 p-2">
           {SIDE.map((item) => {
@@ -88,7 +90,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
         </nav>
         <div className="border-t border-border/40 p-3">
           <Link href="/create" className="inf-btn inf-btn-primary h-9 w-full text-xs">
-            Deploy agent
+            {d.deployAgent}
           </Link>
         </div>
       </aside>
@@ -97,18 +99,20 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
         <div className="border-b border-border/40 px-4 py-4 sm:px-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h1 className="text-lg font-semibold tracking-tight sm:text-xl">Overview</h1>
+              <h1 className="text-lg font-semibold tracking-tight sm:text-xl">{d.overview}</h1>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground sm:text-sm">
-                <span>Console: {live.online || onchain ? "live" : "degraded"}</span>
+                <span>
+                  {d.console}: {live.online || onchain ? d.live : d.degraded}
+                </span>
                 <LiveBlock initialBlock={initialBlock} variant="compact" />
               </div>
             </div>
             <div className="flex items-center gap-2">
               <Link href="/jobs" className="inf-btn inf-btn-ghost h-8 px-3 text-xs">
-                Post task
+                {d.postTask}
               </Link>
               <Link href="/create" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
-                Deploy
+                {d.deploy}
               </Link>
             </div>
           </div>
@@ -138,40 +142,39 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
             <div className="inf-card p-4 lg:col-span-3">
               <div className="mb-4 flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold tracking-tight">Network activity</p>
-                  <p className="text-[11px] text-muted-foreground">Jobs by status</p>
+                  <p className="text-sm font-semibold tracking-tight">{d.networkActivity}</p>
+                  <p className="text-[11px] text-muted-foreground">{d.jobsByStatus}</p>
                 </div>
                 <Link href="/analytics" className="inline-flex items-center text-[11px] text-muted-foreground hover:text-foreground">
-                  Observe <ArrowUpRight className="ml-0.5 h-3 w-3" />
+                  {d.observe} <ArrowUpRight className="ml-0.5 h-3 w-3" />
                 </Link>
               </div>
               {open === 0 && active === 0 && done === 0 ? (
                 <div className="rounded-xl border border-dashed border-border/50 bg-background/30 px-4 py-8 text-center">
-                  <p className="text-sm font-medium tracking-tight">Pipeline is empty</p>
+                  <p className="text-sm font-medium tracking-tight">{d.pipelineEmpty}</p>
                   <p className="mx-auto mt-1.5 max-w-sm text-[12px] leading-relaxed text-muted-foreground">
-                    Open, active, and done are all zero. Post a task or deploy an agent to seed the
-                    market — this board fills from on-chain JobMarketV2 activity.
+                    {d.pipelineEmptyBody}
                   </p>
                   <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
                     <span className="rounded-full border border-border/50 px-2.5 py-1 text-[11px] text-muted-foreground">
-                      Open 0
+                      {d.open} 0
                     </span>
                     <span className="rounded-full border border-border/50 px-2.5 py-1 text-[11px] text-muted-foreground">
-                      Active 0
+                      {d.active} 0
                     </span>
                     <span className="rounded-full border border-border/50 px-2.5 py-1 text-[11px] text-muted-foreground">
-                      Done 0
+                      {d.done} 0
                     </span>
                   </div>
                   <div className="mt-4 flex flex-wrap justify-center gap-2">
                     <Link href="/jobs" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
-                      Post a task
+                      {d.postATask}
                     </Link>
                     <Link href="/create" className="inf-btn inf-btn-ghost h-8 px-3 text-xs">
-                      Deploy agent
+                      {d.deployAgent}
                     </Link>
                     <Link href="/templates" className="inf-btn inf-btn-ghost h-8 px-3 text-xs">
-                      Use template
+                      {d.useTemplate}
                     </Link>
                   </div>
                 </div>
@@ -179,10 +182,10 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                 <>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                     {[
-                      { label: "Open", n: open, c: "bg-chart-3" },
-                      { label: "Active", n: active, c: "bg-chart-1" },
-                      { label: "Done", n: done, c: "bg-chart-2" },
-                      { label: "Disputed", n: disputed, c: "bg-destructive" },
+                      { label: d.open, n: open, c: "bg-chart-3" },
+                      { label: d.active, n: active, c: "bg-chart-1" },
+                      { label: d.done, n: done, c: "bg-chart-2" },
+                      { label: d.disputed, n: disputed, c: "bg-destructive" },
                     ].map((s) => (
                       <div
                         key={s.label}
@@ -219,20 +222,20 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
 
             <div className="inf-card p-4 lg:col-span-2">
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-semibold tracking-tight">Recent tasks</p>
+                <p className="text-sm font-semibold tracking-tight">{d.recentTasks}</p>
                 <Link href="/jobs" className="text-[11px] text-muted-foreground hover:text-foreground">
-                  View all
+                  {d.viewAll}
                 </Link>
               </div>
               <ul className="space-y-0.5">
                 {recentJobs.length === 0 && (
                   <li className="flex flex-col items-center gap-2 py-10 text-center">
-                    <p className="text-xs font-medium text-foreground">No tasks on-chain</p>
+                    <p className="text-xs font-medium text-foreground">{d.noTasksOnchain}</p>
                     <p className="max-w-[16rem] text-[11px] text-muted-foreground">
-                      When jobs are posted they show here with requester short address and RIT reward.
+                      {d.noTasksHint}
                     </p>
                     <Link href="/jobs" className="text-[11px] text-[#00ff99] hover:underline">
-                      Open task board →
+                      {d.openTaskBoard}
                     </Link>
                   </li>
                 )}
@@ -254,7 +257,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                         </p>
                         <p className="mt-0.5 font-mono text-[10px] text-muted-foreground/80">
                           {shortAddress(j.requester)}
-                          {!isZeroAddress(j.provider) ? ` → ${shortAddress(j.provider)}` : " · awaiting provider"}
+                          {!isZeroAddress(j.provider) ? ` → ${shortAddress(j.provider)}` : ` · ${d.awaitingProvider}`}
                         </p>
                         {j.deadline != null && j.deadline > BigInt(0) && (
                           <div className="mt-0.5">
@@ -279,8 +282,8 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
           <div id="agents" className="inf-card overflow-hidden">
             <div className="flex flex-col gap-3 border-b border-border/40 p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold tracking-tight">Agents</p>
-                <p className="text-[11px] text-muted-foreground">Registry, skills, reputation</p>
+                <p className="text-sm font-semibold tracking-tight">{d.agentsSection}</p>
+                <p className="text-[11px] text-muted-foreground">{d.registrySub}</p>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex items-center gap-1.5 rounded-lg border border-border/50 bg-background/40 px-2.5 py-1.5">
@@ -288,12 +291,12 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                   <input
                     value={q}
                     onChange={(e) => setQ(e.target.value)}
-                    placeholder="Search…"
+                    placeholder={d.searchShort}
                     className="w-36 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
                   />
                 </div>
                 <Link href="/create" className="inf-btn inf-btn-primary h-8 px-3 text-xs">
-                  Deploy
+                  {d.deploy}
                 </Link>
               </div>
             </div>
@@ -301,11 +304,11 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
               <table className="w-full text-left text-sm">
                 <thead>
                   <tr className="border-b border-border/40 text-[10px] uppercase tracking-wider text-muted-foreground">
-                    <th className="px-4 py-2.5 font-medium">Name</th>
-                    <th className="px-4 py-2.5 font-medium">Jobs</th>
-                    <th className="px-4 py-2.5 font-medium">Rating</th>
-                    <th className="hidden px-4 py-2.5 font-medium md:table-cell">Skills</th>
-                    <th className="hidden px-4 py-2.5 font-medium lg:table-cell">Status</th>
+                    <th className="px-4 py-2.5 font-medium">{d.name}</th>
+                    <th className="px-4 py-2.5 font-medium">{d.jobsCol}</th>
+                    <th className="px-4 py-2.5 font-medium">{d.ratingCol}</th>
+                    <th className="hidden px-4 py-2.5 font-medium md:table-cell">{d.skillsCol}</th>
+                    <th className="hidden px-4 py-2.5 font-medium lg:table-cell">{d.statusCol}</th>
                     <th className="px-4 py-2.5" />
                   </tr>
                 </thead>
@@ -326,12 +329,12 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                             a.active ? "bg-success/10 text-success" : "bg-muted text-muted-foreground",
                           )}
                         >
-                          {a.active ? "active" : "off"}
+                          {a.active ? d.activeStatus : d.offStatus}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Link href={`/agents/${a.id}`} className="text-xs font-medium text-muted-foreground hover:text-foreground">
-                          Open
+                          {d.openLink}
                         </Link>
                       </td>
                     </tr>
@@ -339,7 +342,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                   {filteredAgents.length === 0 && (
                     <tr>
                       <td colSpan={6} className="px-4 py-12 text-center text-sm text-muted-foreground">
-                        No agents match
+                        {d.noAgentsMatch}
                       </td>
                     </tr>
                   )}

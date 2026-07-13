@@ -5,6 +5,7 @@ import { Cpu, Check, Copy, Sparkles } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { BUILT_IN_SKILLS, type SkillDefinition } from "@/lib/constants"
 import { cn } from "@/lib/utils"
+import { useT } from "@/lib/i18n/context"
 
 function skillSnippet(s: SkillDefinition) {
   return `registry.setSkills(agentId, [{
@@ -36,6 +37,8 @@ export function SkillCard({
   selected?: boolean
   onToggle?: () => void
 }) {
+  const t = useT()
+  const p = t.skillsPage
   const snippet = skillSnippet(skill)
   const { copied, copy } = useCopy()
   const tone = skill.precompileType === "HTTP" ? "blue" : "primary"
@@ -81,7 +84,7 @@ export function SkillCard({
             className="mt-1 flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] text-muted-foreground transition-colors hover:bg-foreground/10 hover:text-foreground"
           >
             {copied ? <Check className="h-3 w-3 text-primary" /> : <Copy className="h-3 w-3" />}
-            {copied ? "Copied" : "Copy"}
+            {copied ? p.copied : p.copy}
           </button>
         </div>
       </CardContent>
@@ -98,6 +101,8 @@ export function SkillCard({
 }
 
 export function SkillCatalog() {
+  const t = useT()
+  const p = t.skillsPage
   const allSkills = BUILT_IN_SKILLS
 
   return (
@@ -105,8 +110,10 @@ export function SkillCatalog() {
       <section>
         <div className="mb-4 flex items-center gap-2">
           <Sparkles className="h-4 w-4 text-primary" />
-          <h3 className="font-semibold">Available skills</h3>
-          <span className="font-mono text-[10px] text-muted-foreground">{allSkills.length} skills</span>
+          <h3 className="font-semibold">{p.available}</h3>
+          <span className="font-mono text-[10px] text-muted-foreground">
+            {allSkills.length} {p.skillsCount}
+          </span>
         </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {allSkills.map((s) => (
@@ -117,8 +124,12 @@ export function SkillCatalog() {
 
       <Card className="surface-card border-border/60">
         <CardContent className="p-5 text-sm text-muted-foreground">
-          <p className="mb-2 font-semibold text-foreground">Register a skill on-chain</p>
-          <p>Skills are on-chain definitions stored in <code className="font-mono text-xs text-foreground">AgentRegistry</code>. Register a skill onto your agent by calling <code className="font-mono text-xs text-foreground">setSkills(agentId, [skill])</code>:</p>
+          <p className="mb-2 font-semibold text-foreground">{p.registerTitle}</p>
+          <p>
+            {p.registerBody}{" "}
+            <code className="font-mono text-xs text-foreground">AgentRegistry</code> /{" "}
+            <code className="font-mono text-xs text-foreground">setSkills(agentId, [skill])</code>
+          </p>
           <pre className="mt-2 overflow-x-auto rounded-lg bg-muted/40 p-3 text-xs leading-relaxed"><code className="font-mono">{`// AgentRegistry.setSkills(agentId, [skill])
 const skill = {
   skillId: "0x0000…0001",
@@ -127,7 +138,7 @@ const skill = {
   active: true
 }
 await registry.setSkills(agentId, [skill])`}</code></pre>
-          <p className="mt-2 text-xs">Run the bootstrap SDK to register an agent and install skills automatically:</p>
+          <p className="mt-2 text-xs">{p.registerHint}</p>
           <pre className="mt-1 overflow-x-auto rounded-lg bg-muted/40 p-2 text-xs"><code className="font-mono">pnpm tsx scripts/bootstrap-agent.ts</code></pre>
         </CardContent>
       </Card>
