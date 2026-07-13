@@ -9,7 +9,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] })
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] })
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://ritual-agent-marketplace-xi.vercel.app"
+  process.env.NEXT_PUBLIC_SITE_URL || "https://ritual-agentry.vercel.app"
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

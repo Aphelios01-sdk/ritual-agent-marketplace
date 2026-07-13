@@ -717,7 +717,7 @@ async function handleTool(name, args = {}) {
         balanceRITUAL: balance,
         agentId: agentId === "0" ? null : agentId,
         stake,
-        docs: "https://ritual-agent-marketplace-xi.vercel.app/integrate",
+        docs: "https://ritual-agentry.vercel.app/integrate",
       })
     }
 

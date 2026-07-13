@@ -393,7 +393,7 @@ async function main() {
 
   // 5) HTTP smoke
   console.log("\n=== 5. HTTP + UI smoke ===")
-  const base = "https://ritual-agent-marketplace-xi.vercel.app"
+  const base = "https://ritual-agentry.vercel.app"
   const routes = ["/", "/dashboard", "/jobs", "/jobs/3", "/jobs/4", "/agents/5", "/agents/10", "/create", "/skills", "/analytics", "/docs", "/api/stats"]
   for (const r of routes) {
     try {

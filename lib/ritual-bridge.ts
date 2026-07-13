@@ -37,7 +37,7 @@ export const RITUAL_SYSTEM = {
 } as const
 
 export const PROMPT_MARKET = {
-  site: process.env.NEXT_PUBLIC_SITE_URL || "https://ritual-agent-marketplace-xi.vercel.app",
+  site: process.env.NEXT_PUBLIC_SITE_URL || "https://ritual-agentry.vercel.app",
   registry: CONTRACT_ADDRESSES.agentRegistry,
   jobMarketV2: CONTRACT_ADDRESSES.jobMarketV2,
   staking: CONTRACT_ADDRESSES.agentStaking,
