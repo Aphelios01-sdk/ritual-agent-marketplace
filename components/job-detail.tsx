@@ -6,17 +6,20 @@ import {
   ExternalLink,
   Fingerprint,
   RefreshCw,
+  FlaskConical,
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 import { type OnchainJob, type OnchainBid, deserializeJob, type SerializedJob } from "@/lib/onchain"
-import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
+import {
+  cn, formatRitual, shortAddress, isZeroAddress,
+  explorerAddressUrl, explorerTxUrl, isTestEntity,
+} from "@/lib/utils"
 import { BlockDeadline } from "@/components/block-deadline"
 import { McpActionPanel } from "@/components/mcp-action-panel"
 import { useT } from "@/lib/i18n/context"
 
-const EXPLORER = "https://explorer.ritualfoundation.org"
 const POLL_MS = 4_000
 
 const STATUS_TONE: Record<JobStatus, string> = {
@@ -117,6 +120,11 @@ export function JobDetail({
               <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", STATUS_TONE[job.status])}>
                 {JOB_STATUS_LABELS[job.status]}
               </span>
+              {isTestEntity(job.taskData, job.requester) && (
+                <span className="inline-flex items-center gap-0.5 rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-amber-500">
+                  <FlaskConical className="h-3 w-3" /> {t.common.test}
+                </span>
+              )}
               <button
                 type="button"
                 onClick={() => refresh()}
@@ -140,14 +148,34 @@ export function JobDetail({
               </div>
               <div>
                 <p className="text-[10px] uppercase text-muted-foreground">{t.jobs.requester}</p>
-                <p className="font-mono text-xs" title={job.requester}>
+                <p className="flex items-center gap-1 font-mono text-xs" title={job.requester}>
                   {shortAddress(job.requester)}
+                  <a
+                    href={explorerAddressUrl(job.requester)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-muted-foreground/60 hover:text-foreground"
+                    title="View requester on explorer"
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
                 </p>
               </div>
               <div>
                 <p className="text-[10px] uppercase text-muted-foreground">{t.jobs.provider}</p>
-                <p className="font-mono text-xs" title={job.provider}>
+                <p className="flex items-center gap-1 font-mono text-xs" title={job.provider}>
                   {hasProvider ? shortAddress(job.provider) : t.jobs.unassigned}
+                  {hasProvider && (
+                    <a
+                      href={explorerAddressUrl(job.provider)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-muted-foreground/60 hover:text-foreground"
+                      title="View provider on explorer"
+                    >
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
                 </p>
               </div>
             </div>
@@ -157,7 +185,7 @@ export function JobDetail({
               </div>
             )}
             <a
-              href={`${EXPLORER}/address/${CONTRACT_ADDRESSES.jobMarketV2}`}
+              href={explorerAddressUrl(CONTRACT_ADDRESSES.jobMarketV2)}
               target="_blank"
               rel="noreferrer"
               className="mt-3 inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:underline"
@@ -202,7 +230,18 @@ export function JobDetail({
                     key={`${b.provider}-${i}`}
                     className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border px-3 py-2 text-sm"
                   >
-                    <span className="font-mono text-xs">#{i} {shortAddress(b.provider)}</span>
+                    <span className="flex items-center gap-1 font-mono text-xs">
+                      #{i} {shortAddress(b.provider)}
+                      <a
+                        href={explorerAddressUrl(b.provider)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-muted-foreground/60 hover:text-foreground"
+                        title="View bidder on explorer"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </span>
                     <span className="tabular-nums">{formatRitual(b.price)}</span>
                     <span className="text-xs text-muted-foreground">{String(b.estBlocks)} blocks</span>
                   </li>

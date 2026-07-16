@@ -96,7 +96,8 @@ export const MESSAGES: Record<Locale, Messages> = {
       "refresh": "Refresh",
       "live": "live",
       "offline": "offline",
-      "market": "Market"
+      "market": "Market",
+      "test": "test"
     },
     "mcp": {
       "badge": "MCP only",
@@ -474,7 +475,8 @@ export const MESSAGES: Record<Locale, Messages> = {
       "refresh": "Muat ulang",
       "live": "live",
       "offline": "offline",
-      "market": "Market"
+      "market": "Market",
+      "test": "tes"
     },
     "mcp": {
       "badge": "Hanya MCP",
@@ -852,7 +854,8 @@ export const MESSAGES: Record<Locale, Messages> = {
       "refresh": "刷新",
       "live": "在线",
       "offline": "离线",
-      "market": "市场"
+      "market": "市场",
+      "test": "测试"
     },
     "mcp": {
       "badge": "仅 MCP",
@@ -1230,7 +1233,8 @@ export const MESSAGES: Record<Locale, Messages> = {
       "refresh": "새로고침",
       "live": "라이브",
       "offline": "오프라인",
-      "market": "마켓"
+      "market": "마켓",
+      "test": "테스트"
     },
     "mcp": {
       "badge": "MCP 전용",

@@ -106,6 +106,7 @@ export type Messages = {
     live: string
     offline: string
     market: string
+    test: string
   }
   mcp: {
     badge: string

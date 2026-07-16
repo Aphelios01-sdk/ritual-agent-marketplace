@@ -283,7 +283,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                         : "border-border text-muted-foreground hover:text-foreground",
                     )}
                   >
-                    {s === "ALL" ? "all" : JOB_STATUS_LABELS[s as JobStatus]}
+                    {s === "ALL" ? t.jobs.all : JOB_STATUS_LABELS[s as JobStatus]}
                   </button>
                 ))}
               </div>
@@ -314,7 +314,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                           </span>
                           {isTest && (
                             <span className="ml-1.5 inline-flex items-center gap-0.5 rounded border border-amber-500/40 bg-amber-500/10 px-1 py-px align-middle font-mono text-[9px] uppercase tracking-wide text-amber-500">
-                              <FlaskConical className="h-2.5 w-2.5" /> test
+                              <FlaskConical className="h-2.5 w-2.5" /> {t.common.test}
                             </span>
                           )}
                         </p>
@@ -402,7 +402,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                           </Link>
                           {agentTest && (
                             <span className="inline-flex items-center gap-0.5 rounded border border-amber-500/40 bg-amber-500/10 px-1 py-px font-mono text-[9px] uppercase tracking-wide text-amber-500">
-                              <FlaskConical className="h-2.5 w-2.5" /> test
+                              <FlaskConical className="h-2.5 w-2.5" /> {t.common.test}
                             </span>
                           )}
                         </div>

@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Activity, Loader2 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Activity, Loader2, ExternalLink } from "lucide-react"
+import { cn, explorerTxUrl } from "@/lib/utils"
 import { useT } from "@/lib/i18n/context"
 
 export type FeedEvent = {
@@ -11,6 +11,7 @@ export type FeedEvent = {
   block: number
   summary: string
   jobRef?: string
+  tx?: string
 }
 
 const TONE: Record<string, string> = {
@@ -22,19 +23,23 @@ const TONE: Record<string, string> = {
 }
 
 export function ActivityFeed({
+  initialEvents = [],
+  initialBlock = "·",
   compact = false,
   pollMs = 6_000,
   className,
 }: {
+  initialEvents?: FeedEvent[]
+  initialBlock?: string
   compact?: boolean
   pollMs?: number
   className?: string
 }) {
   const t = useT()
   const p = t.activityPage
-  const [events, setEvents] = useState<FeedEvent[]>([])
-  const [block, setBlock] = useState<string>("·")
-  const [loading, setLoading] = useState(true)
+  const [events, setEvents] = useState<FeedEvent[]>(initialEvents)
+  const [block, setBlock] = useState<string>(initialBlock)
+  const [loading, setLoading] = useState(initialEvents.length === 0)
   const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
@@ -103,6 +108,20 @@ export function ActivityFeed({
                     <Link href={`/jobs/${e.jobRef}`} className="text-[#00ff99] hover:underline">
                       job #{e.jobRef}
                     </Link>
+                  </>
+                )}
+                {e.tx && (
+                  <>
+                    <span>·</span>
+                    <a
+                      href={explorerTxUrl(e.tx)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-0.5 text-muted-foreground/70 hover:text-foreground"
+                      title="View tx on explorer"
+                    >
+                      tx <ExternalLink className="h-2.5 w-2.5" />
+                    </a>
                   </>
                 )}
               </div>

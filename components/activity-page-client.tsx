@@ -1,9 +1,15 @@
 "use client"
 
-import { ActivityFeed } from "@/components/activity-feed"
+import { ActivityFeed, type FeedEvent } from "@/components/activity-feed"
 import { useT } from "@/lib/i18n/context"
 
-export function ActivityPageClient() {
+export function ActivityPageClient({
+  initialEvents = [],
+  initialBlock = "·",
+}: {
+  initialEvents?: FeedEvent[]
+  initialBlock?: string
+}) {
   const t = useT()
   const p = t.activityPage
 
@@ -14,7 +20,7 @@ export function ActivityPageClient() {
         <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl md:text-4xl">{p.title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">{p.body}</p>
       </div>
-      <ActivityFeed />
+      <ActivityFeed initialEvents={initialEvents} initialBlock={initialBlock} />
     </div>
   )
 }
