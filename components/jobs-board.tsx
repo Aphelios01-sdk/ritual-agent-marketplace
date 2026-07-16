@@ -4,10 +4,11 @@ import { useState, useEffect, useCallback, useMemo } from "react"
 import Link from "next/link"
 import { ExternalLink, Inbox, RefreshCw } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
-import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
-import { type OnchainJob, type SerializedJob, deserializeJob } from "@/lib/onchain"
+import { CONTRACT_ADDRESSES, type JobStatus } from "@/lib/constants"
+import { type OnchainJob, type SerializedJob, deserializeJob, displayJobStatus, isJobExpired } from "@/lib/onchain"
 import { cn, formatRitual, shortAddress, isZeroAddress } from "@/lib/utils"
 import { BlockDeadline } from "@/components/block-deadline"
+import { useLiveBlock } from "@/hooks/use-live-block"
 import { McpPostJobForm } from "@/components/mcp-post-job-form"
 import { McpActionPanel } from "@/components/mcp-action-panel"
 import { useT } from "@/lib/i18n/context"
@@ -25,6 +26,8 @@ const STATUS_COLOR: Record<JobStatus, string> = {
   CANCELLED: "bg-muted text-muted-foreground",
 }
 
+const EXPIRED_TONE = "bg-red-500/10 text-red-400"
+
 type Tab = "available" | "active" | "done" | "all"
 
 export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
@@ -35,6 +38,8 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
   const [refreshing, setRefreshing] = useState(false)
   const [lastTs, setLastTs] = useState<number | null>(null)
   const [serverJobs, setServerJobs] = useState(initialJobs)
+  const chainHead = useLiveBlock(0, 4_000)
+  const head = chainHead.block > 0 ? BigInt(chainHead.block) : BigInt(0)
   if (serverJobs !== initialJobs) {
     setServerJobs(initialJobs)
     setJobs(initialJobs)
@@ -62,7 +67,8 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
   }, [refresh])
 
   const counts = useMemo(() => {
-    const open = jobs.filter((j) => j.status === "OPEN").length
+    const open = jobs.filter((j) => j.status === "OPEN" && !isJobExpired(j, head)).length
+    const expired = jobs.filter((j) => j.status === "OPEN" && isJobExpired(j, head)).length
     const active = jobs.filter((j) => j.status === "ASSIGNED" || j.status === "IN_PROGRESS").length
     const done = jobs.filter(
       (j) =>
@@ -71,13 +77,13 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
         j.status === "CANCELLED" ||
         j.status === "DISPUTED",
     ).length
-    return { open, active, done, total: jobs.length }
-  }, [jobs])
+    return { open, expired, active, done, total: jobs.length }
+  }, [jobs, head])
 
   const visible = useMemo(() => {
     switch (tab) {
       case "available":
-        return jobs.filter((j) => j.status === "OPEN")
+        return jobs.filter((j) => j.status === "OPEN" && !isJobExpired(j, head))
       case "active":
         return jobs.filter((j) => j.status === "ASSIGNED" || j.status === "IN_PROGRESS")
       case "done":
@@ -91,7 +97,12 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
       default:
         return jobs
     }
-  }, [jobs, tab])
+  }, [jobs, tab, head])
+
+  const expiredOpen = useMemo(
+    () => (tab === "available" ? jobs.filter((j) => j.status === "OPEN" && isJobExpired(j, head)) : []),
+    [jobs, tab, head],
+  )
 
   const tabs: { id: Tab; label: string; n: number }[] = [
     { id: "available", label: t.jobs.available, n: counts.open },
@@ -166,40 +177,72 @@ export function JobsBoard({ jobs: initialJobs }: { jobs: OnchainJob[] }) {
           </Card>
         ) : (
           <div className="space-y-2">
-            {visible.map((job) => (
-              <Link
-                key={job.id}
-                href={`/jobs/${job.id}`}
-                className="block rounded-lg border border-border p-4 transition-colors hover:bg-card-hover"
-              >
-                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-muted-foreground">#{job.id}</span>
-                  <span
-                    className={cn(
-                      "rounded-full px-2 py-0.5 text-[10px] font-medium",
-                      STATUS_COLOR[job.status],
-                    )}
-                  >
-                    {JOB_STATUS_LABELS[job.status]}
-                  </span>
-                </div>
-                <p className="line-clamp-2 text-sm">{job.taskData || "·"}</p>
-                <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
-                  <span className="tabular-nums">
-                    {formatRitual(job.reward)} {t.jobs.reward.toLowerCase()}
-                  </span>
-                  <span className="font-mono" title={job.requester}>
-                    req {shortAddress(job.requester)}
-                  </span>
-                  {!isZeroAddress(job.provider) && (
-                    <span className="font-mono" title={job.provider}>
-                      prov {shortAddress(job.provider)}
+            {visible.map((job) => {
+              const display = displayJobStatus(job, head)
+              return (
+                <Link
+                  key={job.id}
+                  href={`/jobs/${job.id}`}
+                  className="block rounded-lg border border-border p-4 transition-colors hover:bg-card-hover"
+                >
+                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-mono text-xs text-muted-foreground">#{job.id}</span>
+                    <span
+                      className={cn(
+                        "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                        display.expired ? EXPIRED_TONE : STATUS_COLOR[job.status],
+                      )}
+                    >
+                      {display.label}
                     </span>
-                  )}
-                  {job.deadline > BigInt(0) && <BlockDeadline deadline={job.deadline} />}
+                  </div>
+                  <p className="line-clamp-2 text-sm">{job.taskData || "·"}</p>
+                  <div className="mt-3 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
+                    <span className="tabular-nums">
+                      {formatRitual(job.reward)} {t.jobs.reward.toLowerCase()}
+                    </span>
+                    <span className="font-mono" title={job.requester}>
+                      req {shortAddress(job.requester)}
+                    </span>
+                    {!isZeroAddress(job.provider) && (
+                      <span className="font-mono" title={job.provider}>
+                        prov {shortAddress(job.provider)}
+                      </span>
+                    )}
+                    {job.deadline > BigInt(0) && <BlockDeadline deadline={job.deadline} initialBlock={chainHead.block} />}
+                  </div>
+                </Link>
+              )
+            })}
+            {expiredOpen.length > 0 && (
+              <div className="pt-4">
+                <p className="mb-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Expired ({expiredOpen.length})
+                </p>
+                <div className="space-y-2 opacity-80">
+                  {expiredOpen.map((job) => (
+                    <Link
+                      key={job.id}
+                      href={`/jobs/${job.id}`}
+                      className="block rounded-lg border border-dashed border-border/80 p-4 transition-colors hover:bg-card-hover"
+                    >
+                      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+                        <span className="font-mono text-xs text-muted-foreground">#{job.id}</span>
+                        <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", EXPIRED_TONE)}>
+                          Expired
+                        </span>
+                      </div>
+                      <p className="line-clamp-2 text-sm text-muted-foreground">{job.taskData || "·"}</p>
+                      {job.deadline > BigInt(0) && (
+                        <div className="mt-3 text-[11px] text-muted-foreground">
+                          <BlockDeadline deadline={job.deadline} initialBlock={chainHead.block} />
+                        </div>
+                      )}
+                    </Link>
+                  ))}
                 </div>
-              </Link>
-            ))}
+              </div>
+            )}
           </div>
         )}
 

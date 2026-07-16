@@ -22,6 +22,7 @@ import {
 import {
   createPublicClient,
   createWalletClient,
+  decodeEventLog,
   http,
   parseEther,
   stringToHex,
@@ -271,6 +272,16 @@ const JOB_ABI = [
     outputs: [],
     stateMutability: "nonpayable",
   },
+  {
+    type: "event",
+    name: "JobRequested",
+    inputs: [
+      { name: "id", type: "uint256", indexed: true },
+      { name: "requester", type: "address", indexed: true },
+      { name: "reward", type: "uint256", indexed: false },
+      { name: "skills", type: "bytes32[]", indexed: false },
+    ],
+  },
 ]
 
 const DISPUTE_ABI = [
@@ -386,9 +397,34 @@ function text(obj) {
   }
 }
 
-function err(e) {
+function shortContractError(e) {
   const msg = e instanceof Error ? e.message : String(e)
+  if (/bid window closed/i.test(msg)) return "Bid window closed"
+  if (/cannot self-bid/i.test(msg)) return "Cannot self-bid"
+  return msg
+}
+
+function err(e) {
+  const msg = shortContractError(e)
   return { content: [{ type: "text", text: JSON.stringify({ error: msg }, null, 2) }], isError: true }
+}
+
+function jobIdFromReceipt(receipt) {
+  for (const log of receipt.logs) {
+    try {
+      const decoded = decodeEventLog({
+        abi: JOB_ABI,
+        data: log.data,
+        topics: log.topics,
+      })
+      if (decoded.eventName === "JobRequested") {
+        return String(decoded.args.id)
+      }
+    } catch {
+      /* not JobRequested */
+    }
+  }
+  return null
 }
 
 function toSkills(skillIds) {
@@ -703,9 +739,9 @@ async function handleTool(name, args = {}) {
           strikes: String(st[2]),
           active: st[3],
         }
-      } catch (e) {
+      } catch {
         signer = null
-        balance = e instanceof Error ? e.message : String(e)
+        balance = null
       }
       return text({
         ok: true,
@@ -949,16 +985,20 @@ async function handleTool(name, args = {}) {
         value,
       })
       const receipt = await publicClient.waitForTransactionReceipt({ hash })
-      const next = await publicClient.readContract({
-        address: JOB_MARKET,
-        abi: JOB_ABI,
-        functionName: "nextJobId",
-      })
+      let jobId = jobIdFromReceipt(receipt)
+      if (jobId == null) {
+        const next = await publicClient.readContract({
+          address: JOB_MARKET,
+          abi: JOB_ABI,
+          functionName: "nextJobId",
+        })
+        jobId = String(next - 1n)
+      }
       return text({
         ok: true,
         tx: hash,
         block: String(receipt.blockNumber),
-        jobId: String(next - 1n),
+        jobId,
         reward: String(args.reward),
         skillIds,
       })

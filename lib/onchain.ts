@@ -1,5 +1,12 @@
 import { createPublicClient, http, type Address } from "viem"
-import { RITUAL_CHAIN, type AgentInfo, type SkillDefinition, type JobStatus, CONTRACT_ADDRESSES } from "./constants"
+import {
+  RITUAL_CHAIN,
+  JOB_STATUS_LABELS,
+  type AgentInfo,
+  type SkillDefinition,
+  type JobStatus,
+  CONTRACT_ADDRESSES,
+} from "./constants"
 import { AGENT_REGISTRY_ABI } from "./contract-abi"
 import { JOB_MARKET_V2_ABI } from "./contract-abi-v2"
 import { AGENT_DIRECTORY_ABI } from "./contract-abi-b"
@@ -131,6 +138,25 @@ export interface OnchainBid {
   price: bigint
   estBlocks: bigint
   submittedAt: bigint
+}
+
+type JobExpiryFields = { status: JobStatus; deadline?: bigint }
+
+/** OPEN job whose bid deadline block is before chain head. */
+export function isJobExpired(job: JobExpiryFields, head: bigint | number): boolean {
+  if (job.status !== "OPEN") return false
+  const dl = job.deadline
+  if (dl == null || dl <= BigInt(0)) return false
+  return dl < BigInt(head)
+}
+
+/** UI label for job status; expired OPEN jobs show "Expired" instead of "Open for Bids". */
+export function displayJobStatus(
+  job: JobExpiryFields,
+  head: bigint | number,
+): { label: string; expired: boolean } {
+  if (isJobExpired(job, head)) return { label: "Expired", expired: true }
+  return { label: JOB_STATUS_LABELS[job.status], expired: false }
 }
 
 function decodeBytesToText(hex: `0x${string}`): string {

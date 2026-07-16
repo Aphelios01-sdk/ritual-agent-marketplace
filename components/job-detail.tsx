@@ -10,14 +10,15 @@ import {
 } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { CONTRACT_ADDRESSES, JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
-import { type OnchainJob, type OnchainBid, deserializeJob, type SerializedJob } from "@/lib/onchain"
+import { CONTRACT_ADDRESSES, type JobStatus } from "@/lib/constants"
+import { type OnchainJob, type OnchainBid, deserializeJob, type SerializedJob, displayJobStatus } from "@/lib/onchain"
 import {
   cn, formatRitual, shortAddress, isZeroAddress,
   explorerAddressUrl, explorerTxUrl, isTestEntity,
 } from "@/lib/utils"
 import { BlockDeadline } from "@/components/block-deadline"
 import { McpActionPanel } from "@/components/mcp-action-panel"
+import { useLiveBlock } from "@/hooks/use-live-block"
 import { useT } from "@/lib/i18n/context"
 
 const POLL_MS = 4_000
@@ -31,6 +32,8 @@ const STATUS_TONE: Record<JobStatus, string> = {
   REFUNDED: "bg-muted text-muted-foreground",
   CANCELLED: "bg-muted text-muted-foreground",
 }
+
+const EXPIRED_TONE = "bg-red-500/10 text-red-400"
 
 function timeline(status: JobStatus) {
   const steps = ["Posted", "Assigned", "In progress", "Result submitted", "Completed"]
@@ -68,7 +71,10 @@ export function JobDetail({
   isMock?: boolean
 }) {
   const t = useT()
+  const live = useLiveBlock(0, POLL_MS)
   const [job, setJob] = useState(initialJob)
+  const head = live.block > 0 ? BigInt(live.block) : BigInt(0)
+  const display = displayJobStatus(job, head)
   const [bids, setBids] = useState<BidView[]>(initialBids)
   const [prevJob, setPrevJob] = useState(initialJob)
   const [prevBids, setPrevBids] = useState(initialBids)
@@ -117,8 +123,13 @@ export function JobDetail({
           <CardContent className="p-5">
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <span className="font-mono text-sm text-muted-foreground">Job #{job.id}</span>
-              <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", STATUS_TONE[job.status])}>
-                {JOB_STATUS_LABELS[job.status]}
+              <span
+                className={cn(
+                  "rounded-full px-2 py-0.5 text-[10px] font-medium",
+                  display.expired ? EXPIRED_TONE : STATUS_TONE[job.status],
+                )}
+              >
+                {display.label}
               </span>
               {isTestEntity(job.taskData, job.requester) && (
                 <span className="inline-flex items-center gap-0.5 rounded border border-amber-500/40 bg-amber-500/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-amber-500">
@@ -181,7 +192,7 @@ export function JobDetail({
             </div>
             {job.deadline > BigInt(0) && (
               <div className="mt-3 text-xs text-muted-foreground">
-                Deadline <BlockDeadline deadline={job.deadline} />
+                Deadline <BlockDeadline deadline={job.deadline} initialBlock={live.block} />
               </div>
             )}
             <a

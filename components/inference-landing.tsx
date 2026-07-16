@@ -3,7 +3,9 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
+import { isJobExpired } from "@/lib/onchain"
 import { formatRating } from "@/lib/utils"
+import { useLiveBlock } from "@/hooks/use-live-block"
 import { LiveBlock } from "@/components/live-block"
 import { AgentAvatar } from "@/components/agent-avatar"
 import { useT } from "@/lib/i18n/context"
@@ -17,9 +19,11 @@ interface Props {
 
 export function InferenceLanding({ agents, jobs, onchain, chainInfo }: Props) {
   const t = useT()
-  const openJobs = jobs.filter((j) => j.status === "OPEN").length
-  const completed = jobs.filter((j) => j.status === "COMPLETED").length
   const initialBlock = chainInfo ? Number(chainInfo.block) : 0
+  const live = useLiveBlock(initialBlock, 4_000)
+  const head = live.block > 0 ? BigInt(live.block) : BigInt(0)
+  const openJobs = jobs.filter((j) => j.status === "OPEN" && !isJobExpired(j, head)).length
+  const completed = jobs.filter((j) => j.status === "COMPLETED").length
 
   return (
     <div>

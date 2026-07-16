@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Activity, Loader2, ExternalLink } from "lucide-react"
+import { Activity, ExternalLink } from "lucide-react"
 import { cn, explorerTxUrl } from "@/lib/utils"
 import { useT } from "@/lib/i18n/context"
 
@@ -39,7 +39,7 @@ export function ActivityFeed({
   const p = t.activityPage
   const [events, setEvents] = useState<FeedEvent[]>(initialEvents)
   const [block, setBlock] = useState<string>(initialBlock)
-  const [loading, setLoading] = useState(initialEvents.length === 0)
+  const [ready, setReady] = useState(true)
   const [err, setErr] = useState<string | null>(null)
 
   useEffect(() => {
@@ -56,7 +56,7 @@ export function ActivityFeed({
       } catch (e) {
         if (!dead) setErr(e instanceof Error ? e.message : "failed")
       } finally {
-        if (!dead) setLoading(false)
+        if (!dead) setReady(true)
       }
     }
     load()
@@ -79,13 +79,8 @@ export function ActivityFeed({
           {p.block} {block}
         </span>
       </div>
-      {loading && (
-        <div className="flex items-center justify-center gap-2 py-10 text-xs text-muted-foreground">
-          <Loader2 className="h-3.5 w-3.5 animate-spin" /> {p.loading}
-        </div>
-      )}
-      {err && !loading && (
-        <p className="px-4 py-8 text-center text-xs text-red-400">{err}</p>
+      {err && ready && (
+        <p className="px-4 py-3 text-center text-xs text-red-400">{err}</p>
       )}
       <ul className={cn("divide-y divide-border/30", compact ? "max-h-64 overflow-y-auto" : "")}>
         {events.map((e, i) => (
@@ -128,7 +123,7 @@ export function ActivityFeed({
             </div>
           </li>
         ))}
-        {!loading && events.length === 0 && (
+        {ready && events.length === 0 && !err && (
           <li className="px-4 py-10 text-center text-xs text-muted-foreground">{p.empty}</li>
         )}
       </ul>

@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 import type { AgentInfo, JobRequestInfo, JobStatus } from "@/lib/constants"
 import { JOB_STATUS_LABELS } from "@/lib/constants"
+import { displayJobStatus, isJobExpired } from "@/lib/onchain"
 import {
   formatRating, formatRitual, shortAddress, isZeroAddress, cn,
   explorerAddressUrl, isTestEntity,
@@ -33,7 +34,8 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
   const initialBlock = chainInfo ? Number(chainInfo.block) : 0
   const live = useLiveBlock(initialBlock, 2000)
 
-  const open = jobs.filter((j) => j.status === "OPEN").length
+  const head = live.block > 0 ? BigInt(live.block) : BigInt(0)
+  const open = jobs.filter((j) => j.status === "OPEN" && !isJobExpired(j, head)).length
   const active = jobs.filter((j) => j.status === "ASSIGNED" || j.status === "IN_PROGRESS").length
   const done = jobs.filter((j) => j.status === "COMPLETED").length
   const disputed = jobs.filter((j) => j.status === "DISPUTED").length
@@ -48,9 +50,13 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
 
   const recentJobs = useMemo(() => {
     const filtered =
-      statusFilter === "ALL" ? jobs : jobs.filter((j) => j.status === statusFilter)
+      statusFilter === "ALL"
+        ? jobs
+        : statusFilter === "OPEN"
+          ? jobs.filter((j) => j.status === "OPEN" && !isJobExpired(j, head))
+          : jobs.filter((j) => j.status === statusFilter)
     return filtered.slice(0, 7)
-  }, [jobs, statusFilter])
+  }, [jobs, statusFilter, head])
 
   const statusOptions: (JobStatus | "ALL")[] = useMemo(() => {
     const present = new Set<JobStatus>(jobs.map((j) => j.status))
@@ -301,6 +307,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                 )}
                 {recentJobs.map((j) => {
                   const isTest = isTestEntity(j.taskData, j.requester)
+                  const jobDisplay = displayJobStatus(j, head)
                   return (
                   <li key={j.id}>
                     <div className="flex items-start justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40">
@@ -346,8 +353,13 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                           </div>
                         )}
                       </div>
-                      <span className="shrink-0 rounded-md border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
-                        {JOB_STATUS_LABELS[j.status] || j.status}
+                      <span
+                        className={cn(
+                          "shrink-0 rounded-md border border-border/50 px-1.5 py-0.5 text-[10px]",
+                          jobDisplay.expired ? "border-red-500/30 text-red-400" : "text-muted-foreground",
+                        )}
+                      >
+                        {jobDisplay.label}
                       </span>
                     </div>
                   </li>

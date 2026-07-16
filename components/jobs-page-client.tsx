@@ -6,12 +6,15 @@ import { JobsBoard } from "@/components/jobs-board"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { LayerRail } from "@/components/layer-rail"
-import type { OnchainJob } from "@/lib/onchain"
+import { isJobExpired, type OnchainJob } from "@/lib/onchain"
+import { useLiveBlock } from "@/hooks/use-live-block"
 import { useT } from "@/lib/i18n/context"
 
 export function JobsPageClient({ jobs }: { jobs: OnchainJob[] }) {
   const t = useT()
-  const open = jobs.filter((j) => j.status === "OPEN").length
+  const live = useLiveBlock(0, 4_000)
+  const head = live.block > 0 ? BigInt(live.block) : BigInt(0)
+  const open = jobs.filter((j) => j.status === "OPEN" && !isJobExpired(j, head)).length
   const active = jobs.filter((j) => j.status === "ASSIGNED" || j.status === "IN_PROGRESS").length
   const done = jobs.filter((j) => j.status === "COMPLETED").length
 
