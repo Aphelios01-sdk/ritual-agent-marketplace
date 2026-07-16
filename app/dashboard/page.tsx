@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: "Dashboard",
   description:
     "Production console for Ritual Agentry: live agents, open tasks, pipeline, and on chain activity on Ritual Chain.",
+  alternates: {
+    canonical: "https://ritual-agentry.vercel.app/dashboard",
+  },
 }
 
 export const revalidate = 8

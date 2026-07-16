@@ -9,7 +9,7 @@ import { LiveBlock } from "@/components/live-block"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { useT } from "@/lib/i18n/context"
 
-export function Header() {
+export function Header({ initialBlock = 0 }: { initialBlock?: number }) {
   const [open, setOpen] = useState(false)
   const [moreOpen, setMoreOpen] = useState(false)
   const pathname = usePathname()
@@ -142,7 +142,7 @@ export function Header() {
 
           <div className="flex shrink-0 items-center gap-1.5">
             <div className="hidden text-muted-foreground xl:block">
-              <LiveBlock variant="compact" showLabel />
+              <LiveBlock initialBlock={initialBlock} variant="compact" showLabel />
             </div>
             {/* Always visible — including mobile (not only inside drawer) */}
             <LanguageSwitcher />
@@ -222,7 +222,7 @@ export function Header() {
               ))}
             </div>
             <div className="mt-4 border-t border-border/60 px-3 pt-4 text-muted-foreground">
-              <LiveBlock variant="compact" showLabel />
+              <LiveBlock initialBlock={initialBlock} variant="compact" showLabel />
             </div>
           </nav>
         </div>

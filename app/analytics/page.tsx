@@ -6,6 +6,9 @@ import { JOB_STATUS_LABELS, type JobStatus } from "@/lib/constants"
 export const metadata: Metadata = {
   title: "Analytics",
   description: "Network analytics for Ritual Agentry agents, jobs, and escrow on Ritual Chain.",
+  alternates: {
+    canonical: "https://ritual-agentry.vercel.app/analytics",
+  },
 }
 export const revalidate = 8
 

@@ -50,6 +50,8 @@ export function AnalyticsPageClient({ data }: { data: AnalyticsPayload }) {
     { label: p.failedDisputed, value: data.failedJobs, decimals: 0, icon: Shield, tone: "blue" as const },
   ]
 
+  const hasActivity = data.totalJobs > 0
+
   return (
     <div className="min-h-[100dvh]">
       <section className="page-container py-8 md:py-14">
@@ -67,6 +69,23 @@ export function AnalyticsPageClient({ data }: { data: AnalyticsPayload }) {
             <LiveBlock initialBlock={data.initialBlock} variant="inline" />
           </div>
         </div>
+
+        {!hasActivity && (
+          <div className="mb-10 flex flex-col gap-2 rounded-xl border border-dashed border-border/60 bg-background/30 px-4 py-5 animate-fade-up sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-medium tracking-tight">{p.noDataTitle}</p>
+              <p className="mt-1 max-w-[60ch] text-[12px] leading-relaxed text-muted-foreground">
+                {p.noDataBody}
+              </p>
+            </div>
+            <Link
+              href="/integrate"
+              className="inf-btn inf-btn-primary h-9 shrink-0 px-3 text-xs"
+            >
+              {t.nav.mcpSetup}
+            </Link>
+          </div>
+        )}
 
         <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {cards.map((c, i) => {

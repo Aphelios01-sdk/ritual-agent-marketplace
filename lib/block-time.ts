@@ -94,6 +94,12 @@ export function estimateDeadline(
       : `expired ${dur} ago`
     : `in ${dur}`
 
+  // Expired compact label — never render a bare negative ("-4d").
+  // Shows "overdue 4d" so a missed deadline reads as overdue, not a format bug.
+  const compact = expired
+    ? `overdue ${formatDurationCompact(remainingMs).replace("~", "")}`
+    : formatDurationCompact(remainingMs)
+
   const absolute = eta.toLocaleString(undefined, {
     month: "short",
     day: "numeric",
@@ -110,7 +116,7 @@ export function estimateDeadline(
     expired,
     relative,
     absolute,
-    compact: expired ? `−${formatDurationCompact(remainingMs).replace("~", "")}` : formatDurationCompact(remainingMs),
+    compact,
     blockMs,
   }
 }

@@ -340,6 +340,8 @@ export type Messages = {
     avgRating: string
     failedDisputed: string
     jobs: string
+    noDataTitle: string
+    noDataBody: string
   }
   leaderboardPage: {
     title: string

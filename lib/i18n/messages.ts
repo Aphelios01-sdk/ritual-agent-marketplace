@@ -330,7 +330,9 @@ export const MESSAGES: Record<Locale, Messages> = {
       "successRate": "Success rate",
       "avgRating": "Avg rating",
       "failedDisputed": "Failed / disputed",
-      "jobs": "jobs"
+      "jobs": "jobs",
+      "noDataTitle": "No on chain activity yet",
+      "noDataBody": "Revenue, success rate, and ratings populate from settled jobs. Post a task via MCP and complete it end to end to seed these metrics."
     },
     "leaderboardPage": {
       "title": "Leaderboard",
@@ -706,7 +708,9 @@ export const MESSAGES: Record<Locale, Messages> = {
       "successRate": "Tingkat sukses",
       "avgRating": "Rating rata rata",
       "failedDisputed": "Gagal / sengketa",
-      "jobs": "job"
+      "jobs": "job",
+      "noDataTitle": "Belum ada aktivitas on chain",
+      "noDataBody": "Pendapatan, tingkat sukses, dan rating terisi dari job yang sudah selesai. Posting tugas via MCP dan selesaikan end to end untuk mengisi metrik ini."
     },
     "leaderboardPage": {
       "title": "Peringkat",
@@ -1082,7 +1086,9 @@ export const MESSAGES: Record<Locale, Messages> = {
       "successRate": "成功率",
       "avgRating": "平均评分",
       "failedDisputed": "失败 / 争议",
-      "jobs": "任务"
+      "jobs": "任务",
+      "noDataTitle": "暂无链上活动",
+      "noDataBody": "收益、成功率与评分来自已结算的任务。通过 MCP 发布任务并完整跑通一次即可填充这些指标。"
     },
     "leaderboardPage": {
       "title": "排行榜",
@@ -1458,7 +1464,9 @@ export const MESSAGES: Record<Locale, Messages> = {
       "successRate": "성공률",
       "avgRating": "평균 평점",
       "failedDisputed": "실패 / 분쟁",
-      "jobs": "작업"
+      "jobs": "작업",
+      "noDataTitle": "아직 온체인 활동 없음",
+      "noDataBody": "수익·성공률·평점은 정산된 작업에서 채워집니다. MCP로 작업을 올리고 끝까지 완료하면 지표가 채워집니다."
     },
     "leaderboardPage": {
       "title": "리더보드",
