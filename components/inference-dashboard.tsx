@@ -4,11 +4,14 @@ import { useMemo, useState } from "react"
 import Link from "next/link"
 import {
   LayoutDashboard, Bot, Briefcase, Layers, Activity, BookOpen,
-  ArrowUpRight, Zap, Clock, Search,
+  ArrowUpRight, Zap, Clock, Search, ExternalLink, FlaskConical,
 } from "lucide-react"
-import type { AgentInfo, JobRequestInfo } from "@/lib/constants"
+import type { AgentInfo, JobRequestInfo, JobStatus } from "@/lib/constants"
 import { JOB_STATUS_LABELS } from "@/lib/constants"
-import { formatRating, formatRitual, shortAddress, isZeroAddress, cn } from "@/lib/utils"
+import {
+  formatRating, formatRitual, shortAddress, isZeroAddress, cn,
+  explorerAddressUrl, isTestEntity,
+} from "@/lib/utils"
 import { BlockDeadline } from "@/components/block-deadline"
 import { LiveBlock } from "@/components/live-block"
 import { useLiveBlock } from "@/hooks/use-live-block"
@@ -26,6 +29,7 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
   const t = useT()
   const d = t.dashboard
   const [q, setQ] = useState("")
+  const [statusFilter, setStatusFilter] = useState<JobStatus | "ALL">("ALL")
   const initialBlock = chainInfo ? Number(chainInfo.block) : 0
   const live = useLiveBlock(initialBlock, 2000)
 
@@ -42,7 +46,19 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
     )
   }, [agents, q])
 
-  const recentJobs = useMemo(() => [...jobs].slice(0, 7), [jobs])
+  const recentJobs = useMemo(() => {
+    const filtered =
+      statusFilter === "ALL" ? jobs : jobs.filter((j) => j.status === statusFilter)
+    return filtered.slice(0, 7)
+  }, [jobs, statusFilter])
+
+  const statusOptions: (JobStatus | "ALL")[] = useMemo(() => {
+    const present = new Set<JobStatus>(jobs.map((j) => j.status))
+    const order: JobStatus[] = [
+      "OPEN", "ASSIGNED", "IN_PROGRESS", "COMPLETED", "DISPUTED", "REFUNDED", "CANCELLED",
+    ]
+    return ["ALL", ...order.filter((s) => present.has(s))]
+  }, [jobs])
 
   const SIDE = [
     { href: "/dashboard", label: d.overview, icon: LayoutDashboard },
@@ -254,6 +270,23 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                   {d.viewAll}
                 </Link>
               </div>
+              <div className="scrollbar-none -mx-1 mb-2 flex gap-1 overflow-x-auto px-1">
+                {statusOptions.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setStatusFilter(s)}
+                    className={cn(
+                      "shrink-0 rounded-full border px-2 py-0.5 text-[10px] transition-colors",
+                      statusFilter === s
+                        ? "border-foreground bg-muted text-foreground"
+                        : "border-border text-muted-foreground hover:text-foreground",
+                    )}
+                  >
+                    {s === "ALL" ? "all" : JOB_STATUS_LABELS[s as JobStatus]}
+                  </button>
+                ))}
+              </div>
               <ul className="space-y-0.5">
                 {recentJobs.length === 0 && (
                   <li className="flex flex-col items-center gap-2 py-10 text-center">
@@ -266,25 +299,42 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                     </Link>
                   </li>
                 )}
-                {recentJobs.map((j) => (
+                {recentJobs.map((j) => {
+                  const isTest = isTestEntity(j.taskData, j.requester)
+                  return (
                   <li key={j.id}>
-                    <Link
-                      href={`/jobs/${j.id}`}
-                      className="flex items-start justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40"
-                    >
+                    <div className="flex items-start justify-between gap-2 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40">
                       <div className="min-w-0">
                         <p className="text-[13px] font-medium tracking-tight">
-                          Job #{j.id}{" "}
+                          <Link href={`/jobs/${j.id}`} className="hover:underline">
+                            Job #{j.id}
+                          </Link>{" "}
                           <span className="font-mono text-[11px] font-normal text-[#00ff99]/90">
                             {formatRitual(j.reward)}
                           </span>
+                          {isTest && (
+                            <span className="ml-1.5 inline-flex items-center gap-0.5 rounded border border-amber-500/40 bg-amber-500/10 px-1 py-px align-middle font-mono text-[9px] uppercase tracking-wide text-amber-500">
+                              <FlaskConical className="h-2.5 w-2.5" /> test
+                            </span>
+                          )}
                         </p>
                         <p className="truncate text-[11px] text-muted-foreground">
                           {j.taskData || "n/a"}
                         </p>
-                        <p className="mt-0.5 font-mono text-[10px] text-muted-foreground/80">
-                          {shortAddress(j.requester)}
-                          {!isZeroAddress(j.provider) ? ` → ${shortAddress(j.provider)}` : ` · ${d.awaitingProvider}`}
+                        <p className="mt-0.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 font-mono text-[10px] text-muted-foreground/80">
+                          <span>
+                            {shortAddress(j.requester)}
+                            {!isZeroAddress(j.provider) ? ` → ${shortAddress(j.provider)}` : ` · ${d.awaitingProvider}`}
+                          </span>
+                          <a
+                            href={explorerAddressUrl(j.requester)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-0.5 text-muted-foreground/60 hover:text-foreground"
+                            title="View requester on explorer"
+                          >
+                            <ExternalLink className="h-2.5 w-2.5" />
+                          </a>
                         </p>
                         {j.deadline != null && j.deadline > BigInt(0) && (
                           <div className="mt-0.5">
@@ -299,9 +349,10 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                       <span className="shrink-0 rounded-md border border-border/50 px-1.5 py-0.5 text-[10px] text-muted-foreground">
                         {JOB_STATUS_LABELS[j.status] || j.status}
                       </span>
-                    </Link>
+                    </div>
                   </li>
-                ))}
+                  )
+                })}
               </ul>
             </div>
           </div>
@@ -340,11 +391,33 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredAgents.map((a) => (
+                  {filteredAgents.map((a) => {
+                    const agentTest = isTestEntity(a.name, a.description)
+                    return (
                     <tr key={a.id} className="border-b border-border/25 last:border-0 transition-colors hover:bg-white/[0.015]">
                       <td className="px-4 py-3">
-                        <div className="font-medium tracking-tight">{a.name}</div>
-                        <div className="font-mono text-[10px] text-muted-foreground">#{a.id}</div>
+                        <div className="flex items-center gap-1.5 font-medium tracking-tight">
+                          <Link href={`/agents/${a.id}`} className="hover:underline">
+                            {a.name}
+                          </Link>
+                          {agentTest && (
+                            <span className="inline-flex items-center gap-0.5 rounded border border-amber-500/40 bg-amber-500/10 px-1 py-px font-mono text-[9px] uppercase tracking-wide text-amber-500">
+                              <FlaskConical className="h-2.5 w-2.5" /> test
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground">
+                          #{a.id}
+                          <a
+                            href={explorerAddressUrl(a.contractAddress)}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center text-muted-foreground/60 hover:text-foreground"
+                            title="View agent contract on explorer"
+                          >
+                            <ExternalLink className="h-2.5 w-2.5" />
+                          </a>
+                        </div>
                       </td>
                       <td className="px-4 py-3 tabular-nums text-muted-foreground">{a.jobCount}</td>
                       <td className="px-4 py-3 tabular-nums text-muted-foreground">{formatRating(a.avgRating)}</td>
@@ -365,7 +438,8 @@ export function InferenceDashboard({ agents, jobs, chainInfo, onchain }: Props) 
                         </Link>
                       </td>
                     </tr>
-                  ))}
+                    )
+                  })}
                   {filteredAgents.length === 0 && (
                     <tr>
                       <td colSpan={6} className="px-4 py-12 text-center text-sm text-muted-foreground">

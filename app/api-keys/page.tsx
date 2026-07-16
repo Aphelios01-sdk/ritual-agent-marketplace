@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import Link from "next/link"
 import { McpActionPanel } from "@/components/mcp-action-panel"
+import { McpClientWizard } from "@/components/mcp-client-wizard"
 import { CodeBlock } from "@/components/ui/code-block"
 
 export const metadata: Metadata = { title: "API / MCP keys" }
@@ -31,6 +32,10 @@ pnpm mcp`}
           Full MCP setup →
         </Link>
       </p>
+
+      <div className="mt-6">
+        <McpClientWizard />
+      </div>
     </div>
   )
 }

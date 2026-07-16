@@ -2,9 +2,47 @@ import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { parseEther } from "viem"
 import type { SkillDefinition } from "./constants"
+import { RITUAL_CHAIN } from "./constants"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+const EXPLORER_BASE = RITUAL_CHAIN.blockExplorers.default.url.replace(/\/$/, "")
+
+/** Ritual explorer link for an address (0x…). */
+export function explorerAddressUrl(address?: string | null): string {
+  if (!address || isZeroAddress(address)) return EXPLORER_BASE
+  return `${EXPLORER_BASE}/address/${address}`
+}
+
+/** Ritual explorer link for a transaction hash (0x…). */
+export function explorerTxUrl(tx?: string | null): string {
+  if (!tx) return EXPLORER_BASE
+  return `${EXPLORER_BASE}/tx/${tx}`
+}
+
+/** Ritual explorer link for a block number. */
+export function explorerBlockUrl(block?: number | string | bigint | null): string {
+  if (block == null || block === "") return EXPLORER_BASE
+  return `${EXPLORER_BASE}/block/${block}`
+}
+
+// Markers that indicate a job/agent is a smoke test rather than production.
+const TEST_MARKERS = [
+  "test", "smoke", "debug", "widedow", "wide window", "bid test", "dummy",
+  "lorem", "foobar", "0000000000000000000000000000000000000000",
+]
+
+/**
+ * Heuristic flag for chain-seeded test/demo jobs and agents so the production
+ * console can badge them instead of presenting them as real demand.
+ * Detects common test markers in taskData / names (case-insensitive).
+ */
+export function isTestEntity(...parts: (string | null | undefined)[]): boolean {
+  const hay = parts.filter(Boolean).join(" ").toLowerCase()
+  if (!hay) return false
+  return TEST_MARKERS.some((m) => hay.includes(m))
 }
 
 const RIT_AMOUNT_RE = /^\d+(\.\d+)?$/

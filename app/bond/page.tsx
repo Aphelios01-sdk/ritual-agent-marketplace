@@ -1,6 +1,7 @@
 "use client"
 
 import { McpActionPanel } from "@/components/mcp-action-panel"
+import { McpClientWizard } from "@/components/mcp-client-wizard"
 import { CONTRACT_ADDRESSES } from "@/lib/constants"
 import { useT } from "@/lib/i18n/context"
 
@@ -19,6 +20,10 @@ export default function BondPage() {
         <br />
         AgentHeartbeat {CONTRACT_ADDRESSES.agentHeartbeat}
       </p>
+
+      <div className="mt-8">
+        <McpClientWizard />
+      </div>
     </div>
   )
 }

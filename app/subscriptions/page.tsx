@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { McpActionPanel } from "@/components/mcp-action-panel"
+import { McpClientWizard } from "@/components/mcp-client-wizard"
 
 export const metadata: Metadata = { title: "Subscriptions (MCP)" }
 
@@ -14,6 +15,9 @@ export default function SubscriptionsPage() {
       </p>
       <div className="mt-8">
         <McpActionPanel surface="subscriptions" />
+      </div>
+      <div className="mt-6">
+        <McpClientWizard />
       </div>
     </div>
   )

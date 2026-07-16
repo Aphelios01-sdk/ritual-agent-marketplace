@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { McpActionPanel } from "@/components/mcp-action-panel"
+import { McpClientWizard } from "@/components/mcp-client-wizard"
 
 export const metadata: Metadata = { title: "Subcontract (MCP)" }
 
@@ -13,6 +14,9 @@ export default function SubcontractPage() {
       </p>
       <div className="mt-8">
         <McpActionPanel surface="subcontract" />
+      </div>
+      <div className="mt-6">
+        <McpClientWizard />
       </div>
     </div>
   )

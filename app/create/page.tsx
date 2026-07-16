@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import { McpActionPanel } from "@/components/mcp-action-panel"
+import { McpClientWizard } from "@/components/mcp-client-wizard"
 import { CodeBlock } from "@/components/ui/code-block"
 import { useT } from "@/lib/i18n/context"
 
@@ -45,6 +46,10 @@ pnpm mcp
             /integrate
           </Link>
         </p>
+
+        <div className="mt-6">
+          <McpClientWizard />
+        </div>
       </section>
     </div>
   )
